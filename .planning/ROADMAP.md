@@ -12,7 +12,7 @@ cactl delivers a CLI-first deploy framework for Entra Conditional Access policie
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Foundation** - Go binary, auth chain, Graph client, workspace init, and config
+- [x] **Phase 1: Foundation** - Go binary, auth chain, Graph client, workspace init, and config (completed 2026-03-04)
 - [ ] **Phase 2: State and Import** - Git-backed state storage, policy import with normalization
 - [ ] **Phase 3: Plan and Apply** - Reconciliation engine, plan/apply loop, semver, validations, display
 - [ ] **Phase 4: Drift, Rollback, and Status** - Drift detection, version rollback, status dashboard
@@ -109,7 +109,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation | 0/3 | Not started | - |
+| 1. Foundation | 0/3 | Complete    | 2026-03-04 |
 | 2. State and Import | 0/2 | Not started | - |
 | 3. Plan and Apply | 0/3 | Not started | - |
 | 4. Drift, Rollback, and Status | 0/2 | Not started | - |
