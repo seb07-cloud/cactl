@@ -38,11 +38,11 @@ Requirements for v1.0 release. Each maps to roadmap phases.
 
 ### State Management
 
-- [ ] **STATE-01**: State manifest records 1:1 mapping between local policy slug and live Entra Object ID
-- [ ] **STATE-02**: GitBackend stores state in refs/cactl/tenants/<tenant-id>/policies/<slug> (current state blobs)
-- [ ] **STATE-03**: Every `cactl apply` creates an immutable annotated Git tag (cactl/<tenant>/<slug>/<semver>) containing full policy JSON
-- [ ] **STATE-04**: `cactl init` writes refspec configuration to .git/config for automatic push/pull of refs/cactl/*
-- [ ] **STATE-05**: State entry schema includes: schema_version, slug, tenant, live_object_id, version, last_deployed, deployed_by, auth_mode, backend_sha
+- [x] **STATE-01**: State manifest records 1:1 mapping between local policy slug and live Entra Object ID
+- [x] **STATE-02**: GitBackend stores state in refs/cactl/tenants/<tenant-id>/policies/<slug> (current state blobs)
+- [x] **STATE-03**: Every `cactl apply` creates an immutable annotated Git tag (cactl/<tenant>/<slug>/<semver>) containing full policy JSON
+- [x] **STATE-04**: `cactl init` writes refspec configuration to .git/config for automatic push/pull of refs/cactl/*
+- [x] **STATE-05**: State entry schema includes: schema_version, slug, tenant, live_object_id, version, last_deployed, deployed_by, auth_mode, backend_sha
 
 ### Import & Normalization
 
@@ -202,11 +202,11 @@ Deferred to future release. Tracked but not in current roadmap.
 | CONF-02 | Phase 1 | Complete |
 | CONF-03 | Phase 1 | Complete |
 | CONF-04 | Phase 1 | Complete |
-| STATE-01 | Phase 2 | Pending |
-| STATE-02 | Phase 2 | Pending |
-| STATE-03 | Phase 2 | Pending |
-| STATE-04 | Phase 2 | Pending |
-| STATE-05 | Phase 2 | Pending |
+| STATE-01 | Phase 2 | Complete |
+| STATE-02 | Phase 2 | Complete |
+| STATE-03 | Phase 2 | Complete |
+| STATE-04 | Phase 2 | Complete |
+| STATE-05 | Phase 2 | Complete |
 | IMPORT-01 | Phase 2 | Pending |
 | IMPORT-02 | Phase 2 | Pending |
 | IMPORT-03 | Phase 2 | Complete |
