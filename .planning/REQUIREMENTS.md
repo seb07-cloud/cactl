@@ -12,7 +12,7 @@ Requirements for v1.0 release. Each maps to roadmap phases.
 - [x] **CLI-01**: User can run `cactl init` to scaffold workspace (.cactl/config.yaml, .gitignore, refspec setup, schema fetch)
 - [ ] **CLI-02**: User can run `cactl plan` to see reconciliation diff between backend and live tenant
 - [ ] **CLI-03**: User can run `cactl apply` to deploy backend state to live tenant with confirmation prompt
-- [ ] **CLI-04**: User can run `cactl import` to pull live CA policies into backend with normalization
+- [x] **CLI-04**: User can run `cactl import` to pull live CA policies into backend with normalization
 - [ ] **CLI-05**: User can run `cactl drift` to check for drift without making changes
 - [ ] **CLI-06**: User can run `cactl rollback` to restore a prior policy version from Git tag history
 - [ ] **CLI-07**: User can run `cactl status` to see tracked policies with version, timestamp, deployer, and sync status
@@ -46,14 +46,14 @@ Requirements for v1.0 release. Each maps to roadmap phases.
 
 ### Import & Normalization
 
-- [ ] **IMPORT-01**: `cactl import --all` fetches all live CA policies and imports them as v1.0.0
-- [ ] **IMPORT-02**: `cactl import --policy <slug>` imports a specific policy by slug or display name
+- [x] **IMPORT-01**: `cactl import --all` fetches all live CA policies and imports them as v1.0.0
+- [x] **IMPORT-02**: `cactl import --policy <slug>` imports a specific policy by slug or display name
 - [x] **IMPORT-03**: Import strips server-managed fields (id, createdDateTime, modifiedDateTime, templateId)
 - [x] **IMPORT-04**: Import removes explicit null fields from Graph API responses
 - [x] **IMPORT-05**: Import normalizes field order (alphabetical) and pretty-prints with 2-space indent
 - [x] **IMPORT-06**: Import enforces kebab-case slug format derived from filename
-- [ ] **IMPORT-07**: `cactl import --force` overwrites existing backend JSON for already-tracked policies
-- [ ] **IMPORT-08**: Without --policy or --all, import lists untracked (?) policies and prompts for selection
+- [x] **IMPORT-07**: `cactl import --force` overwrites existing backend JSON for already-tracked policies
+- [x] **IMPORT-08**: Without --policy or --all, import lists untracked (?) policies and prompts for selection
 
 ### Plan & Apply
 
@@ -185,7 +185,7 @@ Deferred to future release. Tracked but not in current roadmap.
 | CLI-01 | Phase 1 | Complete |
 | CLI-02 | Phase 3 | Pending |
 | CLI-03 | Phase 3 | Pending |
-| CLI-04 | Phase 2 | Pending |
+| CLI-04 | Phase 2 | Complete |
 | CLI-05 | Phase 4 | Pending |
 | CLI-06 | Phase 4 | Pending |
 | CLI-07 | Phase 4 | Pending |
@@ -207,14 +207,14 @@ Deferred to future release. Tracked but not in current roadmap.
 | STATE-03 | Phase 2 | Complete |
 | STATE-04 | Phase 2 | Complete |
 | STATE-05 | Phase 2 | Complete |
-| IMPORT-01 | Phase 2 | Pending |
-| IMPORT-02 | Phase 2 | Pending |
+| IMPORT-01 | Phase 2 | Complete |
+| IMPORT-02 | Phase 2 | Complete |
 | IMPORT-03 | Phase 2 | Complete |
 | IMPORT-04 | Phase 2 | Complete |
 | IMPORT-05 | Phase 2 | Complete |
 | IMPORT-06 | Phase 2 | Complete |
-| IMPORT-07 | Phase 2 | Pending |
-| IMPORT-08 | Phase 2 | Pending |
+| IMPORT-07 | Phase 2 | Complete |
+| IMPORT-08 | Phase 2 | Complete |
 | PLAN-01 | Phase 3 | Pending |
 | PLAN-02 | Phase 3 | Pending |
 | PLAN-03 | Phase 3 | Pending |

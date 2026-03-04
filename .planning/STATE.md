@@ -5,33 +5,33 @@
 See: .planning/PROJECT.md (updated 2026-03-04)
 
 **Core value:** Reliable, idempotent, state-aware deployment of Entra CA policies with Git-native versioning and plan/apply safety
-**Current focus:** Phase 2: State and Import
+**Current focus:** Phase 2: State and Import (Complete)
 
 ## Current Position
 
-Phase: 2 of 5 (State and Import)
-Plan: 2 of 3 in current phase
-Status: Executing
-Last activity: 2026-03-04 -- Completed 02-02 Git State Backend
+Phase: 2 of 5 (State and Import) -- COMPLETE
+Plan: 3 of 3 in current phase
+Status: Phase Complete
+Last activity: 2026-03-04 -- Completed 02-03 Graph Client and Import Command
 
-Progress: [██████████████░░░░░░] 30%
+Progress: [███████████████░░░░░] 35%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 6
-- Average duration: 2.3min
-- Total execution time: 0.23 hours
+- Total plans completed: 7
+- Average duration: 2.4min
+- Total execution time: 0.27 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 01-foundation | 4/4 | 10min | 2.5min |
-| 02-state-and-import | 2/3 | 5min | 2.5min |
+| 02-state-and-import | 3/3 | 8min | 2.7min |
 
 **Recent Trend:**
-- Last 5 plans: 01-03 (3min), 01-04 (2min), 02-01 (2min), 02-02 (3min)
+- Last 5 plans: 01-04 (2min), 02-01 (2min), 02-02 (3min), 02-03 (3min)
 - Trend: Stable
 
 *Updated after each plan completion*
@@ -62,6 +62,10 @@ Recent decisions affecting current work:
 - 02-02: os/exec git plumbing over go-git -- avoids blob-ref ErrUnsupportedObject issues
 - 02-02: Empty manifest returned (not error) when ref missing -- enables first-use without init
 - 02-02: Refspec silently skips when no remote origin -- supports local-only workflows
+- 02-03: Graph client baseURL is struct field (not const) enabling httptest override without build tags
+- 02-03: RawJSON preserved on Policy struct for downstream normalization (avoids double-marshal)
+- 02-03: Slug collision detection prevents two Entra policies from mapping to same slug
+- 02-03: Interactive selection parses comma-separated numbers, "all", or "none"
 
 ### Pending Todos
 
@@ -74,5 +78,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-04
-Stopped at: Completed 02-02-PLAN.md (Git State Backend)
+Stopped at: Completed 02-03-PLAN.md (Graph Client and Import Command) -- Phase 02 complete
 Resume file: None
