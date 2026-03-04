@@ -1,0 +1,194 @@
+# Requirements: cactl
+
+**Defined:** 2026-03-04
+**Core Value:** Reliable, idempotent, state-aware deployment of Entra CA policies with Git-native versioning and plan/apply safety
+
+## v1 Requirements
+
+Requirements for v1.0 release. Each maps to roadmap phases.
+
+### CLI Foundation
+
+- [ ] **CLI-01**: User can run `cactl init` to scaffold workspace (.cactl/config.yaml, .gitignore, refspec setup, schema fetch)
+- [ ] **CLI-02**: User can run `cactl plan` to see reconciliation diff between backend and live tenant
+- [ ] **CLI-03**: User can run `cactl apply` to deploy backend state to live tenant with confirmation prompt
+- [ ] **CLI-04**: User can run `cactl import` to pull live CA policies into backend with normalization
+- [ ] **CLI-05**: User can run `cactl drift` to check for drift without making changes
+- [ ] **CLI-06**: User can run `cactl rollback` to restore a prior policy version from Git tag history
+- [ ] **CLI-07**: User can run `cactl status` to see tracked policies with version, timestamp, deployer, and sync status
+- [ ] **CLI-08**: All commands accept --tenant, --output (human|json), --no-color, --ci, --config, --log-level flags
+- [ ] **CLI-09**: Exit codes follow contract: 0=success/no changes, 1=changes/drift detected, 2=fatal error, 3=validation error
+- [ ] **CLI-10**: Single Go binary with zero external runtime dependencies, built with cobra/viper
+
+### Authentication
+
+- [ ] **AUTH-01**: User can authenticate via Azure CLI credential (`az login` token, default when no SP config)
+- [ ] **AUTH-02**: User can authenticate via service principal with client secret (CACTL_CLIENT_ID + CACTL_CLIENT_SECRET)
+- [ ] **AUTH-03**: User can authenticate via service principal with certificate (CACTL_CLIENT_ID + CACTL_CERT_PATH)
+- [ ] **AUTH-04**: Auth mode resolves in priority order: --auth-mode flag → CACTL_AUTH_MODE env → config file → auto-detect → az login fallback
+- [ ] **AUTH-05**: Per-tenant credential isolation via ClientFactory (one Graph client per tenant, no shared token state)
+- [ ] **AUTH-06**: Credentials are never written to disk, never logged, never included in plan output or state manifest
+
+### Configuration
+
+- [ ] **CONF-01**: All config lives in .cactl/config.yaml with documented schema (tenant, backend, auth, output, semver)
+- [ ] **CONF-02**: Every config value can be overridden by environment variable (CACTL_*) or CLI flag
+- [ ] **CONF-03**: `cactl init` adds .cactl/config.yaml to .gitignore and refuses to continue if already tracked by Git
+- [ ] **CONF-04**: `cactl init` fetches CA policy JSON Schema from Graph metadata and writes to .cactl/schema.json
+
+### State Management
+
+- [ ] **STATE-01**: State manifest records 1:1 mapping between local policy slug and live Entra Object ID
+- [ ] **STATE-02**: GitBackend stores state in refs/cactl/tenants/<tenant-id>/policies/<slug> (current state blobs)
+- [ ] **STATE-03**: Every `cactl apply` creates an immutable annotated Git tag (cactl/<tenant>/<slug>/<semver>) containing full policy JSON
+- [ ] **STATE-04**: `cactl init` writes refspec configuration to .git/config for automatic push/pull of refs/cactl/*
+- [ ] **STATE-05**: State entry schema includes: schema_version, slug, tenant, live_object_id, version, last_deployed, deployed_by, auth_mode, backend_sha
+
+### Import & Normalization
+
+- [ ] **IMPORT-01**: `cactl import --all` fetches all live CA policies and imports them as v1.0.0
+- [ ] **IMPORT-02**: `cactl import --policy <slug>` imports a specific policy by slug or display name
+- [ ] **IMPORT-03**: Import strips server-managed fields (id, createdDateTime, modifiedDateTime, templateId)
+- [ ] **IMPORT-04**: Import removes explicit null fields from Graph API responses
+- [ ] **IMPORT-05**: Import normalizes field order (alphabetical) and pretty-prints with 2-space indent
+- [ ] **IMPORT-06**: Import enforces kebab-case slug format derived from filename
+- [ ] **IMPORT-07**: `cactl import --force` overwrites existing backend JSON for already-tracked policies
+- [ ] **IMPORT-08**: Without --policy or --all, import lists untracked (?) policies and prompts for selection
+
+### Plan & Apply
+
+- [ ] **PLAN-01**: `cactl plan` compares backend JSON files against live tenant state via Graph API
+- [ ] **PLAN-02**: Plan output shows sigils: + (create), ~ (update), -/+ (recreate with warning), ? (untracked)
+- [ ] **PLAN-03**: Plan output shows semver bump suggestion per policy (MAJOR/MINOR/PATCH) based on configurable field triggers
+- [ ] **PLAN-04**: Plan summary line shows counts: N to create, N to update, N to recreate, N untracked
+- [ ] **PLAN-05**: `cactl apply` presents plan diff and requests confirmation before making changes
+- [ ] **PLAN-06**: `cactl apply --auto-approve` skips confirmation (required in --ci mode)
+- [ ] **PLAN-07**: `cactl apply --dry-run` generates full plan and runs Graph API validation but makes no writes
+- [ ] **PLAN-08**: Recreate (-/+) actions escalate confirmation: user must type 'yes' (not just Enter)
+- [ ] **PLAN-09**: Apply is idempotent: running apply on unchanged policy set produces no changes
+- [ ] **PLAN-10**: Full idempotency truth table implemented: create, update, noop, recreate (ghost cleanup), untracked warning
+
+### Semantic Versioning
+
+- [ ] **SEMV-01**: Every tracked policy is versioned independently using MAJOR.MINOR.PATCH
+- [ ] **SEMV-02**: MAJOR bump triggered by scope expansion (configurable via semver.major_fields in config)
+- [ ] **SEMV-03**: MINOR bump triggered by conditions/controls changes (configurable via semver.minor_fields)
+- [ ] **SEMV-04**: PATCH bump for state-only or cosmetic changes (all other fields)
+- [ ] **SEMV-05**: User can override the suggested bump level at apply time
+- [ ] **SEMV-06**: MAJOR bumps display explicit warning in plan output
+
+### Drift Detection
+
+- [ ] **DRIFT-01**: `cactl drift` outputs diff between backend state and live tenant without making changes
+- [ ] **DRIFT-02**: Drift types identified: policy modified (~), policy missing (-/+), untracked policy (?)
+- [ ] **DRIFT-03**: Exit codes: 0=no drift, 1=drift detected, 2=error
+- [ ] **DRIFT-04**: Three remediation options presented: remediate (apply backend), import live (update backend), report only
+
+### Rollback
+
+- [ ] **ROLL-01**: `cactl rollback --policy <slug> --version <semver>` reads policy JSON from annotated tag
+- [ ] **ROLL-02**: Rollback runs plan diff against current live state and presents for confirmation
+- [ ] **ROLL-03**: On confirmation: PATCHes live policy, writes new state manifest entry
+- [ ] **ROLL-04**: Tag history is never modified — full audit trail preserved; rollback becomes new deployment event
+
+### Display & Output
+
+- [ ] **DISP-01**: Human-readable output uses terraform-style colored diffs with sigils
+- [ ] **DISP-02**: All commands support --output json with stable schema (schema_version field)
+- [ ] **DISP-03**: Named locations resolved to display names in plan/diff output (not raw GUIDs)
+- [ ] **DISP-04**: Groups and users resolved to display names in plan/diff output
+- [ ] **DISP-05**: `cactl status` shows per-policy version tree with timestamp and deployer identity
+- [ ] **DISP-06**: --no-color flag disables ANSI color output (also via CACTL_NO_COLOR=1)
+
+### Validation
+
+- [ ] **VALID-01**: Break-glass account exclusion validated at plan time — warn loudly if emergency access accounts not excluded
+- [ ] **VALID-02**: Policy JSON validated against schema fetched during init
+- [ ] **VALID-03**: Detect conflicting conditions (e.g., include and exclude same group)
+- [ ] **VALID-04**: Detect empty include lists (policy applies to no one)
+- [ ] **VALID-05**: Detect policies that would block all users (overly broad with no exclusions)
+
+### CI/CD & Distribution
+
+- [ ] **CICD-01**: --ci flag enables non-interactive mode, suppresses all prompts
+- [ ] **CICD-02**: --ci requires --auto-approve for write operations
+- [ ] **CICD-03**: GoReleaser builds for linux/amd64, linux/arm64, darwin/amd64, darwin/arm64, windows/amd64
+- [ ] **CICD-04**: GitHub Actions example workflow with workload identity auth
+- [ ] **CICD-05**: Azure DevOps example pipeline with SP cert auth
+- [ ] **CICD-06**: Scheduled drift check example (daily cron with alert on exit code 1)
+
+### Multi-Tenant
+
+- [ ] **MTNT-01**: Tenant ID flows as explicit parameter through every layer (CLI → auth → Graph → state)
+- [ ] **MTNT-02**: --tenant flag accepts tenant ID or primary domain, supports multiple values
+- [ ] **MTNT-03**: Sequential multi-tenant apply in v1 (one tenant at a time)
+- [ ] **MTNT-04**: Concurrent pipeline applies rejected with advisory error message
+
+### Code Quality
+
+- [ ] **QUAL-01**: golangci-lint with default ruleset + exhaustive enum checks
+- [ ] **QUAL-02**: Table-driven unit tests with Graph client fully mockable via interface
+- [ ] **QUAL-03**: 80% test coverage target on internal/graph and internal/reconcile
+- [ ] **QUAL-04**: Conventional Commits (feat:, fix:, chore:) for automatic CHANGELOG generation
+- [ ] **QUAL-05**: MIT license
+
+### Documentation
+
+- [ ] **DOCS-01**: Getting started guide (install, init, first import, first plan/apply)
+- [ ] **DOCS-02**: Multi-tenant usage guide
+- [ ] **DOCS-03**: CI/CD integration guide (GitHub Actions + Azure DevOps)
+- [ ] **DOCS-04**: README with badges, install instructions, quick start, architecture overview
+
+## v2 Requirements
+
+Deferred to future release. Tracked but not in current roadmap.
+
+### Extended Auth
+
+- **AUTH-V2-01**: Device code flow for interactive browser auth
+- **AUTH-V2-02**: Workload identity (OIDC) for GitHub Actions / Azure DevOps native
+
+### Extended Backends
+
+- **BACK-V2-01**: AzureBlobBackend with blob leasing for distributed state locking
+- **BACK-V2-02**: LocalFSBackend for offline development and testing
+
+### Advanced Features
+
+- **ADV-V2-01**: Named Locations plugin (shared refs/cactl/* namespace with type prefix)
+- **ADV-V2-02**: Authentication Strengths plugin
+- **ADV-V2-03**: UTCM integration as drift signal source
+- **ADV-V2-04**: Concurrent multi-tenant apply with --concurrency flag
+- **ADV-V2-05**: Ring-based deployment (report-only → enabled promotion with validation gates)
+- **ADV-V2-06**: Maester integration for What-If API testing between plan and apply
+- **ADV-V2-07**: Compliance baseline validation (CIS/CISA SCuBA baselines at plan time)
+
+## Out of Scope
+
+| Feature | Reason |
+|---------|--------|
+| Web UI / React dashboard | CLI-only product; CIPP already serves GUI users |
+| CA policy assessment / gap analysis | Not a security posture tool; Maester/ScubaGear cover this |
+| CA policy editor or designer | Deploy tool, not design tool |
+| General Entra ID management | Scope discipline — CA policies only |
+| Real-time monitoring/alerting | Monitoring concern, not deploy; Sentinel handles this |
+| Policy template marketplace | Security policies are org-specific; community frameworks exist |
+| What-If API simulation | Maester does this well; integrate don't duplicate |
+| ClickOps prevention | Organizational policy, not tooling |
+| Cross-tenant atomic rollback | Impossible — each tenant is independent Graph endpoint |
+| Per-tenant policy overrides in single repo | Separate repos per tenant model chosen |
+
+## Traceability
+
+| Requirement | Phase | Status |
+|-------------|-------|--------|
+| (Populated during roadmap creation) | | |
+
+**Coverage:**
+- v1 requirements: 62 total
+- Mapped to phases: 0
+- Unmapped: 62 ⚠️
+
+---
+*Requirements defined: 2026-03-04*
+*Last updated: 2026-03-04 after initial definition*
