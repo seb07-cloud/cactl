@@ -182,13 +182,99 @@ Deferred to future release. Tracked but not in current roadmap.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| (Populated during roadmap creation) | | |
+| CLI-01 | Phase 1 | Pending |
+| CLI-02 | Phase 3 | Pending |
+| CLI-03 | Phase 3 | Pending |
+| CLI-04 | Phase 2 | Pending |
+| CLI-05 | Phase 4 | Pending |
+| CLI-06 | Phase 4 | Pending |
+| CLI-07 | Phase 4 | Pending |
+| CLI-08 | Phase 1 | Pending |
+| CLI-09 | Phase 1 | Pending |
+| CLI-10 | Phase 1 | Pending |
+| AUTH-01 | Phase 1 | Pending |
+| AUTH-02 | Phase 1 | Pending |
+| AUTH-03 | Phase 1 | Pending |
+| AUTH-04 | Phase 1 | Pending |
+| AUTH-05 | Phase 1 | Pending |
+| AUTH-06 | Phase 1 | Pending |
+| CONF-01 | Phase 1 | Pending |
+| CONF-02 | Phase 1 | Pending |
+| CONF-03 | Phase 1 | Pending |
+| CONF-04 | Phase 1 | Pending |
+| STATE-01 | Phase 2 | Pending |
+| STATE-02 | Phase 2 | Pending |
+| STATE-03 | Phase 2 | Pending |
+| STATE-04 | Phase 2 | Pending |
+| STATE-05 | Phase 2 | Pending |
+| IMPORT-01 | Phase 2 | Pending |
+| IMPORT-02 | Phase 2 | Pending |
+| IMPORT-03 | Phase 2 | Pending |
+| IMPORT-04 | Phase 2 | Pending |
+| IMPORT-05 | Phase 2 | Pending |
+| IMPORT-06 | Phase 2 | Pending |
+| IMPORT-07 | Phase 2 | Pending |
+| IMPORT-08 | Phase 2 | Pending |
+| PLAN-01 | Phase 3 | Pending |
+| PLAN-02 | Phase 3 | Pending |
+| PLAN-03 | Phase 3 | Pending |
+| PLAN-04 | Phase 3 | Pending |
+| PLAN-05 | Phase 3 | Pending |
+| PLAN-06 | Phase 3 | Pending |
+| PLAN-07 | Phase 3 | Pending |
+| PLAN-08 | Phase 3 | Pending |
+| PLAN-09 | Phase 3 | Pending |
+| PLAN-10 | Phase 3 | Pending |
+| SEMV-01 | Phase 3 | Pending |
+| SEMV-02 | Phase 3 | Pending |
+| SEMV-03 | Phase 3 | Pending |
+| SEMV-04 | Phase 3 | Pending |
+| SEMV-05 | Phase 3 | Pending |
+| SEMV-06 | Phase 3 | Pending |
+| DRIFT-01 | Phase 4 | Pending |
+| DRIFT-02 | Phase 4 | Pending |
+| DRIFT-03 | Phase 4 | Pending |
+| DRIFT-04 | Phase 4 | Pending |
+| ROLL-01 | Phase 4 | Pending |
+| ROLL-02 | Phase 4 | Pending |
+| ROLL-03 | Phase 4 | Pending |
+| ROLL-04 | Phase 4 | Pending |
+| DISP-01 | Phase 3 | Pending |
+| DISP-02 | Phase 3 | Pending |
+| DISP-03 | Phase 3 | Pending |
+| DISP-04 | Phase 3 | Pending |
+| DISP-05 | Phase 3 | Pending |
+| DISP-06 | Phase 1 | Pending |
+| VALID-01 | Phase 3 | Pending |
+| VALID-02 | Phase 3 | Pending |
+| VALID-03 | Phase 3 | Pending |
+| VALID-04 | Phase 3 | Pending |
+| VALID-05 | Phase 3 | Pending |
+| CICD-01 | Phase 5 | Pending |
+| CICD-02 | Phase 5 | Pending |
+| CICD-03 | Phase 5 | Pending |
+| CICD-04 | Phase 5 | Pending |
+| CICD-05 | Phase 5 | Pending |
+| CICD-06 | Phase 5 | Pending |
+| MTNT-01 | Phase 5 | Pending |
+| MTNT-02 | Phase 5 | Pending |
+| MTNT-03 | Phase 5 | Pending |
+| MTNT-04 | Phase 5 | Pending |
+| QUAL-01 | Phase 5 | Pending |
+| QUAL-02 | Phase 5 | Pending |
+| QUAL-03 | Phase 5 | Pending |
+| QUAL-04 | Phase 5 | Pending |
+| QUAL-05 | Phase 5 | Pending |
+| DOCS-01 | Phase 5 | Pending |
+| DOCS-02 | Phase 5 | Pending |
+| DOCS-03 | Phase 5 | Pending |
+| DOCS-04 | Phase 5 | Pending |
 
 **Coverage:**
-- v1 requirements: 62 total
-- Mapped to phases: 0
-- Unmapped: 62 ⚠️
+- v1 requirements: 87 total
+- Mapped to phases: 87
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-03-04*
-*Last updated: 2026-03-04 after initial definition*
+*Last updated: 2026-03-04 after roadmap creation*
