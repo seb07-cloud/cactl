@@ -47,11 +47,12 @@ Plans:
   3. State manifest correctly maps each policy slug to its live Entra Object ID, and every apply creates an immutable annotated Git tag
   4. Git refs (refs/cactl/*) are configured for automatic push/pull via refspec, with zero working tree footprint
   5. Import normalizes JSON (strips server fields, removes nulls, alphabetizes keys, pretty-prints with 2-space indent)
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] 02-01: TBD
-- [ ] 02-02: TBD
+- [ ] 02-01-PLAN.md — JSON normalization pipeline and kebab-case slug derivation (TDD)
+- [ ] 02-02-PLAN.md — Git-backed state store: GitBackend, manifest, refspec (TDD)
+- [ ] 02-03-PLAN.md — Graph API client and `cactl import` command with full pipeline wiring
 
 ### Phase 3: Plan and Apply
 **Goal**: User can preview and deploy CA policy changes with colored diffs, semantic versioning, safety validations, and display name resolution
@@ -110,7 +111,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation | 0/3 | Complete    | 2026-03-04 |
-| 2. State and Import | 0/2 | Not started | - |
+| 2. State and Import | 0/3 | Not started | - |
 | 3. Plan and Apply | 0/3 | Not started | - |
 | 4. Drift, Rollback, and Status | 0/2 | Not started | - |
 | 5. Production Readiness | 0/3 | Not started | - |
