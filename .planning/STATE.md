@@ -5,32 +5,33 @@
 See: .planning/PROJECT.md (updated 2026-03-04)
 
 **Core value:** Reliable, idempotent, state-aware deployment of Entra CA policies with Git-native versioning and plan/apply safety
-**Current focus:** Phase 1: Foundation
+**Current focus:** Phase 2: State and Import
 
 ## Current Position
 
-Phase: 1 of 5 (Foundation) -- COMPLETE
-Plan: 4 of 4 in current phase
-Status: Phase complete
-Last activity: 2026-03-04 -- Completed 01-04 Gap Closure
+Phase: 2 of 5 (State and Import)
+Plan: 1 of 3 in current phase
+Status: Executing
+Last activity: 2026-03-04 -- Completed 02-01 Normalize and Slugify
 
-Progress: [██████████░░░░░░░░░░] 20%
+Progress: [██████████░░░░░░░░░░] 25%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 4
-- Average duration: 2.5min
-- Total execution time: 0.17 hours
+- Total plans completed: 5
+- Average duration: 2.4min
+- Total execution time: 0.20 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 01-foundation | 4/4 | 10min | 2.5min |
+| 02-state-and-import | 1/3 | 2min | 2min |
 
 **Recent Trend:**
-- Last 5 plans: 01-01 (3min), 01-02 (2min), 01-03 (3min), 01-04 (2min)
+- Last 5 plans: 01-02 (2min), 01-03 (3min), 01-04 (2min), 02-01 (2min)
 - Trend: Stable
 
 *Updated after each plan completion*
@@ -55,6 +56,9 @@ Recent decisions affecting current work:
 - 01-03: FetchOrFallback convenience function encapsulates fetch-then-fallback pattern
 - 01-03: Git tracking check skipped silently when git unavailable (non-git workspaces supported)
 - 01-04: Error output via fmt.Fprintln(os.Stderr) in main.go -- single error display point, SilenceErrors stays true
+- 02-01: Used strings.Contains for @odata key matching (not HasPrefix) to catch embedded patterns like authenticationStrength@odata.context
+- 02-01: Preserved empty arrays as semantically meaningful in CA policies
+- 02-01: Package-level compiled regexes for Slugify to avoid per-call recompilation
 
 ### Pending Todos
 
@@ -67,5 +71,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-04
-Stopped at: Completed 01-04-PLAN.md (Gap Closure) -- Phase 01-foundation COMPLETE
+Stopped at: Completed 02-01-PLAN.md (Normalize and Slugify)
 Resume file: None

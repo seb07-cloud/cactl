@@ -48,10 +48,10 @@ Requirements for v1.0 release. Each maps to roadmap phases.
 
 - [ ] **IMPORT-01**: `cactl import --all` fetches all live CA policies and imports them as v1.0.0
 - [ ] **IMPORT-02**: `cactl import --policy <slug>` imports a specific policy by slug or display name
-- [ ] **IMPORT-03**: Import strips server-managed fields (id, createdDateTime, modifiedDateTime, templateId)
-- [ ] **IMPORT-04**: Import removes explicit null fields from Graph API responses
-- [ ] **IMPORT-05**: Import normalizes field order (alphabetical) and pretty-prints with 2-space indent
-- [ ] **IMPORT-06**: Import enforces kebab-case slug format derived from filename
+- [x] **IMPORT-03**: Import strips server-managed fields (id, createdDateTime, modifiedDateTime, templateId)
+- [x] **IMPORT-04**: Import removes explicit null fields from Graph API responses
+- [x] **IMPORT-05**: Import normalizes field order (alphabetical) and pretty-prints with 2-space indent
+- [x] **IMPORT-06**: Import enforces kebab-case slug format derived from filename
 - [ ] **IMPORT-07**: `cactl import --force` overwrites existing backend JSON for already-tracked policies
 - [ ] **IMPORT-08**: Without --policy or --all, import lists untracked (?) policies and prompts for selection
 
@@ -209,10 +209,10 @@ Deferred to future release. Tracked but not in current roadmap.
 | STATE-05 | Phase 2 | Pending |
 | IMPORT-01 | Phase 2 | Pending |
 | IMPORT-02 | Phase 2 | Pending |
-| IMPORT-03 | Phase 2 | Pending |
-| IMPORT-04 | Phase 2 | Pending |
-| IMPORT-05 | Phase 2 | Pending |
-| IMPORT-06 | Phase 2 | Pending |
+| IMPORT-03 | Phase 2 | Complete |
+| IMPORT-04 | Phase 2 | Complete |
+| IMPORT-05 | Phase 2 | Complete |
+| IMPORT-06 | Phase 2 | Complete |
 | IMPORT-07 | Phase 2 | Pending |
 | IMPORT-08 | Phase 2 | Pending |
 | PLAN-01 | Phase 3 | Pending |
