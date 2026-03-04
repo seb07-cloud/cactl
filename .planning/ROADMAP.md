@@ -100,12 +100,13 @@ Plans:
   3. GoReleaser produces binaries for linux/amd64, linux/arm64, darwin/amd64, darwin/arm64, windows/amd64
   4. Getting-started, multi-tenant, and CI/CD guides exist alongside a README with badges, install instructions, and architecture overview
   5. golangci-lint passes, table-driven tests with mockable Graph client achieve 80% coverage on graph and reconcile packages, and all commits follow Conventional Commits
-**Plans**: TBD
+**Plans**: 4 plans
 
 Plans:
-- [ ] 05-01: TBD
-- [ ] 05-02: TBD
-- [ ] 05-03: TBD
+- [ ] 05-01-PLAN.md — Multi-tenant sequential execution, CI mode guards, --auto-approve enforcement
+- [ ] 05-02-PLAN.md — GoReleaser config, CI/release workflows, example pipelines (GitHub Actions OIDC, Azure DevOps SP cert, scheduled drift)
+- [ ] 05-03-PLAN.md — golangci-lint v2 config, GraphClient interface extraction, mock-based tests, MIT license
+- [ ] 05-04-PLAN.md — Documentation: README with badges, getting-started, multi-tenant, and CI/CD guides
 
 ## Progress
 
@@ -118,4 +119,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 | 2. State and Import | 0/3 | Complete    | 2026-03-04 |
 | 3. Plan and Apply | 0/3 | Not started | - |
 | 4. Drift, Rollback, and Status | 0/4 | Not started | - |
-| 5. Production Readiness | 0/3 | Not started | - |
+| 5. Production Readiness | 0/4 | Not started | - |
