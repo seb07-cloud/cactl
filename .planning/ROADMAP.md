@@ -57,7 +57,7 @@ Plans:
 ### Phase 3: Plan and Apply
 **Goal**: User can preview and deploy CA policy changes with colored diffs, semantic versioning, safety validations, and display name resolution
 **Depends on**: Phase 2
-**Requirements**: CLI-02, CLI-03, PLAN-01, PLAN-02, PLAN-03, PLAN-04, PLAN-05, PLAN-06, PLAN-07, PLAN-08, PLAN-09, PLAN-10, SEMV-01, SEMV-02, SEMV-03, SEMV-04, SEMV-05, SEMV-06, DISP-01, DISP-02, DISP-03, DISP-04, DISP-05, VALID-01, VALID-02, VALID-03, VALID-04, VALID-05
+**Requirements**: CLI-02, CLI-03, PLAN-01, PLAN-02, PLAN-03, PLAN-04, PLAN-05, PLAN-06, PLAN-07, PLAN-08, PLAN-09, PLAN-10, SEMV-01, SEMV-02, SEMV-03, SEMV-04, SEMV-06, DISP-01, DISP-02, DISP-03, DISP-04, VALID-01, VALID-03, VALID-04, VALID-05
 **Success Criteria** (what must be TRUE):
   1. User can run `cactl plan` and see a terraform-style colored diff with sigils (+, ~, -/+, ?) showing what would change, with named locations and groups resolved to display names
   2. User can run `cactl apply` and deploy changes with a confirmation prompt, or skip confirmation with --auto-approve; recreate actions require explicit 'yes'
@@ -76,7 +76,7 @@ Plans:
 ### Phase 4: Drift, Rollback, and Status
 **Goal**: User can detect configuration drift, roll back to prior policy versions, and view deployment status across tracked policies
 **Depends on**: Phase 3
-**Requirements**: CLI-05, CLI-06, CLI-07, DRIFT-01, DRIFT-02, DRIFT-03, DRIFT-04, ROLL-01, ROLL-02, ROLL-03, ROLL-04
+**Requirements**: CLI-05, CLI-06, CLI-07, DRIFT-01, DRIFT-02, DRIFT-03, DRIFT-04, ROLL-01, ROLL-02, ROLL-03, ROLL-04, SEMV-05, VALID-02, DISP-05
 **Success Criteria** (what must be TRUE):
   1. User can run `cactl drift` and see a diff of backend vs live state without any changes being made, with exit code 0 for no drift and 1 for drift detected
   2. Drift output identifies modification types (~, -/+, ?) and presents three remediation options (remediate, import live, report only)
