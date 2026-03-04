@@ -64,12 +64,14 @@ Plans:
   3. Running `cactl apply` on an unchanged policy set produces no changes (full idempotency)
   4. Each policy change shows a semver bump suggestion (MAJOR/MINOR/PATCH) based on configurable field triggers, with MAJOR bumps displaying explicit warnings
   5. Plan-time validations catch break-glass account exclusion gaps, schema violations, conflicting conditions, empty include lists, and overly broad policies
-**Plans**: TBD
+**Plans**: 5 plans
 
 Plans:
-- [ ] 03-01: TBD
-- [ ] 03-02: TBD
-- [ ] 03-03: TBD
+- [ ] 03-01-PLAN.md — Reconciliation engine and field-level JSON diff (TDD)
+- [ ] 03-02-PLAN.md — Semantic versioning with field triggers and plan-time validations (TDD)
+- [ ] 03-03-PLAN.md — Graph API write operations and display name resolver
+- [ ] 03-04-PLAN.md — Diff output renderer and `cactl plan` command wiring
+- [ ] 03-05-PLAN.md — `cactl apply` command with confirmation, dry-run, and state updates
 
 ### Phase 4: Drift, Rollback, and Status
 **Goal**: User can detect configuration drift, roll back to prior policy versions, and view deployment status across tracked policies
