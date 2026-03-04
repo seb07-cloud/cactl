@@ -9,7 +9,7 @@ Requirements for v1.0 release. Each maps to roadmap phases.
 
 ### CLI Foundation
 
-- [ ] **CLI-01**: User can run `cactl init` to scaffold workspace (.cactl/config.yaml, .gitignore, refspec setup, schema fetch)
+- [x] **CLI-01**: User can run `cactl init` to scaffold workspace (.cactl/config.yaml, .gitignore, refspec setup, schema fetch)
 - [ ] **CLI-02**: User can run `cactl plan` to see reconciliation diff between backend and live tenant
 - [ ] **CLI-03**: User can run `cactl apply` to deploy backend state to live tenant with confirmation prompt
 - [ ] **CLI-04**: User can run `cactl import` to pull live CA policies into backend with normalization
@@ -33,8 +33,8 @@ Requirements for v1.0 release. Each maps to roadmap phases.
 
 - [x] **CONF-01**: All config lives in .cactl/config.yaml with documented schema (tenant, backend, auth, output, semver)
 - [x] **CONF-02**: Every config value can be overridden by environment variable (CACTL_*) or CLI flag
-- [ ] **CONF-03**: `cactl init` adds .cactl/config.yaml to .gitignore and refuses to continue if already tracked by Git
-- [ ] **CONF-04**: `cactl init` fetches CA policy JSON Schema from Graph metadata and writes to .cactl/schema.json
+- [x] **CONF-03**: `cactl init` adds .cactl/config.yaml to .gitignore and refuses to continue if already tracked by Git
+- [x] **CONF-04**: `cactl init` fetches CA policy JSON Schema from Graph metadata and writes to .cactl/schema.json
 
 ### State Management
 
@@ -182,7 +182,7 @@ Deferred to future release. Tracked but not in current roadmap.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| CLI-01 | Phase 1 | Pending |
+| CLI-01 | Phase 1 | Complete |
 | CLI-02 | Phase 3 | Pending |
 | CLI-03 | Phase 3 | Pending |
 | CLI-04 | Phase 2 | Pending |
@@ -200,8 +200,8 @@ Deferred to future release. Tracked but not in current roadmap.
 | AUTH-06 | Phase 1 | Complete |
 | CONF-01 | Phase 1 | Complete |
 | CONF-02 | Phase 1 | Complete |
-| CONF-03 | Phase 1 | Pending |
-| CONF-04 | Phase 1 | Pending |
+| CONF-03 | Phase 1 | Complete |
+| CONF-04 | Phase 1 | Complete |
 | STATE-01 | Phase 2 | Pending |
 | STATE-02 | Phase 2 | Pending |
 | STATE-03 | Phase 2 | Pending |
