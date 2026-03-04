@@ -16,9 +16,9 @@ Requirements for v1.0 release. Each maps to roadmap phases.
 - [ ] **CLI-05**: User can run `cactl drift` to check for drift without making changes
 - [ ] **CLI-06**: User can run `cactl rollback` to restore a prior policy version from Git tag history
 - [ ] **CLI-07**: User can run `cactl status` to see tracked policies with version, timestamp, deployer, and sync status
-- [ ] **CLI-08**: All commands accept --tenant, --output (human|json), --no-color, --ci, --config, --log-level flags
-- [ ] **CLI-09**: Exit codes follow contract: 0=success/no changes, 1=changes/drift detected, 2=fatal error, 3=validation error
-- [ ] **CLI-10**: Single Go binary with zero external runtime dependencies, built with cobra/viper
+- [x] **CLI-08**: All commands accept --tenant, --output (human|json), --no-color, --ci, --config, --log-level flags
+- [x] **CLI-09**: Exit codes follow contract: 0=success/no changes, 1=changes/drift detected, 2=fatal error, 3=validation error
+- [x] **CLI-10**: Single Go binary with zero external runtime dependencies, built with cobra/viper
 
 ### Authentication
 
@@ -31,8 +31,8 @@ Requirements for v1.0 release. Each maps to roadmap phases.
 
 ### Configuration
 
-- [ ] **CONF-01**: All config lives in .cactl/config.yaml with documented schema (tenant, backend, auth, output, semver)
-- [ ] **CONF-02**: Every config value can be overridden by environment variable (CACTL_*) or CLI flag
+- [x] **CONF-01**: All config lives in .cactl/config.yaml with documented schema (tenant, backend, auth, output, semver)
+- [x] **CONF-02**: Every config value can be overridden by environment variable (CACTL_*) or CLI flag
 - [ ] **CONF-03**: `cactl init` adds .cactl/config.yaml to .gitignore and refuses to continue if already tracked by Git
 - [ ] **CONF-04**: `cactl init` fetches CA policy JSON Schema from Graph metadata and writes to .cactl/schema.json
 
@@ -98,7 +98,7 @@ Requirements for v1.0 release. Each maps to roadmap phases.
 - [ ] **DISP-03**: Named locations resolved to display names in plan/diff output (not raw GUIDs)
 - [ ] **DISP-04**: Groups and users resolved to display names in plan/diff output
 - [ ] **DISP-05**: `cactl status` shows per-policy version tree with timestamp and deployer identity
-- [ ] **DISP-06**: --no-color flag disables ANSI color output (also via CACTL_NO_COLOR=1)
+- [x] **DISP-06**: --no-color flag disables ANSI color output (also via CACTL_NO_COLOR=1)
 
 ### Validation
 
@@ -189,17 +189,17 @@ Deferred to future release. Tracked but not in current roadmap.
 | CLI-05 | Phase 4 | Pending |
 | CLI-06 | Phase 4 | Pending |
 | CLI-07 | Phase 4 | Pending |
-| CLI-08 | Phase 1 | Pending |
-| CLI-09 | Phase 1 | Pending |
-| CLI-10 | Phase 1 | Pending |
+| CLI-08 | Phase 1 | Complete |
+| CLI-09 | Phase 1 | Complete |
+| CLI-10 | Phase 1 | Complete |
 | AUTH-01 | Phase 1 | Pending |
 | AUTH-02 | Phase 1 | Pending |
 | AUTH-03 | Phase 1 | Pending |
 | AUTH-04 | Phase 1 | Pending |
 | AUTH-05 | Phase 1 | Pending |
 | AUTH-06 | Phase 1 | Pending |
-| CONF-01 | Phase 1 | Pending |
-| CONF-02 | Phase 1 | Pending |
+| CONF-01 | Phase 1 | Complete |
+| CONF-02 | Phase 1 | Complete |
 | CONF-03 | Phase 1 | Pending |
 | CONF-04 | Phase 1 | Pending |
 | STATE-01 | Phase 2 | Pending |
@@ -244,7 +244,7 @@ Deferred to future release. Tracked but not in current roadmap.
 | DISP-03 | Phase 3 | Pending |
 | DISP-04 | Phase 3 | Pending |
 | DISP-05 | Phase 3 | Pending |
-| DISP-06 | Phase 1 | Pending |
+| DISP-06 | Phase 1 | Complete |
 | VALID-01 | Phase 3 | Pending |
 | VALID-02 | Phase 3 | Pending |
 | VALID-03 | Phase 3 | Pending |
