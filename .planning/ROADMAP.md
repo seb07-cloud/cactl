@@ -30,12 +30,12 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. Auth mode resolves correctly through the priority chain (flag > env > config > auto-detect > fallback)
   4. Global flags (--tenant, --output, --no-color, --ci, --config, --log-level) are accepted on all commands
   5. Credentials are never written to disk, logged, or exposed in any output
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] 01-01: TBD
-- [ ] 01-02: TBD
-- [ ] 01-03: TBD
+- [ ] 01-01-PLAN.md — Go project scaffold, CLI skeleton with global flags, config loading, output renderer, exit codes
+- [ ] 01-02-PLAN.md — Auth layer: AuthProvider interface, three credential types, ClientFactory with per-tenant isolation
+- [ ] 01-03-PLAN.md — `cactl init` command: workspace scaffolding, .gitignore safety, schema fetch with embedded fallback
 
 ### Phase 2: State and Import
 **Goal**: User can import live CA policies into a Git-backed state store with full normalization and version tracking
