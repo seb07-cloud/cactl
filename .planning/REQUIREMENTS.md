@@ -22,12 +22,12 @@ Requirements for v1.0 release. Each maps to roadmap phases.
 
 ### Authentication
 
-- [ ] **AUTH-01**: User can authenticate via Azure CLI credential (`az login` token, default when no SP config)
-- [ ] **AUTH-02**: User can authenticate via service principal with client secret (CACTL_CLIENT_ID + CACTL_CLIENT_SECRET)
-- [ ] **AUTH-03**: User can authenticate via service principal with certificate (CACTL_CLIENT_ID + CACTL_CERT_PATH)
-- [ ] **AUTH-04**: Auth mode resolves in priority order: --auth-mode flag → CACTL_AUTH_MODE env → config file → auto-detect → az login fallback
-- [ ] **AUTH-05**: Per-tenant credential isolation via ClientFactory (one Graph client per tenant, no shared token state)
-- [ ] **AUTH-06**: Credentials are never written to disk, never logged, never included in plan output or state manifest
+- [x] **AUTH-01**: User can authenticate via Azure CLI credential (`az login` token, default when no SP config)
+- [x] **AUTH-02**: User can authenticate via service principal with client secret (CACTL_CLIENT_ID + CACTL_CLIENT_SECRET)
+- [x] **AUTH-03**: User can authenticate via service principal with certificate (CACTL_CLIENT_ID + CACTL_CERT_PATH)
+- [x] **AUTH-04**: Auth mode resolves in priority order: --auth-mode flag → CACTL_AUTH_MODE env → config file → auto-detect → az login fallback
+- [x] **AUTH-05**: Per-tenant credential isolation via ClientFactory (one Graph client per tenant, no shared token state)
+- [x] **AUTH-06**: Credentials are never written to disk, never logged, never included in plan output or state manifest
 
 ### Configuration
 
@@ -192,12 +192,12 @@ Deferred to future release. Tracked but not in current roadmap.
 | CLI-08 | Phase 1 | Complete |
 | CLI-09 | Phase 1 | Complete |
 | CLI-10 | Phase 1 | Complete |
-| AUTH-01 | Phase 1 | Pending |
-| AUTH-02 | Phase 1 | Pending |
-| AUTH-03 | Phase 1 | Pending |
-| AUTH-04 | Phase 1 | Pending |
-| AUTH-05 | Phase 1 | Pending |
-| AUTH-06 | Phase 1 | Pending |
+| AUTH-01 | Phase 1 | Complete |
+| AUTH-02 | Phase 1 | Complete |
+| AUTH-03 | Phase 1 | Complete |
+| AUTH-04 | Phase 1 | Complete |
+| AUTH-05 | Phase 1 | Complete |
+| AUTH-06 | Phase 1 | Complete |
 | CONF-01 | Phase 1 | Complete |
 | CONF-02 | Phase 1 | Complete |
 | CONF-03 | Phase 1 | Pending |
