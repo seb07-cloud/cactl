@@ -1,0 +1,146 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://graph.microsoft.com/v1.0/conditionalAccessPolicy",
+  "title": "Conditional Access Policy",
+  "description": "Microsoft Entra Conditional Access policy resource. Embedded fallback schema for offline use.",
+  "type": "object",
+  "required": ["displayName", "state", "conditions"],
+  "properties": {
+    "displayName": {
+      "type": "string",
+      "description": "Display name of the policy."
+    },
+    "state": {
+      "type": "string",
+      "enum": ["enabled", "disabled", "enabledForReportingButNotEnforced"],
+      "description": "Policy state: enabled, disabled, or report-only."
+    },
+    "conditions": {
+      "$ref": "#/definitions/conditionalAccessConditionSet"
+    },
+    "grantControls": {
+      "$ref": "#/definitions/conditionalAccessGrantControls"
+    },
+    "sessionControls": {
+      "$ref": "#/definitions/conditionalAccessSessionControls"
+    },
+    "id": {
+      "type": "string",
+      "readOnly": true,
+      "description": "Server-assigned unique identifier."
+    },
+    "createdDateTime": {
+      "type": "string",
+      "format": "date-time",
+      "readOnly": true,
+      "description": "Timestamp when the policy was created."
+    },
+    "modifiedDateTime": {
+      "type": "string",
+      "format": "date-time",
+      "readOnly": true,
+      "description": "Timestamp when the policy was last modified."
+    },
+    "templateId": {
+      "type": "string",
+      "readOnly": true,
+      "description": "Template identifier if created from a template."
+    }
+  },
+  "definitions": {
+    "conditionalAccessConditionSet": {
+      "type": "object",
+      "description": "Conditions under which the policy applies.",
+      "additionalProperties": true,
+      "properties": {
+        "applications": {
+          "type": "object",
+          "additionalProperties": true,
+          "description": "Applications and user actions included in or excluded from the policy."
+        },
+        "users": {
+          "type": "object",
+          "additionalProperties": true,
+          "description": "Users, groups, and roles included in or excluded from the policy."
+        },
+        "locations": {
+          "type": "object",
+          "additionalProperties": true,
+          "description": "Locations included in or excluded from the policy."
+        },
+        "platforms": {
+          "type": "object",
+          "additionalProperties": true,
+          "description": "Platforms included in or excluded from the policy."
+        },
+        "clientAppTypes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Client application types included in the policy."
+        },
+        "signInRiskLevels": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Sign-in risk levels included in the policy."
+        },
+        "userRiskLevels": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "User risk levels included in the policy."
+        }
+      }
+    },
+    "conditionalAccessGrantControls": {
+      "type": "object",
+      "description": "Grant controls enforced by the policy.",
+      "additionalProperties": true,
+      "properties": {
+        "operator": {
+          "type": "string",
+          "description": "Operator (AND/OR) for built-in controls."
+        },
+        "builtInControls": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "List of built-in grant controls (e.g., mfa, compliantDevice)."
+        }
+      }
+    },
+    "conditionalAccessSessionControls": {
+      "type": "object",
+      "description": "Session controls enforced by the policy.",
+      "additionalProperties": true,
+      "properties": {
+        "applicationEnforcedRestrictions": {
+          "type": "object",
+          "additionalProperties": true,
+          "description": "Application-enforced restrictions."
+        },
+        "cloudAppSecurity": {
+          "type": "object",
+          "additionalProperties": true,
+          "description": "Cloud App Security session control."
+        },
+        "signInFrequency": {
+          "type": "object",
+          "additionalProperties": true,
+          "description": "Sign-in frequency control."
+        },
+        "persistentBrowser": {
+          "type": "object",
+          "additionalProperties": true,
+          "description": "Persistent browser session control."
+        }
+      }
+    }
+  },
+  "additionalProperties": false
+}
