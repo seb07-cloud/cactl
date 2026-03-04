@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/seb07-cloud/cactl/internal/config"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -61,6 +62,15 @@ func initConfig(cmd *cobra.Command) error {
 	// 4. Bind flags to viper AFTER config is read (critical ordering per Pitfall 3)
 	if err := v.BindPFlags(cmd.Flags()); err != nil {
 		return fmt.Errorf("binding flags: %w", err)
+	}
+
+	// 5. Load and validate resolved config
+	cfg, err := config.Load(v)
+	if err != nil {
+		return fmt.Errorf("loading config: %w", err)
+	}
+	if err := config.Validate(cfg); err != nil {
+		return err
 	}
 
 	return nil

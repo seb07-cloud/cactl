@@ -2,18 +2,21 @@ package main
 
 import (
 	"errors"
+	"fmt"
 	"os"
 
-	"github.com/sebdah/cactl/cmd"
-	"github.com/sebdah/cactl/pkg/types"
+	"github.com/seb07-cloud/cactl/cmd"
+	"github.com/seb07-cloud/cactl/pkg/types"
 )
 
 func main() {
 	if err := cmd.Execute(); err != nil {
 		var exitErr *types.ExitError
 		if errors.As(err, &exitErr) {
+			fmt.Fprintln(os.Stderr, "Error: "+exitErr.Message)
 			os.Exit(exitErr.Code)
 		}
+		fmt.Fprintln(os.Stderr, "Error: "+err.Error())
 		os.Exit(types.ExitFatalError)
 	}
 }
