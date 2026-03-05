@@ -57,16 +57,16 @@ Requirements for v1.0 release. Each maps to roadmap phases.
 
 ### Plan & Apply
 
-- [ ] **PLAN-01**: `cactl plan` compares backend JSON files against live tenant state via Graph API
-- [ ] **PLAN-02**: Plan output shows sigils: + (create), ~ (update), -/+ (recreate with warning), ? (untracked)
+- [x] **PLAN-01**: `cactl plan` compares backend JSON files against live tenant state via Graph API
+- [x] **PLAN-02**: Plan output shows sigils: + (create), ~ (update), -/+ (recreate with warning), ? (untracked)
 - [ ] **PLAN-03**: Plan output shows semver bump suggestion per policy (MAJOR/MINOR/PATCH) based on configurable field triggers
 - [ ] **PLAN-04**: Plan summary line shows counts: N to create, N to update, N to recreate, N untracked
 - [ ] **PLAN-05**: `cactl apply` presents plan diff and requests confirmation before making changes
 - [ ] **PLAN-06**: `cactl apply --auto-approve` skips confirmation (required in --ci mode)
 - [ ] **PLAN-07**: `cactl apply --dry-run` generates full plan and runs Graph API validation but makes no writes
 - [ ] **PLAN-08**: Recreate (-/+) actions escalate confirmation: user must type 'yes' (not just Enter)
-- [ ] **PLAN-09**: Apply is idempotent: running apply on unchanged policy set produces no changes
-- [ ] **PLAN-10**: Full idempotency truth table implemented: create, update, noop, recreate (ghost cleanup), untracked warning
+- [x] **PLAN-09**: Apply is idempotent: running apply on unchanged policy set produces no changes
+- [x] **PLAN-10**: Full idempotency truth table implemented: create, update, noop, recreate (ghost cleanup), untracked warning
 
 ### Semantic Versioning
 
@@ -215,16 +215,16 @@ Deferred to future release. Tracked but not in current roadmap.
 | IMPORT-06 | Phase 2 | Complete |
 | IMPORT-07 | Phase 2 | Complete |
 | IMPORT-08 | Phase 2 | Complete |
-| PLAN-01 | Phase 3 | Pending |
-| PLAN-02 | Phase 3 | Pending |
+| PLAN-01 | Phase 3 | Complete |
+| PLAN-02 | Phase 3 | Complete |
 | PLAN-03 | Phase 3 | Pending |
 | PLAN-04 | Phase 3 | Pending |
 | PLAN-05 | Phase 3 | Pending |
 | PLAN-06 | Phase 3 | Pending |
 | PLAN-07 | Phase 3 | Pending |
 | PLAN-08 | Phase 3 | Pending |
-| PLAN-09 | Phase 3 | Pending |
-| PLAN-10 | Phase 3 | Pending |
+| PLAN-09 | Phase 3 | Complete |
+| PLAN-10 | Phase 3 | Complete |
 | SEMV-01 | Phase 3 | Pending |
 | SEMV-02 | Phase 3 | Pending |
 | SEMV-03 | Phase 3 | Pending |
