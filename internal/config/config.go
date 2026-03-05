@@ -16,6 +16,22 @@ func Load(v *viper.Viper) (*types.Config, error) {
 		return nil, fmt.Errorf("unmarshalling config: %w", err)
 	}
 
+	// Resolve tenants from StringSlice flag binding
+	cfg.Tenants = v.GetStringSlice("tenant")
+
+	// Backward compatibility: if --tenant slice is empty but CACTL_TENANT env
+	// var provides a single string value, wrap it in a slice.
+	if len(cfg.Tenants) == 0 {
+		if single := v.GetString("tenant"); single != "" {
+			cfg.Tenants = []string{single}
+		}
+	}
+
+	// Keep deprecated Tenant field in sync for backward compatibility
+	if len(cfg.Tenants) > 0 {
+		cfg.Tenant = cfg.Tenants[0]
+	}
+
 	// Override auth secrets from viper (env vars via CACTL_ prefix).
 	// These are intentionally read from viper.GetString rather than
 	// unmarshalling, to ensure they come from env vars, not config file.

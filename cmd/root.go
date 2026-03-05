@@ -25,10 +25,11 @@ var rootCmd = &cobra.Command{
 
 func init() {
 	// Global flags (CLI-08)
-	rootCmd.PersistentFlags().String("tenant", "", "Entra tenant ID or primary domain")
+	rootCmd.PersistentFlags().StringSlice("tenant", nil, "Entra tenant ID(s) -- supports multiple values")
 	rootCmd.PersistentFlags().String("output", "human", "Output format: human|json")
 	rootCmd.PersistentFlags().Bool("no-color", false, "Disable ANSI color output")
 	rootCmd.PersistentFlags().Bool("ci", false, "Non-interactive CI mode")
+	rootCmd.PersistentFlags().Bool("auto-approve", false, "Skip confirmation prompts (required with --ci for write operations)")
 	rootCmd.PersistentFlags().String("config", "", "Config file path (default: .cactl/config.yaml)")
 	rootCmd.PersistentFlags().String("log-level", "info", "Log level: debug|info|warn|error")
 	rootCmd.PersistentFlags().String("auth-mode", "", "Auth mode: az-cli|client-secret|client-certificate")
