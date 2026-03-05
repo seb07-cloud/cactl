@@ -152,3 +152,115 @@ func TestNewGitBackendNonGitDir(t *testing.T) {
 	_, err := NewGitBackend(dir)
 	assert.Error(t, err)
 }
+
+func TestListVersionTags(t *testing.T) {
+	dir := initTempRepo(t)
+	b, err := NewGitBackend(dir)
+	require.NoError(t, err)
+
+	data := []byte(`{"displayName":"ca-mfa"}`)
+	blobHash, err := b.WritePolicy("test-tenant", "ca-mfa", data)
+	require.NoError(t, err)
+
+	// Create 3 annotated tags
+	versions := []string{"1.0.0", "1.1.0", "2.0.0"}
+	for _, v := range versions {
+		err := b.CreateVersionTag("test-tenant", "ca-mfa", v, blobHash, "cactl: ca-mfa "+v)
+		require.NoError(t, err)
+	}
+
+	tags, err := b.ListVersionTags("test-tenant", "ca-mfa")
+	require.NoError(t, err)
+	require.Len(t, tags, 3)
+
+	// Should be sorted by semver descending (2.0.0 first)
+	assert.Equal(t, "2.0.0", tags[0].Version)
+	assert.Equal(t, "1.1.0", tags[1].Version)
+	assert.Equal(t, "1.0.0", tags[2].Version)
+
+	// Each should have non-empty fields
+	for _, tag := range tags {
+		assert.NotEmpty(t, tag.Version)
+		assert.NotEmpty(t, tag.Timestamp)
+		assert.NotEmpty(t, tag.Message)
+	}
+}
+
+func TestListVersionTags_Empty(t *testing.T) {
+	dir := initTempRepo(t)
+	b, err := NewGitBackend(dir)
+	require.NoError(t, err)
+
+	tags, err := b.ListVersionTags("test-tenant", "no-such-slug")
+	require.NoError(t, err)
+	assert.Empty(t, tags)
+}
+
+func TestListVersionTags_OtherSlugs(t *testing.T) {
+	dir := initTempRepo(t)
+	b, err := NewGitBackend(dir)
+	require.NoError(t, err)
+
+	data := []byte(`{"displayName":"test"}`)
+	blobHash, err := b.WritePolicy("test-tenant", "ca-mfa", data)
+	require.NoError(t, err)
+	blobHash2, err := b.WritePolicy("test-tenant", "ca-block", data)
+	require.NoError(t, err)
+
+	err = b.CreateVersionTag("test-tenant", "ca-mfa", "1.0.0", blobHash, "mfa v1")
+	require.NoError(t, err)
+	err = b.CreateVersionTag("test-tenant", "ca-mfa", "2.0.0", blobHash, "mfa v2")
+	require.NoError(t, err)
+	err = b.CreateVersionTag("test-tenant", "ca-block", "1.0.0", blobHash2, "block v1")
+	require.NoError(t, err)
+
+	tags, err := b.ListVersionTags("test-tenant", "ca-mfa")
+	require.NoError(t, err)
+	require.Len(t, tags, 2)
+	assert.Equal(t, "2.0.0", tags[0].Version)
+	assert.Equal(t, "1.0.0", tags[1].Version)
+}
+
+func TestReadTagBlob(t *testing.T) {
+	dir := initTempRepo(t)
+	b, err := NewGitBackend(dir)
+	require.NoError(t, err)
+
+	data := []byte(`{"displayName":"test"}`)
+	blobHash, err := b.WritePolicy("test-tenant", "ca-mfa", data)
+	require.NoError(t, err)
+
+	err = b.CreateVersionTag("test-tenant", "ca-mfa", "1.0.0", blobHash, "initial import")
+	require.NoError(t, err)
+
+	got, err := b.ReadTagBlob("test-tenant", "ca-mfa", "1.0.0")
+	require.NoError(t, err)
+	assert.Equal(t, data, got)
+}
+
+func TestReadTagBlob_NotFound(t *testing.T) {
+	dir := initTempRepo(t)
+	b, err := NewGitBackend(dir)
+	require.NoError(t, err)
+
+	_, err = b.ReadTagBlob("test-tenant", "ca-mfa", "9.9.9")
+	assert.Error(t, err)
+}
+
+func TestHashObject(t *testing.T) {
+	dir := initTempRepo(t)
+	b, err := NewGitBackend(dir)
+	require.NoError(t, err)
+
+	data := []byte(`{"displayName":"hash-test","state":"enabled"}`)
+
+	hash, err := b.HashObject(data)
+	require.NoError(t, err)
+	assert.NotEmpty(t, hash)
+	assert.Len(t, hash, 40, "SHA-1 hash should be 40 hex characters")
+
+	// Verify it matches what WritePolicy returns for the same content
+	writeHash, err := b.WritePolicy("test-tenant", "hash-test", data)
+	require.NoError(t, err)
+	assert.Equal(t, writeHash, hash, "HashObject should return same SHA as WritePolicy for identical content")
+}
