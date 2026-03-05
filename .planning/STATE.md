@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-03-04)
 ## Current Position
 
 Phase: 3 of 5 (Plan and Apply)
-Plan: 3 of 5 in current phase
+Plan: 4 of 5 in current phase
 Status: In Progress
-Last activity: 2026-03-05 -- Completed 03-03 Graph Write Operations and Display Name Resolver
+Last activity: 2026-03-05 -- Completed 03-04 Diff Output and Plan Command
 
-Progress: [██████████████████░░] 50%
+Progress: [███████████████████░] 55%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 10
-- Average duration: 2.4min
-- Total execution time: 0.35 hours
+- Total plans completed: 11
+- Average duration: 2.5min
+- Total execution time: 0.42 hours
 
 **By Phase:**
 
@@ -29,10 +29,10 @@ Progress: [██████████████████░░] 50%
 |-------|-------|-------|----------|
 | 01-foundation | 4/4 | 10min | 2.5min |
 | 02-state-and-import | 3/3 | 8min | 2.7min |
-| 03-plan-and-apply | 3/5 | 8min | 2.7min |
+| 03-plan-and-apply | 4/5 | 12min | 3.0min |
 
 **Recent Trend:**
-- Last 5 plans: 02-02 (3min), 02-03 (3min), 03-01 (2min), 03-02 (3min), 03-03 (3min)
+- Last 5 plans: 02-03 (3min), 03-01 (2min), 03-02 (3min), 03-03 (3min), 03-04 (4min)
 - Trend: Stable
 
 *Updated after each plan completion*
@@ -78,6 +78,10 @@ Recent decisions affecting current work:
 - [Phase 03]: 03-02: Local PolicyAction/ActionType in validate package -- mirrors reconcile types for wave-1 independence
 - [Phase 03]: 03-02: VALID-02 schema validation stubbed with TODO -- requires schema.json loading
 - [Phase 03]: 03-02: checkEmptyIncludes only warns when conditions.users node exists -- avoids false positives
+- 03-04: VersionFrom/VersionTo/BumpLevel added to PolicyAction -- plan command enriches after semver computation
+- 03-04: Adapter pattern converts between package-local mirror types in cmd/plan.go (avoids circular deps)
+- 03-04: Resolver errors non-fatal -- plan continues with raw GUIDs if display name resolution fails
+- 03-04: Exit code 1 for actionable changes; validation errors override to exit 3
 
 ### Pending Todos
 
@@ -90,5 +94,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-05
-Stopped at: Completed 03-03-PLAN.md (Graph Write Operations and Display Name Resolver)
+Stopped at: Completed 03-04-PLAN.md (Diff Output and Plan Command)
 Resume file: None

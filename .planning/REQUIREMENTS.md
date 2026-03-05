@@ -10,7 +10,7 @@ Requirements for v1.0 release. Each maps to roadmap phases.
 ### CLI Foundation
 
 - [x] **CLI-01**: User can run `cactl init` to scaffold workspace (.cactl/config.yaml, .gitignore, refspec setup, schema fetch)
-- [ ] **CLI-02**: User can run `cactl plan` to see reconciliation diff between backend and live tenant
+- [x] **CLI-02**: User can run `cactl plan` to see reconciliation diff between backend and live tenant
 - [ ] **CLI-03**: User can run `cactl apply` to deploy backend state to live tenant with confirmation prompt
 - [x] **CLI-04**: User can run `cactl import` to pull live CA policies into backend with normalization
 - [ ] **CLI-05**: User can run `cactl drift` to check for drift without making changes
@@ -59,8 +59,8 @@ Requirements for v1.0 release. Each maps to roadmap phases.
 
 - [x] **PLAN-01**: `cactl plan` compares backend JSON files against live tenant state via Graph API
 - [x] **PLAN-02**: Plan output shows sigils: + (create), ~ (update), -/+ (recreate with warning), ? (untracked)
-- [ ] **PLAN-03**: Plan output shows semver bump suggestion per policy (MAJOR/MINOR/PATCH) based on configurable field triggers
-- [ ] **PLAN-04**: Plan summary line shows counts: N to create, N to update, N to recreate, N untracked
+- [x] **PLAN-03**: Plan output shows semver bump suggestion per policy (MAJOR/MINOR/PATCH) based on configurable field triggers
+- [x] **PLAN-04**: Plan summary line shows counts: N to create, N to update, N to recreate, N untracked
 - [ ] **PLAN-05**: `cactl apply` presents plan diff and requests confirmation before making changes
 - [ ] **PLAN-06**: `cactl apply --auto-approve` skips confirmation (required in --ci mode)
 - [ ] **PLAN-07**: `cactl apply --dry-run` generates full plan and runs Graph API validation but makes no writes
@@ -93,8 +93,8 @@ Requirements for v1.0 release. Each maps to roadmap phases.
 
 ### Display & Output
 
-- [ ] **DISP-01**: Human-readable output uses terraform-style colored diffs with sigils
-- [ ] **DISP-02**: All commands support --output json with stable schema (schema_version field)
+- [x] **DISP-01**: Human-readable output uses terraform-style colored diffs with sigils
+- [x] **DISP-02**: All commands support --output json with stable schema (schema_version field)
 - [x] **DISP-03**: Named locations resolved to display names in plan/diff output (not raw GUIDs)
 - [x] **DISP-04**: Groups and users resolved to display names in plan/diff output
 - [ ] **DISP-05**: `cactl status` shows per-policy version tree with timestamp and deployer identity
@@ -183,7 +183,7 @@ Deferred to future release. Tracked but not in current roadmap.
 | Requirement | Phase | Status |
 |-------------|-------|--------|
 | CLI-01 | Phase 1 | Complete |
-| CLI-02 | Phase 3 | Pending |
+| CLI-02 | Phase 3 | Complete |
 | CLI-03 | Phase 3 | Pending |
 | CLI-04 | Phase 2 | Complete |
 | CLI-05 | Phase 4 | Pending |
@@ -217,8 +217,8 @@ Deferred to future release. Tracked but not in current roadmap.
 | IMPORT-08 | Phase 2 | Complete |
 | PLAN-01 | Phase 3 | Complete |
 | PLAN-02 | Phase 3 | Complete |
-| PLAN-03 | Phase 3 | Pending |
-| PLAN-04 | Phase 3 | Pending |
+| PLAN-03 | Phase 3 | Complete |
+| PLAN-04 | Phase 3 | Complete |
 | PLAN-05 | Phase 3 | Pending |
 | PLAN-06 | Phase 3 | Pending |
 | PLAN-07 | Phase 3 | Pending |
@@ -239,8 +239,8 @@ Deferred to future release. Tracked but not in current roadmap.
 | ROLL-02 | Phase 4 | Pending |
 | ROLL-03 | Phase 4 | Pending |
 | ROLL-04 | Phase 4 | Pending |
-| DISP-01 | Phase 3 | Pending |
-| DISP-02 | Phase 3 | Pending |
+| DISP-01 | Phase 3 | Complete |
+| DISP-02 | Phase 3 | Complete |
 | DISP-03 | Phase 3 | Complete |
 | DISP-04 | Phase 3 | Complete |
 | DISP-05 | Phase 3 | Pending |
