@@ -110,8 +110,8 @@ Requirements for v1.0 release. Each maps to roadmap phases.
 
 ### CI/CD & Distribution
 
-- [ ] **CICD-01**: --ci flag enables non-interactive mode, suppresses all prompts
-- [ ] **CICD-02**: --ci requires --auto-approve for write operations
+- [x] **CICD-01**: --ci flag enables non-interactive mode, suppresses all prompts
+- [x] **CICD-02**: --ci requires --auto-approve for write operations
 - [ ] **CICD-03**: GoReleaser builds for linux/amd64, linux/arm64, darwin/amd64, darwin/arm64, windows/amd64
 - [ ] **CICD-04**: GitHub Actions example workflow with workload identity auth
 - [ ] **CICD-05**: Azure DevOps example pipeline with SP cert auth
@@ -119,10 +119,10 @@ Requirements for v1.0 release. Each maps to roadmap phases.
 
 ### Multi-Tenant
 
-- [ ] **MTNT-01**: Tenant ID flows as explicit parameter through every layer (CLI → auth → Graph → state)
-- [ ] **MTNT-02**: --tenant flag accepts tenant ID or primary domain, supports multiple values
-- [ ] **MTNT-03**: Sequential multi-tenant apply in v1 (one tenant at a time)
-- [ ] **MTNT-04**: Concurrent pipeline applies rejected with advisory error message
+- [x] **MTNT-01**: Tenant ID flows as explicit parameter through every layer (CLI → auth → Graph → state)
+- [x] **MTNT-02**: --tenant flag accepts tenant ID or primary domain, supports multiple values
+- [x] **MTNT-03**: Sequential multi-tenant apply in v1 (one tenant at a time)
+- [x] **MTNT-04**: Concurrent pipeline applies rejected with advisory error message
 
 ### Code Quality
 
@@ -250,16 +250,16 @@ Deferred to future release. Tracked but not in current roadmap.
 | VALID-03 | Phase 3 | Complete |
 | VALID-04 | Phase 3 | Complete |
 | VALID-05 | Phase 3 | Complete |
-| CICD-01 | Phase 5 | Pending |
-| CICD-02 | Phase 5 | Pending |
+| CICD-01 | Phase 5 | Complete |
+| CICD-02 | Phase 5 | Complete |
 | CICD-03 | Phase 5 | Pending |
 | CICD-04 | Phase 5 | Pending |
 | CICD-05 | Phase 5 | Pending |
 | CICD-06 | Phase 5 | Pending |
-| MTNT-01 | Phase 5 | Pending |
-| MTNT-02 | Phase 5 | Pending |
-| MTNT-03 | Phase 5 | Pending |
-| MTNT-04 | Phase 5 | Pending |
+| MTNT-01 | Phase 5 | Complete |
+| MTNT-02 | Phase 5 | Complete |
+| MTNT-03 | Phase 5 | Complete |
+| MTNT-04 | Phase 5 | Complete |
 | QUAL-01 | Phase 5 | Pending |
 | QUAL-02 | Phase 5 | Pending |
 | QUAL-03 | Phase 5 | Pending |
