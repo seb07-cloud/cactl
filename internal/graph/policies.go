@@ -1,6 +1,7 @@
 package graph
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -95,4 +96,73 @@ func (c *Client) GetPolicy(ctx context.Context, policyID string) (*Policy, error
 	p.RawJSON = bodyBytes
 
 	return &p, nil
+}
+
+// CreatePolicy creates a new Conditional Access policy and returns the
+// server-assigned ID.
+func (c *Client) CreatePolicy(ctx context.Context, policyJSON map[string]interface{}) (string, error) {
+	body, err := json.Marshal(policyJSON)
+	if err != nil {
+		return "", fmt.Errorf("marshaling policy: %w", err)
+	}
+
+	url := c.baseURL + "/identity/conditionalAccess/policies"
+	resp, err := c.do(ctx, http.MethodPost, url, bytes.NewReader(body))
+	if err != nil {
+		return "", fmt.Errorf("creating policy: %w", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusCreated {
+		respBody, _ := io.ReadAll(resp.Body)
+		return "", fmt.Errorf("creating policy: HTTP %d: %s", resp.StatusCode, string(respBody))
+	}
+
+	var result struct {
+		ID string `json:"id"`
+	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+		return "", fmt.Errorf("decoding create response: %w", err)
+	}
+
+	return result.ID, nil
+}
+
+// UpdatePolicy updates an existing Conditional Access policy by ID.
+func (c *Client) UpdatePolicy(ctx context.Context, id string, policyJSON map[string]interface{}) error {
+	body, err := json.Marshal(policyJSON)
+	if err != nil {
+		return fmt.Errorf("marshaling policy: %w", err)
+	}
+
+	url := c.baseURL + "/identity/conditionalAccess/policies/" + id
+	resp, err := c.do(ctx, http.MethodPatch, url, bytes.NewReader(body))
+	if err != nil {
+		return fmt.Errorf("updating policy %s: %w", id, err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusNoContent {
+		respBody, _ := io.ReadAll(resp.Body)
+		return fmt.Errorf("updating policy %s: HTTP %d: %s", id, resp.StatusCode, string(respBody))
+	}
+
+	return nil
+}
+
+// DeletePolicy deletes a Conditional Access policy by ID.
+func (c *Client) DeletePolicy(ctx context.Context, id string) error {
+	url := c.baseURL + "/identity/conditionalAccess/policies/" + id
+	resp, err := c.do(ctx, http.MethodDelete, url, nil)
+	if err != nil {
+		return fmt.Errorf("deleting policy %s: %w", id, err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusNoContent {
+		respBody, _ := io.ReadAll(resp.Body)
+		return fmt.Errorf("deleting policy %s: HTTP %d: %s", id, resp.StatusCode, string(respBody))
+	}
+
+	return nil
 }

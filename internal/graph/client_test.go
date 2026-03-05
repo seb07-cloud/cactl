@@ -130,6 +130,124 @@ func TestGetPolicy(t *testing.T) {
 	assert.NotEmpty(t, p.RawJSON, "RawJSON should be populated")
 }
 
+func TestCreatePolicy(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, http.MethodPost, r.Method)
+		assert.Equal(t, "/identity/conditionalAccess/policies", r.URL.Path)
+
+		var body map[string]interface{}
+		err := json.NewDecoder(r.Body).Decode(&body)
+		require.NoError(t, err)
+		assert.Equal(t, "New Policy", body["displayName"])
+
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusCreated)
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"id":          "new-id-123",
+			"displayName": "New Policy",
+		})
+	}))
+	defer server.Close()
+
+	client := newTestClient(server.URL)
+	id, err := client.CreatePolicy(context.Background(), map[string]interface{}{
+		"displayName": "New Policy",
+		"state":       "disabled",
+	})
+
+	require.NoError(t, err)
+	assert.Equal(t, "new-id-123", id)
+}
+
+func TestCreatePolicy_Error(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte(`{"error": {"code": "BadRequest", "message": "Invalid policy"}}`))
+	}))
+	defer server.Close()
+
+	client := newTestClient(server.URL)
+	_, err := client.CreatePolicy(context.Background(), map[string]interface{}{
+		"displayName": "Bad Policy",
+	})
+
+	require.Error(t, err)
+	assert.Contains(t, err.Error(), "400")
+	assert.Contains(t, err.Error(), "BadRequest")
+}
+
+func TestUpdatePolicy(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, http.MethodPatch, r.Method)
+		assert.Equal(t, "/identity/conditionalAccess/policies/policy-99", r.URL.Path)
+		w.WriteHeader(http.StatusNoContent)
+	}))
+	defer server.Close()
+
+	client := newTestClient(server.URL)
+	err := client.UpdatePolicy(context.Background(), "policy-99", map[string]interface{}{
+		"state": "enabled",
+	})
+
+	require.NoError(t, err)
+}
+
+func TestDeletePolicy(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, http.MethodDelete, r.Method)
+		assert.Equal(t, "/identity/conditionalAccess/policies/policy-77", r.URL.Path)
+		w.WriteHeader(http.StatusNoContent)
+	}))
+	defer server.Close()
+
+	client := newTestClient(server.URL)
+	err := client.DeletePolicy(context.Background(), "policy-77")
+
+	require.NoError(t, err)
+}
+
+func TestExecuteBatch(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, http.MethodPost, r.Method)
+		assert.Equal(t, "/$batch", r.URL.Path)
+
+		var batchReq BatchRequest
+		err := json.NewDecoder(r.Body).Decode(&batchReq)
+		require.NoError(t, err)
+		assert.Len(t, batchReq.Requests, 2)
+
+		resp := BatchResponse{
+			Responses: []BatchResponseItem{
+				{ID: "1", Status: 200, Body: json.RawMessage(`{"id":"user-1","displayName":"Alice"}`)},
+				{ID: "2", Status: 200, Body: json.RawMessage(`{"id":"group-1","displayName":"Admins"}`)},
+			},
+		}
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(resp)
+	}))
+	defer server.Close()
+
+	client := newTestClient(server.URL)
+	responses, err := client.ExecuteBatch(context.Background(), []BatchRequestItem{
+		{ID: "1", Method: "GET", URL: "/users/user-1?$select=id,displayName"},
+		{ID: "2", Method: "GET", URL: "/groups/group-1?$select=id,displayName"},
+	})
+
+	require.NoError(t, err)
+	assert.Len(t, responses, 2)
+	assert.Equal(t, "1", responses[0].ID)
+	assert.Equal(t, 200, responses[0].Status)
+	assert.Equal(t, "2", responses[1].ID)
+	assert.Equal(t, 200, responses[1].Status)
+
+	// Verify we can decode response bodies
+	var user struct {
+		DisplayName string `json:"displayName"`
+	}
+	require.NoError(t, json.Unmarshal(responses[0].Body, &user))
+	assert.Equal(t, "Alice", user.DisplayName)
+}
+
 func TestListPoliciesHTTPError(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusForbidden)
