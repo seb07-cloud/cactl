@@ -129,6 +129,81 @@ func (b *GitBackend) forEachRef(prefix string) ([]string, error) {
 	return slugs, nil
 }
 
+// VersionTag represents a single version entry from the tag history.
+type VersionTag struct {
+	Version   string
+	Timestamp string
+	Message   string
+}
+
+// ListVersionTags returns all version tags for a policy sorted by semver descending.
+// Returns an empty slice (not nil) when no tags exist.
+func (b *GitBackend) ListVersionTags(tenantID, slug string) ([]VersionTag, error) {
+	prefix := fmt.Sprintf("refs/tags/cactl/%s/%s/", tenantID, slug)
+	cmd := exec.Command("git", "for-each-ref",
+		"--format=%(refname:strip=5)\t%(creatordate:iso)\t%(contents:lines=1)",
+		"--sort=-version:refname",
+		prefix,
+	)
+	cmd.Dir = b.repoDir
+	out, err := cmd.Output()
+	if err != nil {
+		return nil, fmt.Errorf("listing version tags: %w", err)
+	}
+
+	output := strings.TrimSpace(string(out))
+	if output == "" {
+		return []VersionTag{}, nil
+	}
+
+	lines := strings.Split(output, "\n")
+	tags := make([]VersionTag, 0, len(lines))
+	for _, line := range lines {
+		line = strings.TrimSpace(line)
+		if line == "" {
+			continue
+		}
+		parts := strings.SplitN(line, "\t", 3)
+		if len(parts) < 1 {
+			continue
+		}
+		version := parts[0]
+		timestamp := ""
+		message := ""
+		if len(parts) >= 2 {
+			timestamp = parts[1]
+		}
+		if len(parts) >= 3 {
+			message = parts[2]
+		}
+		tags = append(tags, VersionTag{
+			Version:   version,
+			Timestamp: timestamp,
+			Message:   message,
+		})
+	}
+	return tags, nil
+}
+
+// ReadTagBlob reads the policy JSON content from an annotated tag.
+// Uses ^{} to dereference the annotated tag to the underlying blob.
+func (b *GitBackend) ReadTagBlob(tenantID, slug, version string) ([]byte, error) {
+	tagName := fmt.Sprintf("cactl/%s/%s/%s", tenantID, slug, version)
+	cmd := exec.Command("git", "cat-file", "blob", tagName+"^{}")
+	cmd.Dir = b.repoDir
+	out, err := cmd.Output()
+	if err != nil {
+		return nil, fmt.Errorf("reading tag %s: %w", tagName, err)
+	}
+	return out, nil
+}
+
+// HashObject computes the git SHA-1 hash for arbitrary data bytes.
+// This wraps the internal hashObject and writes the blob to the object store.
+func (b *GitBackend) HashObject(data []byte) (string, error) {
+	return b.hashObject(data)
+}
+
 // policyRef returns the full ref path for a policy.
 func policyRef(tenantID, slug string) string {
 	return fmt.Sprintf("refs/cactl/tenants/%s/policies/%s", tenantID, slug)
