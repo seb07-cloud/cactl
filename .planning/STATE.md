@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-03-04)
 ## Current Position
 
 Phase: 4 of 5 (Drift, Rollback, and Status)
-Plan: 1 of 4 in current phase
+Plan: 2 of 4 in current phase
 Status: In Progress
-Last activity: 2026-03-05 -- Completed 04-01 Git Version Tag Infrastructure
+Last activity: 2026-03-05 -- Completed 04-02 Drift Command
 
-Progress: [█████████████████████████] 65%
+Progress: [██████████████████████████] 70%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 13
-- Average duration: 2.3min
-- Total execution time: 0.49 hours
+- Total plans completed: 14
+- Average duration: 2.2min
+- Total execution time: 0.52 hours
 
 **By Phase:**
 
@@ -30,10 +30,10 @@ Progress: [███████████████████████
 | 01-foundation | 4/4 | 10min | 2.5min |
 | 02-state-and-import | 3/3 | 8min | 2.7min |
 | 03-plan-and-apply | 5/5 | 15min | 3.0min |
-| 04-drift-rollback-and-status | 1/4 | 1min | 1.0min |
+| 04-drift-rollback-and-status | 2/4 | 3min | 1.5min |
 
 **Recent Trend:**
-- Last 5 plans: 03-02 (3min), 03-03 (3min), 03-04 (4min), 03-05 (3min), 04-01 (1min)
+- Last 5 plans: 03-03 (3min), 03-04 (4min), 03-05 (3min), 04-01 (1min), 04-02 (2min)
 - Trend: Stable
 
 *Updated after each plan completion*
@@ -89,6 +89,10 @@ Recent decisions affecting current work:
 - 03-05: CI mode returns exit 2 when --auto-approve missing
 - 04-01: strip=5 in for-each-ref to extract version directly from tag ref path
 - 04-01: HashObject wraps private hashObject for public API -- avoids code duplication
+- 04-02: Drift keeps Untracked in actionable filter (unlike apply) since untracked IS drift
+- 04-02: No semver/validation/resolver in drift -- keeps it fast for CI scheduled checks
+- 04-02: Remediation footer only shown for human output (not JSON) to keep JSON machine-parseable
+- 04-02: All drift errors wrapped in ExitError code 2 for consistent fatal error handling
 
 ### Pending Todos
 
@@ -101,5 +105,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-05
-Stopped at: Completed 04-01-PLAN.md (Git Version Tag Infrastructure)
+Stopped at: Completed 04-02-PLAN.md (Drift Command)
 Resume file: None

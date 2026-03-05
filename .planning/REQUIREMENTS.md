@@ -13,7 +13,7 @@ Requirements for v1.0 release. Each maps to roadmap phases.
 - [x] **CLI-02**: User can run `cactl plan` to see reconciliation diff between backend and live tenant
 - [x] **CLI-03**: User can run `cactl apply` to deploy backend state to live tenant with confirmation prompt
 - [x] **CLI-04**: User can run `cactl import` to pull live CA policies into backend with normalization
-- [ ] **CLI-05**: User can run `cactl drift` to check for drift without making changes
+- [x] **CLI-05**: User can run `cactl drift` to check for drift without making changes
 - [ ] **CLI-06**: User can run `cactl rollback` to restore a prior policy version from Git tag history
 - [ ] **CLI-07**: User can run `cactl status` to see tracked policies with version, timestamp, deployer, and sync status
 - [x] **CLI-08**: All commands accept --tenant, --output (human|json), --no-color, --ci, --config, --log-level flags
@@ -79,10 +79,10 @@ Requirements for v1.0 release. Each maps to roadmap phases.
 
 ### Drift Detection
 
-- [ ] **DRIFT-01**: `cactl drift` outputs diff between backend state and live tenant without making changes
-- [ ] **DRIFT-02**: Drift types identified: policy modified (~), policy missing (-/+), untracked policy (?)
-- [ ] **DRIFT-03**: Exit codes: 0=no drift, 1=drift detected, 2=error
-- [ ] **DRIFT-04**: Three remediation options presented: remediate (apply backend), import live (update backend), report only
+- [x] **DRIFT-01**: `cactl drift` outputs diff between backend state and live tenant without making changes
+- [x] **DRIFT-02**: Drift types identified: policy modified (~), policy missing (-/+), untracked policy (?)
+- [x] **DRIFT-03**: Exit codes: 0=no drift, 1=drift detected, 2=error
+- [x] **DRIFT-04**: Three remediation options presented: remediate (apply backend), import live (update backend), report only
 
 ### Rollback
 
@@ -97,13 +97,13 @@ Requirements for v1.0 release. Each maps to roadmap phases.
 - [x] **DISP-02**: All commands support --output json with stable schema (schema_version field)
 - [x] **DISP-03**: Named locations resolved to display names in plan/diff output (not raw GUIDs)
 - [x] **DISP-04**: Groups and users resolved to display names in plan/diff output
-- [ ] **DISP-05**: `cactl status` shows per-policy version tree with timestamp and deployer identity
+- [x] **DISP-05**: `cactl status` shows per-policy version tree with timestamp and deployer identity
 - [x] **DISP-06**: --no-color flag disables ANSI color output (also via CACTL_NO_COLOR=1)
 
 ### Validation
 
 - [x] **VALID-01**: Break-glass account exclusion validated at plan time — warn loudly if emergency access accounts not excluded
-- [ ] **VALID-02**: Policy JSON validated against schema fetched during init
+- [x] **VALID-02**: Policy JSON validated against schema fetched during init
 - [x] **VALID-03**: Detect conflicting conditions (e.g., include and exclude same group)
 - [x] **VALID-04**: Detect empty include lists (policy applies to no one)
 - [x] **VALID-05**: Detect policies that would block all users (overly broad with no exclusions)
@@ -186,7 +186,7 @@ Deferred to future release. Tracked but not in current roadmap.
 | CLI-02 | Phase 3 | Complete |
 | CLI-03 | Phase 3 | Complete |
 | CLI-04 | Phase 2 | Complete |
-| CLI-05 | Phase 4 | Pending |
+| CLI-05 | Phase 4 | Complete |
 | CLI-06 | Phase 4 | Pending |
 | CLI-07 | Phase 4 | Pending |
 | CLI-08 | Phase 1 | Complete |
@@ -231,10 +231,10 @@ Deferred to future release. Tracked but not in current roadmap.
 | SEMV-04 | Phase 3 | Complete |
 | SEMV-05 | Phase 3 | Pending |
 | SEMV-06 | Phase 3 | Complete |
-| DRIFT-01 | Phase 4 | Pending |
-| DRIFT-02 | Phase 4 | Pending |
-| DRIFT-03 | Phase 4 | Pending |
-| DRIFT-04 | Phase 4 | Pending |
+| DRIFT-01 | Phase 4 | Complete |
+| DRIFT-02 | Phase 4 | Complete |
+| DRIFT-03 | Phase 4 | Complete |
+| DRIFT-04 | Phase 4 | Complete |
 | ROLL-01 | Phase 4 | Complete |
 | ROLL-02 | Phase 4 | Pending |
 | ROLL-03 | Phase 4 | Pending |
@@ -243,10 +243,10 @@ Deferred to future release. Tracked but not in current roadmap.
 | DISP-02 | Phase 3 | Complete |
 | DISP-03 | Phase 3 | Complete |
 | DISP-04 | Phase 3 | Complete |
-| DISP-05 | Phase 3 | Pending |
+| DISP-05 | Phase 3 | Complete |
 | DISP-06 | Phase 1 | Complete |
 | VALID-01 | Phase 3 | Complete |
-| VALID-02 | Phase 3 | Pending |
+| VALID-02 | Phase 3 | Complete |
 | VALID-03 | Phase 3 | Complete |
 | VALID-04 | Phase 3 | Complete |
 | VALID-05 | Phase 3 | Complete |
