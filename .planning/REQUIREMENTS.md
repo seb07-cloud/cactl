@@ -126,11 +126,11 @@ Requirements for v1.0 release. Each maps to roadmap phases.
 
 ### Code Quality
 
-- [ ] **QUAL-01**: golangci-lint with default ruleset + exhaustive enum checks
-- [ ] **QUAL-02**: Table-driven unit tests with Graph client fully mockable via interface
-- [ ] **QUAL-03**: 80% test coverage target on internal/graph and internal/reconcile
+- [x] **QUAL-01**: golangci-lint with default ruleset + exhaustive enum checks
+- [x] **QUAL-02**: Table-driven unit tests with Graph client fully mockable via interface
+- [x] **QUAL-03**: 80% test coverage target on internal/graph and internal/reconcile
 - [ ] **QUAL-04**: Conventional Commits (feat:, fix:, chore:) for automatic CHANGELOG generation
-- [ ] **QUAL-05**: MIT license
+- [x] **QUAL-05**: MIT license
 
 ### Documentation
 
@@ -260,11 +260,11 @@ Deferred to future release. Tracked but not in current roadmap.
 | MTNT-02 | Phase 5 | Pending |
 | MTNT-03 | Phase 5 | Pending |
 | MTNT-04 | Phase 5 | Pending |
-| QUAL-01 | Phase 5 | Pending |
-| QUAL-02 | Phase 5 | Pending |
-| QUAL-03 | Phase 5 | Pending |
+| QUAL-01 | Phase 5 | Complete |
+| QUAL-02 | Phase 5 | Complete |
+| QUAL-03 | Phase 5 | Complete |
 | QUAL-04 | Phase 5 | Pending |
-| QUAL-05 | Phase 5 | Pending |
+| QUAL-05 | Phase 5 | Complete |
 | DOCS-01 | Phase 5 | Pending |
 | DOCS-02 | Phase 5 | Pending |
 | DOCS-03 | Phase 5 | Pending |
