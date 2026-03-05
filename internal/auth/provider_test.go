@@ -3,7 +3,7 @@ package auth
 import (
 	"testing"
 
-	"github.com/sebdah/cactl/pkg/types"
+	"github.com/seb07-cloud/cactl/pkg/types"
 	"github.com/stretchr/testify/assert"
 )
 

@@ -6,7 +6,7 @@ import (
 	"sync"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore"
-	"github.com/sebdah/cactl/pkg/types"
+	"github.com/seb07-cloud/cactl/pkg/types"
 )
 
 // ClientFactory creates and caches credential instances per tenant.

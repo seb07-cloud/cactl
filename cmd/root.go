@@ -76,6 +76,11 @@ func initConfig(cmd *cobra.Command) error {
 	return nil
 }
 
+// SetVersionInfo configures the root command version string from build-time ldflags.
+func SetVersionInfo(v, c, d string) {
+	rootCmd.Version = fmt.Sprintf("%s (commit: %s, built: %s)", v, c, d)
+}
+
 // Execute runs the root command and returns any error.
 func Execute() error {
 	return rootCmd.Execute()
