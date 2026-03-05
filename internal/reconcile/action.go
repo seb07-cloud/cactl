@@ -46,4 +46,8 @@ type PolicyAction struct {
 	LiveObjectID string
 	Diff         []FieldDiff
 	Warnings     []string
+	// Version fields are populated by the plan command after semver computation.
+	VersionFrom string
+	VersionTo   string
+	BumpLevel   string
 }
