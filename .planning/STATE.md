@@ -10,17 +10,17 @@ See: .planning/PROJECT.md (updated 2026-03-04)
 ## Current Position
 
 Phase: 5 of 5 (Production Readiness)
-Plan: 1 of 4 in current phase
+Plan: 3 of 4 in current phase
 Status: In Progress
-Last activity: 2026-03-05 -- Completed 05-01 Multi-Tenant and CI Mode
+Last activity: 2026-03-05 -- Completed Wave 1 (05-01, 05-02, 05-03)
 
-Progress: [██████████████████████████████████] 90%
+Progress: [██████████████████████████████████] 95%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 18
-- Average duration: 2.1min
+- Total plans completed: 20
+- Average duration: 2.0min
 - Total execution time: 0.60 hours
 
 **By Phase:**
@@ -31,10 +31,10 @@ Progress: [███████████████████████
 | 02-state-and-import | 3/3 | 8min | 2.7min |
 | 03-plan-and-apply | 5/5 | 15min | 3.0min |
 | 04-drift-rollback-and-status | 5/5 | 8min | 1.6min |
-| 05-production-readiness | 1/4 | 3min | 3.0min |
+| 05-production-readiness | 3/4 | 7min | 2.3min |
 
 **Recent Trend:**
-- Last 5 plans: 04-02 (2min), 04-03 (2min), 04-04 (2min), 04-05 (1min), 05-01 (3min)
+- Last 5 plans: 04-04 (2min), 04-05 (1min), 05-01 (3min), 05-02 (2min), 05-03 (2min)
 - Trend: Stable
 
 *Updated after each plan completion*
@@ -105,6 +105,10 @@ Recent decisions affecting current work:
 - 05-01: Backward compat: single CACTL_TENANT env var auto-wrapped into []string slice
 - 05-01: Config.Tenant deprecated field kept in sync for gradual migration of other commands
 - 05-01: MTNT-04 concurrent pipeline advisory: comment-only in v1, lock file deferred to v1.1
+- 05-02: GoReleaser v2 format with version: 2 header
+- 05-02: CGO_ENABLED=0 for static binaries across all platforms
+- 05-02: Changelog groups by conventional commit prefix (feat, fix, others)
+- 05-02: Fixed go.mod module path mismatch (sebdah -> seb07-cloud) to unblock builds
 
 ### Pending Todos
 
@@ -117,5 +121,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-05
-Stopped at: Completed 05-01-PLAN.md (Multi-Tenant and CI Mode)
+Stopped at: Completed Wave 1 (05-01, 05-02, 05-03) -- starting Wave 2
 Resume file: None

@@ -1,0 +1,47 @@
+name: Scheduled Drift Check
+
+on:
+  schedule:
+    - cron: "0 6 * * *"
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+  issues: write
+
+jobs:
+  drift:
+    name: Drift Detection
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Azure Login (OIDC)
+        uses: azure/login@v2
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Install cactl
+        run: |
+          LATEST=$(curl -s https://api.github.com/repos/seb07-cloud/cactl/releases/latest | grep tag_name | cut -d '"' -f 4)
+          curl -sL "https://github.com/seb07-cloud/cactl/releases/download/${LATEST}/cactl_${LATEST#v}_linux_amd64.tar.gz" | tar xz
+          sudo mv cactl /usr/local/bin/
+
+      - name: Run drift check
+        run: cactl drift --ci --tenant ${{ vars.AZURE_TENANT_ID }}
+
+      - name: Create issue on drift
+        if: failure()
+        run: |
+          gh issue create \
+            --title "Drift detected in Conditional Access policies" \
+            --body "The scheduled drift check found configuration drift. Run \`cactl drift\` locally for details." \
+            --label "drift"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -1,0 +1,36 @@
+name: cactl plan
+
+on:
+  pull_request:
+    paths:
+      - "policies/**"
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  plan:
+    name: Plan CA Changes
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Azure Login (OIDC)
+        uses: azure/login@v2
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Install cactl
+        run: |
+          LATEST=$(curl -s https://api.github.com/repos/seb07-cloud/cactl/releases/latest | grep tag_name | cut -d '"' -f 4)
+          curl -sL "https://github.com/seb07-cloud/cactl/releases/download/${LATEST}/cactl_${LATEST#v}_linux_amd64.tar.gz" | tar xz
+          sudo mv cactl /usr/local/bin/
+
+      - name: Run cactl plan
+        run: cactl plan --ci --tenant ${{ vars.AZURE_TENANT_ID }}

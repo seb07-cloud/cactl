@@ -1,0 +1,33 @@
+trigger:
+  branches:
+    include:
+      - main
+  paths:
+    include:
+      - "policies/*"
+
+pool:
+  vmImage: ubuntu-latest
+
+variables:
+  - group: cactl-credentials
+
+steps:
+  - task: AzureCLI@2
+    displayName: Run cactl plan
+    inputs:
+      azureSubscription: $(AZURE_SERVICE_CONNECTION)
+      scriptType: bash
+      addSpnToEnvironment: true
+      scriptLocation: inlineScript
+      inlineScript: |
+        export CACTL_CLIENT_ID=$servicePrincipalId
+        export CACTL_CERT_PATH=$(CACTL_CERT_PATH)
+        export CACTL_AUTH_MODE=client-certificate
+
+        # Install cactl
+        LATEST=$(curl -s https://api.github.com/repos/seb07-cloud/cactl/releases/latest | grep tag_name | cut -d '"' -f 4)
+        curl -sL "https://github.com/seb07-cloud/cactl/releases/download/${LATEST}/cactl_${LATEST#v}_linux_amd64.tar.gz" | tar xz
+        sudo mv cactl /usr/local/bin/
+
+        cactl plan --ci --tenant $(AZURE_TENANT_ID)
