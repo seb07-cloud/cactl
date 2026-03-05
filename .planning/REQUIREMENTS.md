@@ -70,12 +70,12 @@ Requirements for v1.0 release. Each maps to roadmap phases.
 
 ### Semantic Versioning
 
-- [ ] **SEMV-01**: Every tracked policy is versioned independently using MAJOR.MINOR.PATCH
-- [ ] **SEMV-02**: MAJOR bump triggered by scope expansion (configurable via semver.major_fields in config)
-- [ ] **SEMV-03**: MINOR bump triggered by conditions/controls changes (configurable via semver.minor_fields)
-- [ ] **SEMV-04**: PATCH bump for state-only or cosmetic changes (all other fields)
+- [x] **SEMV-01**: Every tracked policy is versioned independently using MAJOR.MINOR.PATCH
+- [x] **SEMV-02**: MAJOR bump triggered by scope expansion (configurable via semver.major_fields in config)
+- [x] **SEMV-03**: MINOR bump triggered by conditions/controls changes (configurable via semver.minor_fields)
+- [x] **SEMV-04**: PATCH bump for state-only or cosmetic changes (all other fields)
 - [ ] **SEMV-05**: User can override the suggested bump level at apply time
-- [ ] **SEMV-06**: MAJOR bumps display explicit warning in plan output
+- [x] **SEMV-06**: MAJOR bumps display explicit warning in plan output
 
 ### Drift Detection
 
@@ -102,11 +102,11 @@ Requirements for v1.0 release. Each maps to roadmap phases.
 
 ### Validation
 
-- [ ] **VALID-01**: Break-glass account exclusion validated at plan time — warn loudly if emergency access accounts not excluded
+- [x] **VALID-01**: Break-glass account exclusion validated at plan time — warn loudly if emergency access accounts not excluded
 - [ ] **VALID-02**: Policy JSON validated against schema fetched during init
-- [ ] **VALID-03**: Detect conflicting conditions (e.g., include and exclude same group)
-- [ ] **VALID-04**: Detect empty include lists (policy applies to no one)
-- [ ] **VALID-05**: Detect policies that would block all users (overly broad with no exclusions)
+- [x] **VALID-03**: Detect conflicting conditions (e.g., include and exclude same group)
+- [x] **VALID-04**: Detect empty include lists (policy applies to no one)
+- [x] **VALID-05**: Detect policies that would block all users (overly broad with no exclusions)
 
 ### CI/CD & Distribution
 
@@ -225,12 +225,12 @@ Deferred to future release. Tracked but not in current roadmap.
 | PLAN-08 | Phase 3 | Pending |
 | PLAN-09 | Phase 3 | Complete |
 | PLAN-10 | Phase 3 | Complete |
-| SEMV-01 | Phase 3 | Pending |
-| SEMV-02 | Phase 3 | Pending |
-| SEMV-03 | Phase 3 | Pending |
-| SEMV-04 | Phase 3 | Pending |
+| SEMV-01 | Phase 3 | Complete |
+| SEMV-02 | Phase 3 | Complete |
+| SEMV-03 | Phase 3 | Complete |
+| SEMV-04 | Phase 3 | Complete |
 | SEMV-05 | Phase 3 | Pending |
-| SEMV-06 | Phase 3 | Pending |
+| SEMV-06 | Phase 3 | Complete |
 | DRIFT-01 | Phase 4 | Pending |
 | DRIFT-02 | Phase 4 | Pending |
 | DRIFT-03 | Phase 4 | Pending |
@@ -245,11 +245,11 @@ Deferred to future release. Tracked but not in current roadmap.
 | DISP-04 | Phase 3 | Complete |
 | DISP-05 | Phase 3 | Pending |
 | DISP-06 | Phase 1 | Complete |
-| VALID-01 | Phase 3 | Pending |
+| VALID-01 | Phase 3 | Complete |
 | VALID-02 | Phase 3 | Pending |
-| VALID-03 | Phase 3 | Pending |
-| VALID-04 | Phase 3 | Pending |
-| VALID-05 | Phase 3 | Pending |
+| VALID-03 | Phase 3 | Complete |
+| VALID-04 | Phase 3 | Complete |
+| VALID-05 | Phase 3 | Complete |
 | CICD-01 | Phase 5 | Pending |
 | CICD-02 | Phase 5 | Pending |
 | CICD-03 | Phase 5 | Pending |
