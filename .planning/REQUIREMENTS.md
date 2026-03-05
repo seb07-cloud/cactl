@@ -11,7 +11,7 @@ Requirements for v1.0 release. Each maps to roadmap phases.
 
 - [x] **CLI-01**: User can run `cactl init` to scaffold workspace (.cactl/config.yaml, .gitignore, refspec setup, schema fetch)
 - [x] **CLI-02**: User can run `cactl plan` to see reconciliation diff between backend and live tenant
-- [ ] **CLI-03**: User can run `cactl apply` to deploy backend state to live tenant with confirmation prompt
+- [x] **CLI-03**: User can run `cactl apply` to deploy backend state to live tenant with confirmation prompt
 - [x] **CLI-04**: User can run `cactl import` to pull live CA policies into backend with normalization
 - [ ] **CLI-05**: User can run `cactl drift` to check for drift without making changes
 - [ ] **CLI-06**: User can run `cactl rollback` to restore a prior policy version from Git tag history
@@ -61,10 +61,10 @@ Requirements for v1.0 release. Each maps to roadmap phases.
 - [x] **PLAN-02**: Plan output shows sigils: + (create), ~ (update), -/+ (recreate with warning), ? (untracked)
 - [x] **PLAN-03**: Plan output shows semver bump suggestion per policy (MAJOR/MINOR/PATCH) based on configurable field triggers
 - [x] **PLAN-04**: Plan summary line shows counts: N to create, N to update, N to recreate, N untracked
-- [ ] **PLAN-05**: `cactl apply` presents plan diff and requests confirmation before making changes
-- [ ] **PLAN-06**: `cactl apply --auto-approve` skips confirmation (required in --ci mode)
-- [ ] **PLAN-07**: `cactl apply --dry-run` generates full plan and runs Graph API validation but makes no writes
-- [ ] **PLAN-08**: Recreate (-/+) actions escalate confirmation: user must type 'yes' (not just Enter)
+- [x] **PLAN-05**: `cactl apply` presents plan diff and requests confirmation before making changes
+- [x] **PLAN-06**: `cactl apply --auto-approve` skips confirmation (required in --ci mode)
+- [x] **PLAN-07**: `cactl apply --dry-run` generates full plan and runs Graph API validation but makes no writes
+- [x] **PLAN-08**: Recreate (-/+) actions escalate confirmation: user must type 'yes' (not just Enter)
 - [x] **PLAN-09**: Apply is idempotent: running apply on unchanged policy set produces no changes
 - [x] **PLAN-10**: Full idempotency truth table implemented: create, update, noop, recreate (ghost cleanup), untracked warning
 
@@ -184,7 +184,7 @@ Deferred to future release. Tracked but not in current roadmap.
 |-------------|-------|--------|
 | CLI-01 | Phase 1 | Complete |
 | CLI-02 | Phase 3 | Complete |
-| CLI-03 | Phase 3 | Pending |
+| CLI-03 | Phase 3 | Complete |
 | CLI-04 | Phase 2 | Complete |
 | CLI-05 | Phase 4 | Pending |
 | CLI-06 | Phase 4 | Pending |
@@ -219,10 +219,10 @@ Deferred to future release. Tracked but not in current roadmap.
 | PLAN-02 | Phase 3 | Complete |
 | PLAN-03 | Phase 3 | Complete |
 | PLAN-04 | Phase 3 | Complete |
-| PLAN-05 | Phase 3 | Pending |
-| PLAN-06 | Phase 3 | Pending |
-| PLAN-07 | Phase 3 | Pending |
-| PLAN-08 | Phase 3 | Pending |
+| PLAN-05 | Phase 3 | Complete |
+| PLAN-06 | Phase 3 | Complete |
+| PLAN-07 | Phase 3 | Complete |
+| PLAN-08 | Phase 3 | Complete |
 | PLAN-09 | Phase 3 | Complete |
 | PLAN-10 | Phase 3 | Complete |
 | SEMV-01 | Phase 3 | Complete |

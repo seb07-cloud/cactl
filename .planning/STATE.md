@@ -9,19 +9,19 @@ See: .planning/PROJECT.md (updated 2026-03-04)
 
 ## Current Position
 
-Phase: 3 of 5 (Plan and Apply)
-Plan: 4 of 5 in current phase
-Status: In Progress
-Last activity: 2026-03-05 -- Completed 03-04 Diff Output and Plan Command
+Phase: 3 of 5 (Plan and Apply) -- COMPLETE
+Plan: 5 of 5 in current phase
+Status: Phase Complete
+Last activity: 2026-03-05 -- Completed 03-05 Apply Command
 
-Progress: [███████████████████░] 55%
+Progress: [████████████████████] 60%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 11
+- Total plans completed: 12
 - Average duration: 2.5min
-- Total execution time: 0.42 hours
+- Total execution time: 0.47 hours
 
 **By Phase:**
 
@@ -29,10 +29,10 @@ Progress: [███████████████████░] 55%
 |-------|-------|-------|----------|
 | 01-foundation | 4/4 | 10min | 2.5min |
 | 02-state-and-import | 3/3 | 8min | 2.7min |
-| 03-plan-and-apply | 4/5 | 12min | 3.0min |
+| 03-plan-and-apply | 5/5 | 15min | 3.0min |
 
 **Recent Trend:**
-- Last 5 plans: 02-03 (3min), 03-01 (2min), 03-02 (3min), 03-03 (3min), 03-04 (4min)
+- Last 5 plans: 03-01 (2min), 03-02 (3min), 03-03 (3min), 03-04 (4min), 03-05 (3min)
 - Trend: Stable
 
 *Updated after each plan completion*
@@ -82,6 +82,10 @@ Recent decisions affecting current work:
 - 03-04: Adapter pattern converts between package-local mirror types in cmd/plan.go (avoids circular deps)
 - 03-04: Resolver errors non-fatal -- plan continues with raw GUIDs if display name resolution fails
 - 03-04: Exit code 1 for actionable changes; validation errors override to exit 3
+- 03-05: Reader-based confirm/confirmExplicit helpers for testability without stdin mocking
+- 03-05: Per-action manifest+tag writes ensure state consistency even on mid-apply failure
+- 03-05: Recreate uses BumpMinor (not BumpPatch) since policy identity changes
+- 03-05: CI mode returns exit 2 when --auto-approve missing
 
 ### Pending Todos
 
@@ -94,5 +98,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-05
-Stopped at: Completed 03-04-PLAN.md (Diff Output and Plan Command)
+Stopped at: Completed 03-05-PLAN.md (Apply Command) -- Phase 03 complete
 Resume file: None
