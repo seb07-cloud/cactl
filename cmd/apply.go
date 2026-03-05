@@ -37,9 +37,8 @@ func init() {
 	rootCmd.AddCommand(applyCmd)
 	applyCmd.Flags().Bool("auto-approve", false, "Skip confirmation prompt (required for CI mode)")
 	applyCmd.Flags().Bool("dry-run", false, "Generate plan but make no Graph API writes")
+	applyCmd.Flags().String("bump-level", "", "Override computed bump level (major|minor|patch)")
 }
-
-// TODO: SEMV-05 --bump-level flag for user override
 
 func runApply(cmd *cobra.Command, args []string) error {
 	ctx := cmd.Context()
@@ -60,6 +59,20 @@ func runApply(cmd *cobra.Command, args []string) error {
 			Code:    types.ExitFatalError,
 			Message: "tenant is required: use --tenant or set CACTL_TENANT",
 		}
+	}
+
+	// Read --bump-level override
+	bumpLevelOverride, _ := cmd.Flags().GetString("bump-level")
+	var overrideBump *semver.BumpLevel
+	if bumpLevelOverride != "" {
+		bl, err := parseBumpLevel(bumpLevelOverride)
+		if err != nil {
+			return &types.ExitError{
+				Code:    types.ExitFatalError,
+				Message: fmt.Sprintf("invalid --bump-level %q: must be major, minor, or patch", bumpLevelOverride),
+			}
+		}
+		overrideBump = &bl
 	}
 
 	// 2. Create auth factory and credential
@@ -167,6 +180,9 @@ func runApply(cmd *cobra.Command, args []string) error {
 		}
 
 		bumpLevel := semver.DetermineBump(semverDiffs, majorFields, minorFields)
+		if overrideBump != nil {
+			bumpLevel = *overrideBump
+		}
 		actions[i].BumpLevel = bumpLevel.String()
 
 		currentVersion := "1.0.0"
@@ -507,6 +523,20 @@ func hasAction(actions []reconcile.PolicyAction, t reconcile.ActionType) bool {
 		}
 	}
 	return false
+}
+
+// parseBumpLevel converts a user-provided string to a semver.BumpLevel.
+func parseBumpLevel(s string) (semver.BumpLevel, error) {
+	switch strings.ToLower(s) {
+	case "major":
+		return semver.BumpMajor, nil
+	case "minor":
+		return semver.BumpMinor, nil
+	case "patch":
+		return semver.BumpPatch, nil
+	default:
+		return 0, fmt.Errorf("unknown bump level: %s", s)
+	}
 }
 
 // deployerIdentity returns the deployer identity string for manifest entries.

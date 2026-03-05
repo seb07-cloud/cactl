@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/seb07-cloud/cactl/internal/reconcile"
+	"github.com/seb07-cloud/cactl/internal/semver"
 	"github.com/seb07-cloud/cactl/pkg/types"
 )
 
@@ -151,6 +152,42 @@ func TestHasAction(t *testing.T) {
 	}
 	if hasAction(actions, reconcile.ActionRecreate) {
 		t.Error("hasAction should not find ActionRecreate")
+	}
+}
+
+func TestApplyCmd_HasBumpLevelFlag(t *testing.T) {
+	f := applyCmd.Flags().Lookup("bump-level")
+	if f == nil {
+		t.Error("apply command missing --bump-level flag")
+	} else if f.DefValue != "" {
+		t.Errorf("--bump-level default should be empty, got %q", f.DefValue)
+	}
+}
+
+func TestParseBumpLevel(t *testing.T) {
+	tests := []struct {
+		input   string
+		want    semver.BumpLevel
+		wantErr bool
+	}{
+		{"major", semver.BumpMajor, false},
+		{"MAJOR", semver.BumpMajor, false},
+		{"minor", semver.BumpMinor, false},
+		{"Minor", semver.BumpMinor, false},
+		{"patch", semver.BumpPatch, false},
+		{"PATCH", semver.BumpPatch, false},
+		{"invalid", 0, true},
+		{"", 0, true},
+	}
+	for _, tt := range tests {
+		got, err := parseBumpLevel(tt.input)
+		if (err != nil) != tt.wantErr {
+			t.Errorf("parseBumpLevel(%q) error = %v, wantErr %v", tt.input, err, tt.wantErr)
+			continue
+		}
+		if !tt.wantErr && got != tt.want {
+			t.Errorf("parseBumpLevel(%q) = %v, want %v", tt.input, got, tt.want)
+		}
 	}
 }
 
