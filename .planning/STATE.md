@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-03-04)
 
 **Core value:** Reliable, idempotent, state-aware deployment of Entra CA policies with Git-native versioning and plan/apply safety
-**Current focus:** Phase 4: Drift, Rollback, and Status
+**Current focus:** Phase 4: Drift, Rollback, and Status (Complete)
 
 ## Current Position
 
 Phase: 4 of 5 (Drift, Rollback, and Status)
-Plan: 4 of 4 in current phase
-Status: In Progress
-Last activity: 2026-03-05 -- Completed 04-04 Status Command
+Plan: 5 of 5 in current phase
+Status: Phase Complete
+Last activity: 2026-03-05 -- Completed 04-05 Gap Closure (SEMV-05 + stale checkboxes)
 
-Progress: [██████████████████████████████] 80%
+Progress: [██████████████████████████████] 85%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 16
-- Average duration: 2.1min
-- Total execution time: 0.56 hours
+- Total plans completed: 17
+- Average duration: 2.0min
+- Total execution time: 0.57 hours
 
 **By Phase:**
 
@@ -30,10 +30,10 @@ Progress: [███████████████████████
 | 01-foundation | 4/4 | 10min | 2.5min |
 | 02-state-and-import | 3/3 | 8min | 2.7min |
 | 03-plan-and-apply | 5/5 | 15min | 3.0min |
-| 04-drift-rollback-and-status | 4/4 | 7min | 1.75min |
+| 04-drift-rollback-and-status | 5/5 | 8min | 1.6min |
 
 **Recent Trend:**
-- Last 5 plans: 03-05 (3min), 04-01 (1min), 04-02 (2min), 04-03 (2min), 04-04 (2min)
+- Last 5 plans: 04-01 (1min), 04-02 (2min), 04-03 (2min), 04-04 (2min), 04-05 (1min)
 - Trend: Stable
 
 *Updated after each plan completion*
@@ -98,6 +98,8 @@ Recent decisions affecting current work:
 - 04-04: Git SHA comparison via HashObject matches backend storage format exactly
 - 04-04: Status always exits 0 -- informational command, not a gate
 - 04-04: BuildSummary exported for reuse between table and JSON rendering paths
+- 04-05: parseBumpLevel helper in cmd package (not semver) since it handles user CLI input
+- 04-05: Override read early in runApply, applied inside bump computation loop per action
 
 ### Pending Todos
 
@@ -110,5 +112,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-05
-Stopped at: Completed 04-04-PLAN.md (Status Command)
+Stopped at: Completed 04-05-PLAN.md (Gap Closure) -- Phase 4 complete
 Resume file: None
