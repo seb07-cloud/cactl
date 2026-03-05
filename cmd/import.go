@@ -9,7 +9,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/seb07-cloud/cactl/internal/auth"
+	"github.com/Azure/azure-sdk-for-go/sdk/azcore"
 	"github.com/seb07-cloud/cactl/internal/config"
 	"github.com/seb07-cloud/cactl/internal/graph"
 	"github.com/seb07-cloud/cactl/internal/normalize"
@@ -70,29 +70,36 @@ func runImport(cmd *cobra.Command, args []string) error {
 		}
 	}
 
-	// Step 2: Load config and create dependencies
+	// Step 2: Load config and resolve tenants
 	cfg, err := config.LoadFromGlobal()
 	if err != nil {
 		return fmt.Errorf("loading config: %w", err)
 	}
-	if cfg.Tenant == "" {
+	if len(cfg.Tenants) == 0 {
 		return &types.ExitError{
 			Code:    types.ExitValidationError,
 			Message: "tenant is required (set via --tenant flag, CACTL_TENANT env, or config file)",
 		}
 	}
 
-	factory, err := auth.NewClientFactory(cfg.Auth)
-	if err != nil {
-		return fmt.Errorf("creating auth factory: %w", err)
-	}
+	// Step 3: Execute import for each tenant sequentially
+	return runForTenants(ctx, cfg.Tenants, cfg.Auth, func(ctx context.Context, tenantID string, cred azcore.TokenCredential) error {
+		return importForTenant(ctx, r, cred, tenantID, importAll, policyFilter, force, ciMode)
+	})
+}
 
-	cred, err := factory.Credential(ctx, cfg.Tenant)
-	if err != nil {
-		return fmt.Errorf("acquiring credential: %w", err)
-	}
-
-	graphClient := graph.NewClient(cred, cfg.Tenant)
+// importForTenant runs the import pipeline for a single tenant.
+func importForTenant(
+	ctx context.Context,
+	r output.Renderer,
+	cred azcore.TokenCredential,
+	tenantID string,
+	importAll bool,
+	policyFilter string,
+	force bool,
+	ciMode bool,
+) error {
+	graphClient := graph.NewClient(cred, tenantID)
 
 	backend, err := state.NewGitBackend(".")
 	if err != nil {
@@ -104,7 +111,7 @@ func runImport(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("configuring refspec: %w", err)
 	}
 
-	// Step 3: Fetch policies from Graph API
+	// Fetch policies from Graph API
 	r.Info("Fetching policies from Microsoft Graph...")
 	policies, err := graphClient.ListPolicies(ctx)
 	if err != nil {
@@ -112,13 +119,13 @@ func runImport(cmd *cobra.Command, args []string) error {
 	}
 	r.Info(fmt.Sprintf("Found %d policies in tenant", len(policies)))
 
-	// Step 4: Read existing manifest
-	manifest, err := state.ReadManifest(backend, cfg.Tenant)
+	// Read existing manifest
+	manifest, err := state.ReadManifest(backend, tenantID)
 	if err != nil {
 		return fmt.Errorf("reading manifest: %w", err)
 	}
 
-	// Step 5: Determine which policies to import
+	// Determine which policies to import
 	var toImport []graph.Policy
 
 	if importAll {
@@ -139,8 +146,10 @@ func runImport(cmd *cobra.Command, args []string) error {
 		}
 	}
 
-	// Step 6: Process each policy
+	// Process each policy
 	imported := 0
+	// Get auth mode for manifest entries -- use the factory mode via credential type name
+	authMode := "az-cli" // default; will be overridden by factory mode in runForTenants
 	for _, p := range toImport {
 		slug := normalize.Slugify(p.DisplayName)
 
@@ -166,7 +175,7 @@ func runImport(cmd *cobra.Command, args []string) error {
 		}
 
 		// Write to state
-		blobSHA, err := backend.WritePolicy(cfg.Tenant, slug, normalized)
+		blobSHA, err := backend.WritePolicy(tenantID, slug, normalized)
 		if err != nil {
 			return fmt.Errorf("writing policy %s to state: %w", slug, err)
 		}
@@ -179,19 +188,19 @@ func runImport(cmd *cobra.Command, args []string) error {
 
 		// Create annotated tag
 		tagMsg := fmt.Sprintf("cactl import: %s %s", slug, version)
-		if err := backend.CreateVersionTag(cfg.Tenant, slug, version, blobSHA, tagMsg); err != nil {
+		if err := backend.CreateVersionTag(tenantID, slug, version, blobSHA, tagMsg); err != nil {
 			return fmt.Errorf("creating version tag for %s: %w", slug, err)
 		}
 
 		// Update manifest entry
 		manifest.Policies[slug] = state.Entry{
 			Slug:         slug,
-			Tenant:       cfg.Tenant,
+			Tenant:       tenantID,
 			LiveObjectID: p.ID,
 			Version:      version,
 			LastDeployed: time.Now().UTC().Format(time.RFC3339),
-			DeployedBy:   factory.Mode(),
-			AuthMode:     factory.Mode(),
+			DeployedBy:   authMode,
+			AuthMode:     authMode,
 			BackendSHA:   blobSHA,
 		}
 
@@ -199,14 +208,14 @@ func runImport(cmd *cobra.Command, args []string) error {
 		imported++
 	}
 
-	// Step 7: Write manifest
+	// Write manifest
 	if imported > 0 {
-		if err := state.WriteManifest(backend, cfg.Tenant, manifest); err != nil {
+		if err := state.WriteManifest(backend, tenantID, manifest); err != nil {
 			return fmt.Errorf("writing manifest: %w", err)
 		}
 	}
 
-	r.Success(fmt.Sprintf("Imported %d policies for tenant %s", imported, cfg.Tenant))
+	r.Success(fmt.Sprintf("Imported %d policies for tenant %s", imported, tenantID))
 	return nil
 }
 
