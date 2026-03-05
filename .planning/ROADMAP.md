@@ -82,13 +82,14 @@ Plans:
   2. Drift output identifies modification types (~, -/+, ?) and presents three remediation options (remediate, import live, report only)
   3. User can run `cactl rollback --policy <slug> --version <semver>` to restore a prior version from Git tag history, with plan diff and confirmation before applying
   4. User can run `cactl status` and see all tracked policies with version, timestamp, deployer identity, and sync status
-**Plans**: 4 plans
+**Plans**: 5 plans
 
 Plans:
 - [ ] 04-01-PLAN.md — Git tag operations: ListVersionTags and ReadTagBlob on GitBackend (TDD)
 - [ ] 04-02-PLAN.md — `cactl drift` command: read-only reconciliation with remediation suggestions
 - [ ] 04-03-PLAN.md — `cactl rollback` command: tag read, diff, confirm, PATCH, new version tag
 - [ ] 04-04-PLAN.md — `cactl status` command: status table, sync check, version history
+- [ ] 04-05-PLAN.md — Gap closure: SEMV-05 --bump-level flag + stale REQUIREMENTS.md checkboxes
 
 ### Phase 5: Production Readiness
 **Goal**: Tool is production-ready with multi-tenant support, CI/CD integration, quality enforcement, documentation, and cross-platform binary distribution
