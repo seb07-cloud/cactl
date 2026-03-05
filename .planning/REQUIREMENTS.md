@@ -134,10 +134,10 @@ Requirements for v1.0 release. Each maps to roadmap phases.
 
 ### Documentation
 
-- [ ] **DOCS-01**: Getting started guide (install, init, first import, first plan/apply)
-- [ ] **DOCS-02**: Multi-tenant usage guide
-- [ ] **DOCS-03**: CI/CD integration guide (GitHub Actions + Azure DevOps)
-- [ ] **DOCS-04**: README with badges, install instructions, quick start, architecture overview
+- [x] **DOCS-01**: Getting started guide (install, init, first import, first plan/apply)
+- [x] **DOCS-02**: Multi-tenant usage guide
+- [x] **DOCS-03**: CI/CD integration guide (GitHub Actions + Azure DevOps)
+- [x] **DOCS-04**: README with badges, install instructions, quick start, architecture overview
 
 ## v2 Requirements
 
@@ -265,10 +265,10 @@ Deferred to future release. Tracked but not in current roadmap.
 | QUAL-03 | Phase 5 | Complete |
 | QUAL-04 | Phase 5 | Complete |
 | QUAL-05 | Phase 5 | Complete |
-| DOCS-01 | Phase 5 | Pending |
-| DOCS-02 | Phase 5 | Pending |
-| DOCS-03 | Phase 5 | Pending |
-| DOCS-04 | Phase 5 | Pending |
+| DOCS-01 | Phase 5 | Complete |
+| DOCS-02 | Phase 5 | Complete |
+| DOCS-03 | Phase 5 | Complete |
+| DOCS-04 | Phase 5 | Complete |
 
 **Coverage:**
 - v1 requirements: 87 total

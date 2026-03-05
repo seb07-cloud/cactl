@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-03-04)
 
 **Core value:** Reliable, idempotent, state-aware deployment of Entra CA policies with Git-native versioning and plan/apply safety
-**Current focus:** Phase 5: Production Readiness (In Progress)
+**Current focus:** Phase 5: Production Readiness (Complete)
 
 ## Current Position
 
 Phase: 5 of 5 (Production Readiness)
-Plan: 3 of 4 in current phase
-Status: In Progress
-Last activity: 2026-03-05 -- Completed Wave 1 (05-01, 05-02, 05-03)
+Plan: 4 of 4 in current phase
+Status: Complete
+Last activity: 2026-03-05 -- Completed 05-04 (Documentation Suite)
 
-Progress: [██████████████████████████████████] 95%
+Progress: [████████████████████████████████████] 100%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 20
+- Total plans completed: 21
 - Average duration: 2.0min
-- Total execution time: 0.60 hours
+- Total execution time: 0.63 hours
 
 **By Phase:**
 
@@ -31,10 +31,10 @@ Progress: [███████████████████████
 | 02-state-and-import | 3/3 | 8min | 2.7min |
 | 03-plan-and-apply | 5/5 | 15min | 3.0min |
 | 04-drift-rollback-and-status | 5/5 | 8min | 1.6min |
-| 05-production-readiness | 3/4 | 7min | 2.3min |
+| 05-production-readiness | 4/4 | 9min | 2.3min |
 
 **Recent Trend:**
-- Last 5 plans: 04-04 (2min), 04-05 (1min), 05-01 (3min), 05-02 (2min), 05-03 (2min)
+- Last 5 plans: 04-05 (1min), 05-01 (3min), 05-02 (2min), 05-03 (2min), 05-04 (2min)
 - Trend: Stable
 
 *Updated after each plan completion*
@@ -112,6 +112,9 @@ Recent decisions affecting current work:
 - 05-03: GraphClient interface scoped to ListPolicies/GetPolicy only (write methods deferred)
 - 05-03: MockGraphClient uses func fields (not generated mocks) for simplicity
 - 05-03: golangci-lint not available locally; config validated by YAML structure only
+- 05-04: README structured as project landing page with badges, install, quick start, architecture, and doc links
+- 05-04: Docs use relative links between files for portability
+- 05-04: CI/CD guide references example pipelines created in 05-02
 
 ### Pending Todos
 
@@ -124,5 +127,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-05
-Stopped at: Completed Wave 1 (05-01, 05-02, 05-03) -- starting Wave 2
+Stopped at: Completed 05-04 (Documentation Suite) -- Phase 5 complete, all 21 plans done
 Resume file: None
