@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-03-04)
 
 **Core value:** Reliable, idempotent, state-aware deployment of Entra CA policies with Git-native versioning and plan/apply safety
-**Current focus:** Phase 4: Drift, Rollback, and Status (Complete)
+**Current focus:** Phase 5: Production Readiness (In Progress)
 
 ## Current Position
 
-Phase: 4 of 5 (Drift, Rollback, and Status)
-Plan: 5 of 5 in current phase
-Status: Phase Complete
-Last activity: 2026-03-05 -- Completed 04-05 Gap Closure (SEMV-05 + stale checkboxes)
+Phase: 5 of 5 (Production Readiness)
+Plan: 2 of 4 in current phase
+Status: In Progress
+Last activity: 2026-03-05 -- Completed 05-02 CI/CD and Distribution
 
-Progress: [██████████████████████████████] 85%
+Progress: [██████████████████████████████] 90%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 17
+- Total plans completed: 18
 - Average duration: 2.0min
-- Total execution time: 0.57 hours
+- Total execution time: 0.60 hours
 
 **By Phase:**
 
@@ -31,9 +31,10 @@ Progress: [███████████████████████
 | 02-state-and-import | 3/3 | 8min | 2.7min |
 | 03-plan-and-apply | 5/5 | 15min | 3.0min |
 | 04-drift-rollback-and-status | 5/5 | 8min | 1.6min |
+| 05-production-readiness | 1/4 | 2min | 2.0min |
 
 **Recent Trend:**
-- Last 5 plans: 04-01 (1min), 04-02 (2min), 04-03 (2min), 04-04 (2min), 04-05 (1min)
+- Last 5 plans: 04-02 (2min), 04-03 (2min), 04-04 (2min), 04-05 (1min), 05-02 (2min)
 - Trend: Stable
 
 *Updated after each plan completion*
@@ -100,6 +101,10 @@ Recent decisions affecting current work:
 - 04-04: BuildSummary exported for reuse between table and JSON rendering paths
 - 04-05: parseBumpLevel helper in cmd package (not semver) since it handles user CLI input
 - 04-05: Override read early in runApply, applied inside bump computation loop per action
+- 05-02: GoReleaser v2 format with version: 2 header
+- 05-02: CGO_ENABLED=0 for static binaries across all platforms
+- 05-02: Changelog groups by conventional commit prefix (feat, fix, others)
+- 05-02: Fixed go.mod module path mismatch (sebdah -> seb07-cloud) to unblock builds
 
 ### Pending Todos
 
@@ -112,5 +117,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-05
-Stopped at: Completed 04-05-PLAN.md (Gap Closure) -- Phase 4 complete
+Stopped at: Completed 05-02-PLAN.md (CI/CD and Distribution)
 Resume file: None

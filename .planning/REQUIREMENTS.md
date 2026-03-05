@@ -112,10 +112,10 @@ Requirements for v1.0 release. Each maps to roadmap phases.
 
 - [ ] **CICD-01**: --ci flag enables non-interactive mode, suppresses all prompts
 - [ ] **CICD-02**: --ci requires --auto-approve for write operations
-- [ ] **CICD-03**: GoReleaser builds for linux/amd64, linux/arm64, darwin/amd64, darwin/arm64, windows/amd64
-- [ ] **CICD-04**: GitHub Actions example workflow with workload identity auth
-- [ ] **CICD-05**: Azure DevOps example pipeline with SP cert auth
-- [ ] **CICD-06**: Scheduled drift check example (daily cron with alert on exit code 1)
+- [x] **CICD-03**: GoReleaser builds for linux/amd64, linux/arm64, darwin/amd64, darwin/arm64, windows/amd64
+- [x] **CICD-04**: GitHub Actions example workflow with workload identity auth
+- [x] **CICD-05**: Azure DevOps example pipeline with SP cert auth
+- [x] **CICD-06**: Scheduled drift check example (daily cron with alert on exit code 1)
 
 ### Multi-Tenant
 
@@ -129,7 +129,7 @@ Requirements for v1.0 release. Each maps to roadmap phases.
 - [ ] **QUAL-01**: golangci-lint with default ruleset + exhaustive enum checks
 - [ ] **QUAL-02**: Table-driven unit tests with Graph client fully mockable via interface
 - [ ] **QUAL-03**: 80% test coverage target on internal/graph and internal/reconcile
-- [ ] **QUAL-04**: Conventional Commits (feat:, fix:, chore:) for automatic CHANGELOG generation
+- [x] **QUAL-04**: Conventional Commits (feat:, fix:, chore:) for automatic CHANGELOG generation
 - [ ] **QUAL-05**: MIT license
 
 ### Documentation
@@ -252,10 +252,10 @@ Deferred to future release. Tracked but not in current roadmap.
 | VALID-05 | Phase 3 | Complete |
 | CICD-01 | Phase 5 | Pending |
 | CICD-02 | Phase 5 | Pending |
-| CICD-03 | Phase 5 | Pending |
-| CICD-04 | Phase 5 | Pending |
-| CICD-05 | Phase 5 | Pending |
-| CICD-06 | Phase 5 | Pending |
+| CICD-03 | Phase 5 | Complete |
+| CICD-04 | Phase 5 | Complete |
+| CICD-05 | Phase 5 | Complete |
+| CICD-06 | Phase 5 | Complete |
 | MTNT-01 | Phase 5 | Pending |
 | MTNT-02 | Phase 5 | Pending |
 | MTNT-03 | Phase 5 | Pending |
@@ -263,7 +263,7 @@ Deferred to future release. Tracked but not in current roadmap.
 | QUAL-01 | Phase 5 | Pending |
 | QUAL-02 | Phase 5 | Pending |
 | QUAL-03 | Phase 5 | Pending |
-| QUAL-04 | Phase 5 | Pending |
+| QUAL-04 | Phase 5 | Complete |
 | QUAL-05 | Phase 5 | Pending |
 | DOCS-01 | Phase 5 | Pending |
 | DOCS-02 | Phase 5 | Pending |
