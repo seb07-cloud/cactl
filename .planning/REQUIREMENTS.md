@@ -86,7 +86,7 @@ Requirements for v1.0 release. Each maps to roadmap phases.
 
 ### Rollback
 
-- [ ] **ROLL-01**: `cactl rollback --policy <slug> --version <semver>` reads policy JSON from annotated tag
+- [x] **ROLL-01**: `cactl rollback --policy <slug> --version <semver>` reads policy JSON from annotated tag
 - [ ] **ROLL-02**: Rollback runs plan diff against current live state and presents for confirmation
 - [ ] **ROLL-03**: On confirmation: PATCHes live policy, writes new state manifest entry
 - [ ] **ROLL-04**: Tag history is never modified — full audit trail preserved; rollback becomes new deployment event
@@ -235,7 +235,7 @@ Deferred to future release. Tracked but not in current roadmap.
 | DRIFT-02 | Phase 4 | Pending |
 | DRIFT-03 | Phase 4 | Pending |
 | DRIFT-04 | Phase 4 | Pending |
-| ROLL-01 | Phase 4 | Pending |
+| ROLL-01 | Phase 4 | Complete |
 | ROLL-02 | Phase 4 | Pending |
 | ROLL-03 | Phase 4 | Pending |
 | ROLL-04 | Phase 4 | Pending |

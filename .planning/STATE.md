@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-03-04)
 
 **Core value:** Reliable, idempotent, state-aware deployment of Entra CA policies with Git-native versioning and plan/apply safety
-**Current focus:** Phase 3: Plan and Apply
+**Current focus:** Phase 4: Drift, Rollback, and Status
 
 ## Current Position
 
-Phase: 3 of 5 (Plan and Apply) -- COMPLETE
-Plan: 5 of 5 in current phase
-Status: Phase Complete
-Last activity: 2026-03-05 -- Completed 03-05 Apply Command
+Phase: 4 of 5 (Drift, Rollback, and Status)
+Plan: 1 of 4 in current phase
+Status: In Progress
+Last activity: 2026-03-05 -- Completed 04-01 Git Version Tag Infrastructure
 
-Progress: [████████████████████] 60%
+Progress: [█████████████████████████] 65%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 12
-- Average duration: 2.5min
-- Total execution time: 0.47 hours
+- Total plans completed: 13
+- Average duration: 2.3min
+- Total execution time: 0.49 hours
 
 **By Phase:**
 
@@ -30,9 +30,10 @@ Progress: [████████████████████] 60%
 | 01-foundation | 4/4 | 10min | 2.5min |
 | 02-state-and-import | 3/3 | 8min | 2.7min |
 | 03-plan-and-apply | 5/5 | 15min | 3.0min |
+| 04-drift-rollback-and-status | 1/4 | 1min | 1.0min |
 
 **Recent Trend:**
-- Last 5 plans: 03-01 (2min), 03-02 (3min), 03-03 (3min), 03-04 (4min), 03-05 (3min)
+- Last 5 plans: 03-02 (3min), 03-03 (3min), 03-04 (4min), 03-05 (3min), 04-01 (1min)
 - Trend: Stable
 
 *Updated after each plan completion*
@@ -86,6 +87,8 @@ Recent decisions affecting current work:
 - 03-05: Per-action manifest+tag writes ensure state consistency even on mid-apply failure
 - 03-05: Recreate uses BumpMinor (not BumpPatch) since policy identity changes
 - 03-05: CI mode returns exit 2 when --auto-approve missing
+- 04-01: strip=5 in for-each-ref to extract version directly from tag ref path
+- 04-01: HashObject wraps private hashObject for public API -- avoids code duplication
 
 ### Pending Todos
 
@@ -98,5 +101,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-05
-Stopped at: Completed 03-05-PLAN.md (Apply Command) -- Phase 03 complete
+Stopped at: Completed 04-01-PLAN.md (Git Version Tag Infrastructure)
 Resume file: None
