@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-03-04)
 ## Current Position
 
 Phase: 4 of 5 (Drift, Rollback, and Status)
-Plan: 2 of 4 in current phase
+Plan: 4 of 4 in current phase
 Status: In Progress
-Last activity: 2026-03-05 -- Completed 04-02 Drift Command
+Last activity: 2026-03-05 -- Completed 04-04 Status Command
 
-Progress: [██████████████████████████] 70%
+Progress: [██████████████████████████████] 80%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 14
-- Average duration: 2.2min
-- Total execution time: 0.52 hours
+- Total plans completed: 16
+- Average duration: 2.1min
+- Total execution time: 0.56 hours
 
 **By Phase:**
 
@@ -30,10 +30,10 @@ Progress: [███████████████████████
 | 01-foundation | 4/4 | 10min | 2.5min |
 | 02-state-and-import | 3/3 | 8min | 2.7min |
 | 03-plan-and-apply | 5/5 | 15min | 3.0min |
-| 04-drift-rollback-and-status | 2/4 | 3min | 1.5min |
+| 04-drift-rollback-and-status | 4/4 | 7min | 1.75min |
 
 **Recent Trend:**
-- Last 5 plans: 03-03 (3min), 03-04 (4min), 03-05 (3min), 04-01 (1min), 04-02 (2min)
+- Last 5 plans: 03-05 (3min), 04-01 (1min), 04-02 (2min), 04-03 (2min), 04-04 (2min)
 - Trend: Stable
 
 *Updated after each plan completion*
@@ -93,6 +93,11 @@ Recent decisions affecting current work:
 - 04-02: No semver/validation/resolver in drift -- keeps it fast for CI scheduled checks
 - 04-02: Remediation footer only shown for human output (not JSON) to keep JSON machine-parseable
 - 04-02: All drift errors wrapped in ExitError code 2 for consistent fatal error handling
+- 04-04: Graceful degradation -- auth/network failures show "unknown" sync status instead of erroring
+- 04-04: ListPolicies once + index by ID for O(1) per-policy sync lookup (avoids N+1)
+- 04-04: Git SHA comparison via HashObject matches backend storage format exactly
+- 04-04: Status always exits 0 -- informational command, not a gate
+- 04-04: BuildSummary exported for reuse between table and JSON rendering paths
 
 ### Pending Todos
 
@@ -105,5 +110,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-05
-Stopped at: Completed 04-02-PLAN.md (Drift Command)
+Stopped at: Completed 04-04-PLAN.md (Status Command)
 Resume file: None

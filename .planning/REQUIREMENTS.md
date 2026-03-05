@@ -15,7 +15,7 @@ Requirements for v1.0 release. Each maps to roadmap phases.
 - [x] **CLI-04**: User can run `cactl import` to pull live CA policies into backend with normalization
 - [x] **CLI-05**: User can run `cactl drift` to check for drift without making changes
 - [ ] **CLI-06**: User can run `cactl rollback` to restore a prior policy version from Git tag history
-- [ ] **CLI-07**: User can run `cactl status` to see tracked policies with version, timestamp, deployer, and sync status
+- [x] **CLI-07**: User can run `cactl status` to see tracked policies with version, timestamp, deployer, and sync status
 - [x] **CLI-08**: All commands accept --tenant, --output (human|json), --no-color, --ci, --config, --log-level flags
 - [x] **CLI-09**: Exit codes follow contract: 0=success/no changes, 1=changes/drift detected, 2=fatal error, 3=validation error
 - [x] **CLI-10**: Single Go binary with zero external runtime dependencies, built with cobra/viper
@@ -188,7 +188,7 @@ Deferred to future release. Tracked but not in current roadmap.
 | CLI-04 | Phase 2 | Complete |
 | CLI-05 | Phase 4 | Complete |
 | CLI-06 | Phase 4 | Pending |
-| CLI-07 | Phase 4 | Pending |
+| CLI-07 | Phase 4 | Complete |
 | CLI-08 | Phase 1 | Complete |
 | CLI-09 | Phase 1 | Complete |
 | CLI-10 | Phase 1 | Complete |
