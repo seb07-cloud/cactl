@@ -261,3 +261,100 @@ func TestListPoliciesHTTPError(t *testing.T) {
 	require.Error(t, err)
 	assert.Contains(t, err.Error(), "403")
 }
+
+// MockGraphClient is a test double implementing GraphClient via configurable
+// function fields. This allows table-driven tests without httptest servers.
+type MockGraphClient struct {
+	ListPoliciesFunc func(ctx context.Context) ([]Policy, error)
+	GetPolicyFunc    func(ctx context.Context, policyID string) (*Policy, error)
+}
+
+// Verify MockGraphClient implements GraphClient at compile time.
+var _ GraphClient = (*MockGraphClient)(nil)
+
+func (m *MockGraphClient) ListPolicies(ctx context.Context) ([]Policy, error) {
+	return m.ListPoliciesFunc(ctx)
+}
+
+func (m *MockGraphClient) GetPolicy(ctx context.Context, policyID string) (*Policy, error) {
+	return m.GetPolicyFunc(ctx, policyID)
+}
+
+func TestMockGraphClient(t *testing.T) {
+	tests := []struct {
+		name      string
+		mock      *MockGraphClient
+		run       func(t *testing.T, c GraphClient)
+	}{
+		{
+			name: "ListPolicies returns expected policies",
+			mock: &MockGraphClient{
+				ListPoliciesFunc: func(_ context.Context) ([]Policy, error) {
+					return []Policy{
+						{ID: "p1", DisplayName: "Policy One", State: "enabled"},
+						{ID: "p2", DisplayName: "Policy Two", State: "disabled"},
+					}, nil
+				},
+			},
+			run: func(t *testing.T, c GraphClient) {
+				policies, err := c.ListPolicies(context.Background())
+				require.NoError(t, err)
+				assert.Len(t, policies, 2)
+				assert.Equal(t, "p1", policies[0].ID)
+				assert.Equal(t, "Policy One", policies[0].DisplayName)
+				assert.Equal(t, "p2", policies[1].ID)
+			},
+		},
+		{
+			name: "ListPolicies returns error",
+			mock: &MockGraphClient{
+				ListPoliciesFunc: func(_ context.Context) ([]Policy, error) {
+					return nil, fmt.Errorf("network timeout")
+				},
+			},
+			run: func(t *testing.T, c GraphClient) {
+				policies, err := c.ListPolicies(context.Background())
+				require.Error(t, err)
+				assert.Nil(t, policies)
+				assert.Contains(t, err.Error(), "network timeout")
+			},
+		},
+		{
+			name: "GetPolicy returns expected policy by ID",
+			mock: &MockGraphClient{
+				GetPolicyFunc: func(_ context.Context, id string) (*Policy, error) {
+					if id == "policy-42" {
+						return &Policy{ID: "policy-42", DisplayName: "CA042: Test", State: "enabled"}, nil
+					}
+					return nil, fmt.Errorf("not found: %s", id)
+				},
+			},
+			run: func(t *testing.T, c GraphClient) {
+				p, err := c.GetPolicy(context.Background(), "policy-42")
+				require.NoError(t, err)
+				assert.Equal(t, "policy-42", p.ID)
+				assert.Equal(t, "CA042: Test", p.DisplayName)
+			},
+		},
+		{
+			name: "GetPolicy returns error for unknown ID",
+			mock: &MockGraphClient{
+				GetPolicyFunc: func(_ context.Context, id string) (*Policy, error) {
+					return nil, fmt.Errorf("not found: %s", id)
+				},
+			},
+			run: func(t *testing.T, c GraphClient) {
+				p, err := c.GetPolicy(context.Background(), "unknown-id")
+				require.Error(t, err)
+				assert.Nil(t, p)
+				assert.Contains(t, err.Error(), "not found: unknown-id")
+			},
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			tc.run(t, tc.mock)
+		})
+	}
+}

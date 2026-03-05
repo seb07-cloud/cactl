@@ -3,12 +3,26 @@ version: "2"
 linters:
   default: standard
   enable:
-    - govet
-    - errcheck
-    - staticcheck
-    - unused
-    - gosimple
-    - ineffassign
+    - exhaustive
+    - testifylint
+    - errorlint
+    - gocritic
+    - gosec
+    - prealloc
+  settings:
+    exhaustive:
+      check:
+        - switch
+        - map
+      default-signifies-exhaustive: false
+    testifylint:
+      enable-all: true
 
-run:
-  go: "1.24"
+formatters:
+  enable:
+    - gofmt
+    - goimports
+
+issues:
+  max-issues-per-linter: 0
+  max-same-issues: 0

@@ -17,6 +17,9 @@ const (
 	graphScope     = "https://graph.microsoft.com/.default"
 )
 
+// Verify Client implements GraphClient at compile time.
+var _ GraphClient = (*Client)(nil)
+
 // Client is an authenticated HTTP client for Microsoft Graph API.
 type Client struct {
 	baseURL    string

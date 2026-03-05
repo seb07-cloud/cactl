@@ -109,6 +109,9 @@ Recent decisions affecting current work:
 - 05-02: CGO_ENABLED=0 for static binaries across all platforms
 - 05-02: Changelog groups by conventional commit prefix (feat, fix, others)
 - 05-02: Fixed go.mod module path mismatch (sebdah -> seb07-cloud) to unblock builds
+- 05-03: GraphClient interface scoped to ListPolicies/GetPolicy only (write methods deferred)
+- 05-03: MockGraphClient uses func fields (not generated mocks) for simplicity
+- 05-03: golangci-lint not available locally; config validated by YAML structure only
 
 ### Pending Todos
 
