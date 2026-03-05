@@ -14,7 +14,7 @@ Requirements for v1.0 release. Each maps to roadmap phases.
 - [x] **CLI-03**: User can run `cactl apply` to deploy backend state to live tenant with confirmation prompt
 - [x] **CLI-04**: User can run `cactl import` to pull live CA policies into backend with normalization
 - [x] **CLI-05**: User can run `cactl drift` to check for drift without making changes
-- [ ] **CLI-06**: User can run `cactl rollback` to restore a prior policy version from Git tag history
+- [x] **CLI-06**: User can run `cactl rollback` to restore a prior policy version from Git tag history
 - [x] **CLI-07**: User can run `cactl status` to see tracked policies with version, timestamp, deployer, and sync status
 - [x] **CLI-08**: All commands accept --tenant, --output (human|json), --no-color, --ci, --config, --log-level flags
 - [x] **CLI-09**: Exit codes follow contract: 0=success/no changes, 1=changes/drift detected, 2=fatal error, 3=validation error
@@ -74,7 +74,7 @@ Requirements for v1.0 release. Each maps to roadmap phases.
 - [x] **SEMV-02**: MAJOR bump triggered by scope expansion (configurable via semver.major_fields in config)
 - [x] **SEMV-03**: MINOR bump triggered by conditions/controls changes (configurable via semver.minor_fields)
 - [x] **SEMV-04**: PATCH bump for state-only or cosmetic changes (all other fields)
-- [ ] **SEMV-05**: User can override the suggested bump level at apply time
+- [x] **SEMV-05**: User can override the suggested bump level at apply time
 - [x] **SEMV-06**: MAJOR bumps display explicit warning in plan output
 
 ### Drift Detection
@@ -87,9 +87,9 @@ Requirements for v1.0 release. Each maps to roadmap phases.
 ### Rollback
 
 - [x] **ROLL-01**: `cactl rollback --policy <slug> --version <semver>` reads policy JSON from annotated tag
-- [ ] **ROLL-02**: Rollback runs plan diff against current live state and presents for confirmation
-- [ ] **ROLL-03**: On confirmation: PATCHes live policy, writes new state manifest entry
-- [ ] **ROLL-04**: Tag history is never modified — full audit trail preserved; rollback becomes new deployment event
+- [x] **ROLL-02**: Rollback runs plan diff against current live state and presents for confirmation
+- [x] **ROLL-03**: On confirmation: PATCHes live policy, writes new state manifest entry
+- [x] **ROLL-04**: Tag history is never modified — full audit trail preserved; rollback becomes new deployment event
 
 ### Display & Output
 
@@ -187,7 +187,7 @@ Deferred to future release. Tracked but not in current roadmap.
 | CLI-03 | Phase 3 | Complete |
 | CLI-04 | Phase 2 | Complete |
 | CLI-05 | Phase 4 | Complete |
-| CLI-06 | Phase 4 | Pending |
+| CLI-06 | Phase 4 | Complete |
 | CLI-07 | Phase 4 | Complete |
 | CLI-08 | Phase 1 | Complete |
 | CLI-09 | Phase 1 | Complete |
@@ -229,16 +229,16 @@ Deferred to future release. Tracked but not in current roadmap.
 | SEMV-02 | Phase 3 | Complete |
 | SEMV-03 | Phase 3 | Complete |
 | SEMV-04 | Phase 3 | Complete |
-| SEMV-05 | Phase 3 | Pending |
+| SEMV-05 | Phase 3 | Complete |
 | SEMV-06 | Phase 3 | Complete |
 | DRIFT-01 | Phase 4 | Complete |
 | DRIFT-02 | Phase 4 | Complete |
 | DRIFT-03 | Phase 4 | Complete |
 | DRIFT-04 | Phase 4 | Complete |
 | ROLL-01 | Phase 4 | Complete |
-| ROLL-02 | Phase 4 | Pending |
-| ROLL-03 | Phase 4 | Pending |
-| ROLL-04 | Phase 4 | Pending |
+| ROLL-02 | Phase 4 | Complete |
+| ROLL-03 | Phase 4 | Complete |
+| ROLL-04 | Phase 4 | Complete |
 | DISP-01 | Phase 3 | Complete |
 | DISP-02 | Phase 3 | Complete |
 | DISP-03 | Phase 3 | Complete |
