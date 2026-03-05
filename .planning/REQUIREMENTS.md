@@ -95,8 +95,8 @@ Requirements for v1.0 release. Each maps to roadmap phases.
 
 - [ ] **DISP-01**: Human-readable output uses terraform-style colored diffs with sigils
 - [ ] **DISP-02**: All commands support --output json with stable schema (schema_version field)
-- [ ] **DISP-03**: Named locations resolved to display names in plan/diff output (not raw GUIDs)
-- [ ] **DISP-04**: Groups and users resolved to display names in plan/diff output
+- [x] **DISP-03**: Named locations resolved to display names in plan/diff output (not raw GUIDs)
+- [x] **DISP-04**: Groups and users resolved to display names in plan/diff output
 - [ ] **DISP-05**: `cactl status` shows per-policy version tree with timestamp and deployer identity
 - [x] **DISP-06**: --no-color flag disables ANSI color output (also via CACTL_NO_COLOR=1)
 
@@ -241,8 +241,8 @@ Deferred to future release. Tracked but not in current roadmap.
 | ROLL-04 | Phase 4 | Pending |
 | DISP-01 | Phase 3 | Pending |
 | DISP-02 | Phase 3 | Pending |
-| DISP-03 | Phase 3 | Pending |
-| DISP-04 | Phase 3 | Pending |
+| DISP-03 | Phase 3 | Complete |
+| DISP-04 | Phase 3 | Complete |
 | DISP-05 | Phase 3 | Pending |
 | DISP-06 | Phase 1 | Complete |
 | VALID-01 | Phase 3 | Pending |

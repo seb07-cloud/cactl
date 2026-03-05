@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-03-04)
 ## Current Position
 
 Phase: 3 of 5 (Plan and Apply)
-Plan: 1 of 5 in current phase
+Plan: 3 of 5 in current phase
 Status: In Progress
-Last activity: 2026-03-05 -- Completed 03-01 Reconciliation Engine
+Last activity: 2026-03-05 -- Completed 03-03 Graph Write Operations and Display Name Resolver
 
-Progress: [████████████████░░░░] 40%
+Progress: [██████████████████░░] 50%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 8
+- Total plans completed: 10
 - Average duration: 2.4min
-- Total execution time: 0.30 hours
+- Total execution time: 0.35 hours
 
 **By Phase:**
 
@@ -29,10 +29,10 @@ Progress: [████████████████░░░░] 40%
 |-------|-------|-------|----------|
 | 01-foundation | 4/4 | 10min | 2.5min |
 | 02-state-and-import | 3/3 | 8min | 2.7min |
-| 03-plan-and-apply | 1/5 | 2min | 2min |
+| 03-plan-and-apply | 3/5 | 8min | 2.7min |
 
 **Recent Trend:**
-- Last 5 plans: 02-01 (2min), 02-02 (3min), 02-03 (3min), 03-01 (2min)
+- Last 5 plans: 02-02 (3min), 02-03 (3min), 03-01 (2min), 03-02 (3min), 03-03 (3min)
 - Trend: Stable
 
 *Updated after each plan completion*
@@ -71,6 +71,13 @@ Recent decisions affecting current work:
 - 03-01: Noop actions suppressed (not emitted) -- plan output only shows actionable changes
 - 03-01: Actions sorted by slug for deterministic output across runs
 - 03-01: nil returned instead of empty slice for zero-action cases (idiomatic Go)
+- 03-03: CollectRefs accepts []map[string]interface{} instead of reconcile.PolicyAction (avoids circular dep on unbuilt package)
+- 03-03: BatchClient interface in resolve package for mock injection (not concrete *graph.Client)
+- 03-03: isGUID uses structural UUID format check to exclude sentinel values like All/None
+- [Phase 03]: 03-02: Local FieldDiff type in semver package -- reconcile package not yet available, avoids circular deps
+- [Phase 03]: 03-02: Local PolicyAction/ActionType in validate package -- mirrors reconcile types for wave-1 independence
+- [Phase 03]: 03-02: VALID-02 schema validation stubbed with TODO -- requires schema.json loading
+- [Phase 03]: 03-02: checkEmptyIncludes only warns when conditions.users node exists -- avoids false positives
 
 ### Pending Todos
 
@@ -83,5 +90,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-05
-Stopped at: Completed 03-01-PLAN.md (Reconciliation Engine)
+Stopped at: Completed 03-03-PLAN.md (Graph Write Operations and Display Name Resolver)
 Resume file: None
