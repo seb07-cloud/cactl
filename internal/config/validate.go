@@ -3,7 +3,7 @@ package config
 import (
 	"fmt"
 
-	"github.com/sebdah/cactl/pkg/types"
+	"github.com/seb07-cloud/cactl/pkg/types"
 )
 
 // validOutputFormats lists the accepted values for the --output flag.

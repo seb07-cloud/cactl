@@ -1,4 +1,4 @@
-module github.com/sebdah/cactl
+module github.com/seb07-cloud/cactl
 
 go 1.25.0
 

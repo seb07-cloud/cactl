@@ -7,9 +7,9 @@ import (
 	"os/exec"
 	"strings"
 
-	"github.com/sebdah/cactl/internal/output"
-	"github.com/sebdah/cactl/internal/schema"
-	"github.com/sebdah/cactl/pkg/types"
+	"github.com/seb07-cloud/cactl/internal/output"
+	"github.com/seb07-cloud/cactl/internal/schema"
+	"github.com/seb07-cloud/cactl/pkg/types"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -27,7 +27,7 @@ var configFilePath = cactlDir + "/" + configFileName
 // No secrets are stored here; ClientID, ClientSecret, CertPath come from env vars only.
 const defaultConfig = `# cactl configuration
 # All values can be overridden by CACTL_* environment variables or CLI flags
-# See: https://github.com/sebdah/cactl
+# See: https://github.com/seb07-cloud/cactl
 tenant: ""
 auth:
   mode: ""  # az-cli | client-secret | client-certificate (auto-detected if empty)
