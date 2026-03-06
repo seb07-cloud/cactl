@@ -117,6 +117,10 @@ Recent decisions affecting current work:
 - 05-04: Docs use relative links between files for portability
 - 05-04: CI/CD guide references example pipelines created in 05-02
 - 05-05: Kept awk BEGIN block for float comparison (POSIX-portable)
+- 06-01: huh v0.8.0 (not v2) as published latest; provides Select/Confirm out of box
+- 06-01: Function fields in RestoreConfig avoid circular dep between tui and cmd packages
+- 06-01: Diff summaries compare each version to predecessor (not current desired state)
+- 06-01: Auto-plan errors treated as non-fatal since exit code 1 is expected when changes exist
 - 06-02: Diff summaries show top-level field names only (deduped from dot-path diffs)
 - 06-02: Graceful degradation: tag listing failure shows 0 versions instead of erroring
 - 06-02: No restore capability in history command (per user decision: read-only only)
@@ -136,5 +140,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-06
-Stopped at: Completed 06-02 (History Command) -- Phase 6 complete, all 24 plans done
+Stopped at: Completed 06-01-PLAN.md (Interactive History Browser) -- re-executed with actual implementation
 Resume file: None
