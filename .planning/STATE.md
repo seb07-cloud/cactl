@@ -117,6 +117,10 @@ Recent decisions affecting current work:
 - 05-04: CI/CD guide references example pipelines created in 05-02
 - 05-05: Kept awk BEGIN block for float comparison (POSIX-portable)
 
+### Roadmap Evolution
+
+- Phase 6 added: Point-in-Time Restore - git history timeline, point-in-time policy restore with full diffs
+
 ### Pending Todos
 
 1. Add point-in-time restore for policies (2026-03-06)
