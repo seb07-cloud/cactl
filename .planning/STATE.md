@@ -132,6 +132,7 @@ Recent decisions affecting current work:
 ### Pending Todos
 
 1. Add point-in-time restore for policies (2026-03-06)
+2. Run aggressive DRY code-simplifier over entire codebase (2026-03-06)
 
 ### Blockers/Concerns
 
