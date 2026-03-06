@@ -17,6 +17,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 3: Plan and Apply** - Reconciliation engine, plan/apply loop, semver, validations, display (completed 2026-03-05)
 - [x] **Phase 4: Drift, Rollback, and Status** - Drift detection, version rollback, status dashboard (completed 2026-03-05)
 - [x] **Phase 5: Production Readiness** - Multi-tenant, CI/CD, code quality, docs, binary distribution (completed 2026-03-05)
+- [ ] **Phase 6: Point-in-Time Restore** - Git history timeline, point-in-time policy restore with full diffs (not started)
 
 ## Phase Details
 
@@ -112,7 +113,7 @@ Plans:
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
+Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -121,3 +122,13 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 | 3. Plan and Apply | 0/3 | Complete    | 2026-03-05 |
 | 4. Drift, Rollback, and Status | 0/4 | Complete    | 2026-03-05 |
 | 5. Production Readiness | 0/4 | Complete    | 2026-03-05 |
+| 6. Point-in-Time Restore | 0/2 | Not Started | - |
+
+### Phase 6: Point-in-Time Restore
+**Goal**: User can restore any policy to its state at any previous point in time, with full diff preview and confirmation
+**Depends on**: Phase 5
+**Plans:** 2 plans
+
+Plans:
+- [ ] 06-01-PLAN.md — TUI package with huh selectors and interactive rollback restore wizard (-i flag)
+- [ ] 06-02-PLAN.md — Standalone `cactl history` command with version timeline and diff summaries
