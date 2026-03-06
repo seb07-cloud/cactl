@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-03-04)
 
 **Core value:** Reliable, idempotent, state-aware deployment of Entra CA policies with Git-native versioning and plan/apply safety
-**Current focus:** Phase 5: Production Readiness (Complete)
+**Current focus:** Phase 6: Point-in-Time Restore (Complete)
 
 ## Current Position
 
-Phase: 5 of 5 (Production Readiness)
-Plan: 5 of 5 in current phase
+Phase: 6 of 6 (Point-in-Time Restore)
+Plan: 2 of 2 in current phase
 Status: Complete
-Last activity: 2026-03-05 -- Completed 05-05 (Enforce CI Coverage Threshold)
+Last activity: 2026-03-06 -- Completed 06-02 (History Command)
 
 Progress: [████████████████████████████████████] 100%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 22
-- Average duration: 1.9min
-- Total execution time: 0.65 hours
+- Total plans completed: 24
+- Average duration: 1.8min
+- Total execution time: 0.68 hours
 
 **By Phase:**
 
@@ -32,9 +32,10 @@ Progress: [███████████████████████
 | 03-plan-and-apply | 5/5 | 15min | 3.0min |
 | 04-drift-rollback-and-status | 5/5 | 8min | 1.6min |
 | 05-production-readiness | 5/5 | 10min | 2.0min |
+| 06-point-in-time-restore | 2/2 | 2min | 1.0min |
 
 **Recent Trend:**
-- Last 5 plans: 05-01 (3min), 05-02 (2min), 05-03 (2min), 05-04 (2min), 05-05 (1min)
+- Last 5 plans: 05-04 (2min), 05-05 (1min), 06-01 (1min), 06-02 (1min)
 - Trend: Stable
 
 *Updated after each plan completion*
@@ -116,6 +117,9 @@ Recent decisions affecting current work:
 - 05-04: Docs use relative links between files for portability
 - 05-04: CI/CD guide references example pipelines created in 05-02
 - 05-05: Kept awk BEGIN block for float comparison (POSIX-portable)
+- 06-02: Diff summaries show top-level field names only (deduped from dot-path diffs)
+- 06-02: Graceful degradation: tag listing failure shows 0 versions instead of erroring
+- 06-02: No restore capability in history command (per user decision: read-only only)
 
 ### Roadmap Evolution
 
@@ -131,6 +135,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-05
-Stopped at: Completed 05-05 (Enforce CI Coverage Threshold) -- Phase 5 complete, all 22 plans done
+Last session: 2026-03-06
+Stopped at: Completed 06-02 (History Command) -- Phase 6 complete, all 24 plans done
 Resume file: None
