@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"time"
 
 	"github.com/seb07-cloud/cactl/internal/auth"
 	"github.com/seb07-cloud/cactl/internal/config"
@@ -125,17 +126,7 @@ func (p *CommandPipeline) ComputeSemverBumps(actions []reconcile.PolicyAction, o
 		if actions[i].Action != reconcile.ActionUpdate {
 			continue
 		}
-		// Convert reconcile.FieldDiff to semver.FieldDiff
-		semverDiffs := make([]semver.FieldDiff, len(actions[i].Diff))
-		for j, d := range actions[i].Diff {
-			semverDiffs[j] = semver.FieldDiff{
-				Path:     d.Path,
-				OldValue: d.OldValue,
-				NewValue: d.NewValue,
-			}
-		}
-
-		bumpLevel := semver.DetermineBump(semverDiffs, majorFields, minorFields)
+		bumpLevel := semver.DetermineBump(actions[i].Diff, majorFields, minorFields)
 		if overrideBump != nil {
 			bumpLevel = *overrideBump
 		}
@@ -168,12 +159,13 @@ func (p *CommandPipeline) RunValidations(actions []reconcile.PolicyAction) []val
 	valCfg := validate.ValidationConfig{
 		BreakGlassAccounts: breakGlassAccounts,
 	}
-	// Convert to validate.PolicyAction (local mirror types)
+	// Since validate.ActionType is now a type alias for reconcile.ActionType,
+	// we can construct validate.PolicyAction without casting.
 	valActions := make([]validate.PolicyAction, len(actions))
 	for i, a := range actions {
 		valActions[i] = validate.PolicyAction{
 			Slug:        a.Slug,
-			Action:      validate.ActionType(a.Action),
+			Action:      a.Action,
 			BackendJSON: a.BackendJSON,
 		}
 	}
@@ -210,6 +202,46 @@ func (p *CommandPipeline) RenderPlan(w io.Writer, actions []reconcile.PolicyActi
 	} else {
 		useColor := output.ShouldUseColor(viper.GetViper())
 		output.RenderPlan(w, actions, validations, resolver, useColor)
+	}
+	return nil
+}
+
+// RecordAppliedAction writes backend state, creates a version tag, and updates the manifest
+// after a successful Graph API write. This consolidates the identical post-action sequence
+// shared by create, update, and recreate handlers.
+func (p *CommandPipeline) RecordAppliedAction(slug, objectID, version string, data map[string]interface{}, tagMessage string) error {
+	backendJSON, _ := json.Marshal(data)
+	sha, err := p.Backend.WritePolicy(p.Cfg.Tenant, slug, backendJSON)
+	if err != nil {
+		return &types.ExitError{
+			Code:    types.ExitFatalError,
+			Message: fmt.Sprintf("writing backend state for %s: %v", slug, err),
+		}
+	}
+
+	actualVersion, tagErr := p.Backend.CreateVersionTag(p.Cfg.Tenant, slug, version, sha, tagMessage)
+	if tagErr != nil {
+		return &types.ExitError{
+			Code:    types.ExitFatalError,
+			Message: fmt.Sprintf("creating version tag for %s: %v", slug, tagErr),
+		}
+	}
+
+	p.Manifest.Policies[slug] = state.Entry{
+		Slug:         slug,
+		Tenant:       p.Cfg.Tenant,
+		LiveObjectID: objectID,
+		Version:      actualVersion,
+		LastDeployed: time.Now().UTC().Format(time.RFC3339),
+		DeployedBy:   deployerIdentity(p.Cfg),
+		AuthMode:     p.Cfg.Auth.Mode,
+		BackendSHA:   sha,
+	}
+	if err := state.WriteManifest(p.Backend, p.Cfg.Tenant, p.Manifest); err != nil {
+		return &types.ExitError{
+			Code:    types.ExitFatalError,
+			Message: fmt.Sprintf("writing manifest after %s: %v", slug, err),
+		}
 	}
 	return nil
 }

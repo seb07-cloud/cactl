@@ -2,6 +2,8 @@ package validate
 
 import (
 	"fmt"
+
+	"github.com/seb07-cloud/cactl/internal/reconcile"
 )
 
 // Severity represents the severity level of a validation result.
@@ -24,16 +26,17 @@ func (s Severity) String() string {
 	}
 }
 
-// ActionType mirrors reconcile.ActionType to avoid circular dependencies.
+// ActionType is a type alias for reconcile.ActionType.
 // The reconcile package defines the canonical type.
-type ActionType int
+type ActionType = reconcile.ActionType
 
-const (
-	ActionNoop      ActionType = iota
-	ActionCreate
-	ActionUpdate
-	ActionRecreate
-	ActionUntracked
+// Action constants aliased from the reconcile package.
+var (
+	ActionNoop      = reconcile.ActionNoop
+	ActionCreate    = reconcile.ActionCreate
+	ActionUpdate    = reconcile.ActionUpdate
+	ActionRecreate  = reconcile.ActionRecreate
+	ActionUntracked = reconcile.ActionUntracked
 )
 
 // PolicyAction is a local mirror of reconcile.PolicyAction containing the

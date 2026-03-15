@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+
+	"github.com/seb07-cloud/cactl/internal/reconcile"
 )
 
 // BumpLevel represents the semantic versioning bump level.
@@ -29,14 +31,9 @@ func (b BumpLevel) String() string {
 	}
 }
 
-// FieldDiff represents a single field-level difference between two JSON documents.
-// This is a local type matching the reconcile.FieldDiff interface to avoid
-// circular dependencies. The reconcile package defines the canonical type.
-type FieldDiff struct {
-	Path     string
-	OldValue interface{}
-	NewValue interface{}
-}
+// FieldDiff is a type alias for reconcile.FieldDiff.
+// The reconcile package defines the canonical type.
+type FieldDiff = reconcile.FieldDiff
 
 // DetermineBump analyzes field diffs against configured triggers and returns the
 // highest applicable bump level. Any major field triggers BumpMajor immediately
