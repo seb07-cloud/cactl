@@ -21,13 +21,17 @@ func TestTestCmd_Registered(t *testing.T) {
 	assert.True(t, found, "testCmd should be registered on rootCmd")
 }
 
-func TestTestCmd_MissingTenant(t *testing.T) {
-	// Reset viper for test isolation
-	rootCmd.SetArgs([]string{"test"})
-	err := rootCmd.Execute()
-	// Should fail with tenant required error (exit code 2)
+func TestTestCmd_NoTestFiles(t *testing.T) {
+	dir := t.TempDir()
+	origDir, _ := os.Getwd()
+	require.NoError(t, os.Chdir(dir))
+	defer func() { _ = os.Chdir(origDir) }()
+
+	// Call runTest directly to avoid viper state leaking between tests
+	err := runTest(testCmd, []string{})
 	assert.Error(t, err)
-	assert.Contains(t, err.Error(), "tenant")
+	// With az login active, tenant resolves but no test files exist
+	assert.Contains(t, err.Error(), "no test files found")
 }
 
 func TestTestCmd_WithTestFiles(t *testing.T) {

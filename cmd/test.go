@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/seb07-cloud/cactl/internal/config"
 	"github.com/seb07-cloud/cactl/internal/output"
 	"github.com/seb07-cloud/cactl/internal/testengine"
 	"github.com/seb07-cloud/cactl/pkg/types"
@@ -32,19 +33,19 @@ func init() {
 func runTest(cmd *cobra.Command, args []string) error {
 	v := viper.GetViper()
 
-	// Get tenant
-	tenants := v.GetStringSlice("tenant")
-	tenant := ""
-	if len(tenants) > 0 {
-		tenant = tenants[0]
+	// Resolve tenant through the standard config chain (flag > env > az CLI context)
+	cfg, err := config.LoadFromGlobal()
+	if err != nil {
+		return &types.ExitError{
+			Code:    types.ExitFatalError,
+			Message: fmt.Sprintf("loading config: %v", err),
+		}
 	}
-	if tenant == "" {
-		tenant = v.GetString("tenant")
-	}
+	tenant := cfg.Tenant
 	if tenant == "" {
 		return &types.ExitError{
 			Code:    types.ExitFatalError,
-			Message: "tenant is required: use --tenant or set CACTL_TENANT",
+			Message: "tenant is required: use --tenant, set CACTL_TENANT, or log in with az login",
 		}
 	}
 
