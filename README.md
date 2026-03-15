@@ -1,4 +1,4 @@
-# cactl
+# Conditional Access Policy Control
 
 **The deploy framework for Microsoft Entra Conditional Access policies.**
 
