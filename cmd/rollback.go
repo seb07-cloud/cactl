@@ -232,11 +232,11 @@ func runInteractiveRollback(ctx context.Context, cfg *types.Config) error {
 	}
 
 	restoreCfg := tui.RestoreConfig{
-		Backend:  backend,
-		Tenant:   cfg.Tenant,
-		Manifest: manifest,
-		UseColor: output.ShouldUseColor(viper.GetViper()),
-		RepoDir:  ".",
+		Backend:         backend,
+		Tenant:          cfg.Tenant,
+		Manifest:        manifest,
+		UseColor:        output.ShouldUseColor(viper.GetViper()),
+		RepoDir:         ".",
 		WritePolicyFile: WritePolicyFile,
 		ReadDesiredPolicies: func(tenant string) (map[string]map[string]interface{}, error) {
 			policies, err := ReadDesiredPolicies(tenant)

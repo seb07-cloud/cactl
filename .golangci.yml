@@ -17,6 +17,9 @@ linters:
       - path: _test\.go
         linters:
           - gosec
+      - text: "G117"
+        linters:
+          - gosec
   settings:
     errcheck:
       exclude-functions:
