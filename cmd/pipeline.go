@@ -123,31 +123,50 @@ func (p *CommandPipeline) ComputeSemverBumps(actions []reconcile.PolicyAction, o
 	}
 
 	for i := range actions {
-		if actions[i].Action != reconcile.ActionUpdate {
-			continue
-		}
-		bumpLevel := semver.DetermineBump(actions[i].Diff, majorFields, minorFields)
-		if overrideBump != nil {
-			bumpLevel = *overrideBump
-		}
-		actions[i].BumpLevel = bumpLevel.String()
+		switch actions[i].Action {
+		case reconcile.ActionUpdate:
+			bumpLevel := semver.DetermineBump(actions[i].Diff, majorFields, minorFields)
+			if overrideBump != nil {
+				bumpLevel = *overrideBump
+			}
+			actions[i].BumpLevel = bumpLevel.String()
 
-		// Look up current version from manifest
-		currentVersion := "1.0.0"
-		if entry, ok := p.Manifest.Policies[actions[i].Slug]; ok && entry.Version != "" {
-			currentVersion = entry.Version
-		}
+			currentVersion := "1.0.0"
+			if entry, ok := p.Manifest.Policies[actions[i].Slug]; ok && entry.Version != "" {
+				currentVersion = entry.Version
+			}
 
-		newVersion, err := semver.BumpVersion(currentVersion, bumpLevel)
-		if err != nil {
-			return fmt.Errorf("computing version for %s: %w", actions[i].Slug, err)
-		}
-		actions[i].VersionFrom = currentVersion
-		actions[i].VersionTo = newVersion
+			newVersion, err := semver.BumpVersion(currentVersion, bumpLevel)
+			if err != nil {
+				return fmt.Errorf("computing version for %s: %w", actions[i].Slug, err)
+			}
+			actions[i].VersionFrom = currentVersion
+			actions[i].VersionTo = newVersion
 
-		// SEMV-06: Add warning for MAJOR bumps
-		if bumpLevel == semver.BumpMajor {
-			actions[i].Warnings = append(actions[i].Warnings, "MAJOR version bump: scope-affecting change detected")
+			// SEMV-06: Add warning for MAJOR bumps
+			if bumpLevel == semver.BumpMajor {
+				actions[i].Warnings = append(actions[i].Warnings, "MAJOR version bump: scope-affecting change detected")
+			}
+
+		case reconcile.ActionRecreate:
+			// Default recreates to minor; override if --bump-level is set
+			bumpLevel := semver.BumpMinor
+			if overrideBump != nil {
+				bumpLevel = *overrideBump
+			}
+			actions[i].BumpLevel = bumpLevel.String()
+
+			currentVersion := "1.0.0"
+			if entry, ok := p.Manifest.Policies[actions[i].Slug]; ok && entry.Version != "" {
+				currentVersion = entry.Version
+			}
+
+			newVersion, err := semver.BumpVersion(currentVersion, bumpLevel)
+			if err != nil {
+				return fmt.Errorf("computing version for %s: %w", actions[i].Slug, err)
+			}
+			actions[i].VersionFrom = currentVersion
+			actions[i].VersionTo = newVersion
 		}
 	}
 	return nil

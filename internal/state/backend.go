@@ -56,14 +56,61 @@ func (b *GitBackend) ListPolicies(tenantID string) ([]string, error) {
 
 // CreateVersionTag creates an annotated tag pointing to the given blob hash.
 // Tag format: cactl/<tenantID>/<slug>/<version>
-func (b *GitBackend) CreateVersionTag(tenantID, slug, version, blobHash, message string) error {
-	tagName := fmt.Sprintf("cactl/%s/%s/%s", tenantID, slug, version)
-	cmd := exec.Command("git", "tag", "-a", tagName, blobHash, "-m", message)
-	cmd.Dir = b.repoDir
-	if out, err := cmd.CombinedOutput(); err != nil {
-		return fmt.Errorf("creating tag %s: %s: %w", tagName, strings.TrimSpace(string(out)), err)
+//
+// If the tag already exists and points to the same blob, it is treated as a
+// no-op (idempotent). If it exists with different content, the version is
+// auto-bumped (patch increment) until a free tag is found.
+//
+// Returns the actual version used (which may differ from the requested version
+// if auto-bumping occurred).
+func (b *GitBackend) CreateVersionTag(tenantID, slug, version, blobHash, message string) (string, error) {
+	for attempts := 0; attempts < 100; attempts++ {
+		tagName := fmt.Sprintf("cactl/%s/%s/%s", tenantID, slug, version)
+
+		existing, err := b.tagTarget(tagName)
+		if err != nil {
+			// Tag doesn't exist — create it
+			cmd := exec.Command("git", "tag", "-a", tagName, blobHash, "-m", message)
+			cmd.Dir = b.repoDir
+			if out, err := cmd.CombinedOutput(); err != nil {
+				return "", fmt.Errorf("creating tag %s: %s: %w", tagName, strings.TrimSpace(string(out)), err)
+			}
+			return version, nil
+		}
+
+		// Tag exists — check if same content (idempotent)
+		if existing == blobHash {
+			return version, nil
+		}
+
+		// Different content: bump patch and retry
+		version = bumpPatch(version)
 	}
-	return nil
+
+	return "", fmt.Errorf("could not find free version tag for %s/%s after 100 attempts", slug, version)
+}
+
+// bumpPatch increments the patch component of a semver string.
+func bumpPatch(version string) string {
+	parts := strings.Split(version, ".")
+	if len(parts) != 3 {
+		return version + ".1"
+	}
+	patch := 0
+	fmt.Sscanf(parts[2], "%d", &patch)
+	return fmt.Sprintf("%s.%s.%d", parts[0], parts[1], patch+1)
+}
+
+// tagTarget returns the blob hash that an annotated tag points to.
+// Returns an error if the tag does not exist.
+func (b *GitBackend) tagTarget(tagName string) (string, error) {
+	cmd := exec.Command("git", "rev-parse", tagName+"^{}")
+	cmd.Dir = b.repoDir
+	out, err := cmd.Output()
+	if err != nil {
+		return "", err
+	}
+	return strings.TrimSpace(string(out)), nil
 }
 
 // hashObject writes data as a blob to the Git object store and returns the SHA.

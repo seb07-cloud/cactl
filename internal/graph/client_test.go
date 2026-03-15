@@ -131,21 +131,39 @@ func TestGetPolicy(t *testing.T) {
 }
 
 func TestCreatePolicy(t *testing.T) {
+	callCount := 0
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, http.MethodPost, r.Method)
-		assert.Equal(t, "/identity/conditionalAccess/policies", r.URL.Path)
-
-		var body map[string]interface{}
-		err := json.NewDecoder(r.Body).Decode(&body)
-		require.NoError(t, err)
-		assert.Equal(t, "New Policy", body["displayName"])
-
+		callCount++
 		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusCreated)
-		json.NewEncoder(w).Encode(map[string]interface{}{
-			"id":          "new-id-123",
-			"displayName": "New Policy",
-		})
+
+		switch {
+		case callCount == 1 && r.Method == http.MethodGet:
+			// Read-before-write: ListPolicies returns empty (no duplicate)
+			json.NewEncoder(w).Encode(map[string]interface{}{
+				"value": []interface{}{},
+			})
+		case callCount == 2 && r.Method == http.MethodPost:
+			// Actual create
+			var body map[string]interface{}
+			err := json.NewDecoder(r.Body).Decode(&body)
+			require.NoError(t, err)
+			assert.Equal(t, "New Policy", body["displayName"])
+
+			w.WriteHeader(http.StatusCreated)
+			json.NewEncoder(w).Encode(map[string]interface{}{
+				"id":          "new-id-123",
+				"displayName": "New Policy",
+			})
+		case callCount == 3 && r.Method == http.MethodGet:
+			// Post-create verification: GetPolicy
+			json.NewEncoder(w).Encode(map[string]interface{}{
+				"id":          "new-id-123",
+				"displayName": "New Policy",
+			})
+		default:
+			t.Errorf("unexpected request #%d: %s %s", callCount, r.Method, r.URL.Path)
+			w.WriteHeader(http.StatusInternalServerError)
+		}
 	}))
 	defer server.Close()
 
@@ -157,10 +175,49 @@ func TestCreatePolicy(t *testing.T) {
 
 	require.NoError(t, err)
 	assert.Equal(t, "new-id-123", id)
+	assert.Equal(t, 3, callCount, "expected 3 requests: list, create, verify")
+}
+
+func TestCreatePolicy_ExistingDuplicate(t *testing.T) {
+	// Read-before-write should return existing ID instead of POSTing
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, http.MethodGet, r.Method, "should only GET, never POST")
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"value": []interface{}{
+				map[string]interface{}{
+					"id":          "existing-id-456",
+					"displayName": "New Policy",
+				},
+			},
+		})
+	}))
+	defer server.Close()
+
+	client := newTestClient(server.URL)
+	id, err := client.CreatePolicy(context.Background(), map[string]interface{}{
+		"displayName": "New Policy",
+		"state":       "disabled",
+	})
+
+	require.NoError(t, err)
+	assert.Equal(t, "existing-id-456", id)
 }
 
 func TestCreatePolicy_Error(t *testing.T) {
+	callCount := 0
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		callCount++
+		w.Header().Set("Content-Type", "application/json")
+
+		if callCount == 1 && r.Method == http.MethodGet {
+			// Read-before-write: no existing policy
+			json.NewEncoder(w).Encode(map[string]interface{}{
+				"value": []interface{}{},
+			})
+			return
+		}
+		// POST fails
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte(`{"error": {"code": "BadRequest", "message": "Invalid policy"}}`))
 	}))

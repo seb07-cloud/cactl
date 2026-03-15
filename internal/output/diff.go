@@ -31,6 +31,8 @@ func sigil(action reconcile.ActionType) (string, string) {
 		return "-/+", colorRed
 	case reconcile.ActionUntracked:
 		return "?", colorCyan
+	case reconcile.ActionDuplicate:
+		return "!!", colorMagenta
 	default:
 		return " ", colorReset
 	}
@@ -47,6 +49,8 @@ func actionVerb(action reconcile.ActionType) string {
 		return "recreate"
 	case reconcile.ActionUntracked:
 		return "untracked"
+	case reconcile.ActionDuplicate:
+		return "duplicate"
 	default:
 		return ""
 	}
@@ -99,7 +103,7 @@ func RenderPlan(w io.Writer, actions []reconcile.PolicyAction, validations []val
 	}
 
 	// Summary
-	var create, update, recreate, untracked int
+	var create, update, recreate, untracked, duplicate int
 	for _, a := range actions {
 		switch a.Action {
 		case reconcile.ActionCreate:
@@ -110,6 +114,8 @@ func RenderPlan(w io.Writer, actions []reconcile.PolicyAction, validations []val
 			recreate++
 		case reconcile.ActionUntracked:
 			untracked++
+		case reconcile.ActionDuplicate:
+			duplicate++
 		}
 	}
 
@@ -126,6 +132,9 @@ func RenderPlan(w io.Writer, actions []reconcile.PolicyAction, validations []val
 	}
 	if untracked > 0 {
 		parts = append(parts, c(colorCyan, fmt.Sprintf("%d untracked", untracked)))
+	}
+	if duplicate > 0 {
+		parts = append(parts, c(colorMagenta, fmt.Sprintf("%d duplicates", duplicate)))
 	}
 	fmt.Fprintf(w, "Plan: %s\n", strings.Join(parts, ", "))
 }
@@ -152,9 +161,18 @@ func renderAction(w io.Writer, a reconcile.PolicyAction, resolver *resolve.Resol
 		header += c(colorRed, " (deleted from tenant, will recreate)")
 	case reconcile.ActionUntracked:
 		header += c(colorDim, " (not managed by cactl)")
+	case reconcile.ActionDuplicate:
+		header += c(colorMagenta, fmt.Sprintf(" (%d live policies share this displayName)", len(a.DuplicateIDs)))
 	}
 
 	fmt.Fprintln(w, header)
+
+	// Duplicate policy IDs
+	if len(a.DuplicateIDs) > 0 {
+		for _, id := range a.DuplicateIDs {
+			fmt.Fprintf(w, "      %s %s\n", c(colorMagenta, ">>"), id)
+		}
+	}
 
 	// Field-level diffs
 	if len(a.Diff) > 0 {
@@ -339,6 +357,7 @@ func RenderPlanJSON(w io.Writer, actions []reconcile.PolicyAction, validations [
 		}
 
 		ao.Warnings = a.Warnings
+		ao.DuplicateIDs = a.DuplicateIDs
 		out.Actions = append(out.Actions, ao)
 	}
 
@@ -352,6 +371,8 @@ func RenderPlanJSON(w io.Writer, actions []reconcile.PolicyAction, validations [
 			out.Summary.Recreate++
 		case reconcile.ActionUntracked:
 			out.Summary.Untracked++
+		case reconcile.ActionDuplicate:
+			out.Summary.Duplicate++
 		case reconcile.ActionNoop:
 			out.Summary.Noop++
 		}

@@ -3,12 +3,14 @@ package tui
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"os"
 	"os/exec"
 	"sort"
 	"strings"
 
+	"github.com/charmbracelet/huh"
 	"github.com/seb07-cloud/cactl/internal/output"
 	"github.com/seb07-cloud/cactl/internal/reconcile"
 	"github.com/seb07-cloud/cactl/internal/state"
@@ -48,78 +50,99 @@ func RunInteractiveRestore(ctx context.Context, cfg RestoreConfig) error {
 		return nil
 	}
 
-	// Step 1: Select policy
-	selectedSlug, err := SelectPolicy(slugs)
-	if err != nil {
-		return fmt.Errorf("selecting policy: %w", err)
-	}
-
-	// Step 2: Load version history
-	tags, err := cfg.Backend.ListVersionTags(cfg.Tenant, selectedSlug)
-	if err != nil {
-		return fmt.Errorf("listing versions for %s: %w", selectedSlug, err)
-	}
-	if len(tags) == 0 {
-		fmt.Fprintf(os.Stdout, "No version history for '%s'.\n", selectedSlug)
-		return nil
-	}
-
-	// Step 3: Compute diff summaries for each version
-	summaries := computeDiffSummaries(cfg.Backend, cfg.Tenant, selectedSlug, tags)
-
-	// Version selection loop (supports back-navigation)
+	// Policy selection loop (outer) with version selection loop (inner)
 	for {
-		// Step 4: Select version
-		selectedVersion, err := SelectVersion(tags, summaries)
+		// Step 1: Select policy (Esc or "Quit" exits)
+		selectedSlug, err := SelectPolicy(slugs)
 		if err != nil {
-			return fmt.Errorf("selecting version: %w", err)
+			if errors.Is(err, huh.ErrUserAborted) {
+				return nil
+			}
+			return fmt.Errorf("selecting policy: %w", err)
 		}
-
-		// Step 5: Read historical JSON
-		historicalJSON, err := cfg.Backend.ReadTagBlob(cfg.Tenant, selectedSlug, selectedVersion)
-		if err != nil {
-			return fmt.Errorf("reading version %s: %w", selectedVersion, err)
-		}
-
-		// Step 6: Read current desired state
-		desiredPolicies, err := cfg.ReadDesiredPolicies(cfg.Tenant)
-		if err != nil {
-			return fmt.Errorf("reading desired state: %w", err)
-		}
-
-		var historicalMap map[string]interface{}
-		if err := json.Unmarshal(historicalJSON, &historicalMap); err != nil {
-			return fmt.Errorf("parsing historical version: %w", err)
-		}
-
-		currentDesiredMap := desiredPolicies[selectedSlug]
-
-		// Step 7: Compute diff (historical is "desired" = what we want, current is "actual" = what we have)
-		diffs := reconcile.ComputeDiff(historicalMap, currentDesiredMap)
-
-		if len(diffs) == 0 {
-			fmt.Fprintf(os.Stdout, "Selected version %s matches current desired state.\n", selectedVersion)
-			continue // back to version selection
-		}
-
-		// Step 8: Render diffs
-		fmt.Fprintf(os.Stdout, "\nDiff: %s version %s vs current desired state\n\n", selectedSlug, selectedVersion)
-		output.RenderFieldDiffs(os.Stdout, diffs, cfg.UseColor)
-		fmt.Fprintln(os.Stdout)
-
-		// Step 9: Action selection
-		action, err := SelectAction()
-		if err != nil {
-			return fmt.Errorf("selecting action: %w", err)
-		}
-
-		switch action {
-		case "back":
-			continue // back to version selection
-		case "quit":
+		if selectedSlug == "" {
 			return nil
-		case "restore":
-			return performRestore(ctx, cfg, selectedSlug, selectedVersion, historicalJSON)
+		}
+
+		// Step 2: Load version history
+		tags, err := cfg.Backend.ListVersionTags(cfg.Tenant, selectedSlug)
+		if err != nil {
+			return fmt.Errorf("listing versions for %s: %w", selectedSlug, err)
+		}
+		if len(tags) == 0 {
+			fmt.Fprintf(os.Stdout, "No version history for '%s'.\n", selectedSlug)
+			continue // back to policy selection
+		}
+
+		// Step 3: Compute diff summaries for each version
+		summaries := computeDiffSummaries(cfg.Backend, cfg.Tenant, selectedSlug, tags)
+
+		// Version selection loop (supports back-navigation)
+		backToPolicies := false
+		for {
+			// Step 4: Select version (returns "" for "Back to policies", Esc also goes back)
+			selectedVersion, err := SelectVersion(tags, summaries)
+			if err != nil {
+				if errors.Is(err, huh.ErrUserAborted) {
+					backToPolicies = true
+					break
+				}
+				return fmt.Errorf("selecting version: %w", err)
+			}
+			if selectedVersion == "" {
+				backToPolicies = true
+				break
+			}
+
+			// Step 5: Read historical JSON
+			historicalJSON, err := cfg.Backend.ReadTagBlob(cfg.Tenant, selectedSlug, selectedVersion)
+			if err != nil {
+				return fmt.Errorf("reading version %s: %w", selectedVersion, err)
+			}
+
+			// Step 6: Read current desired state
+			desiredPolicies, err := cfg.ReadDesiredPolicies(cfg.Tenant)
+			if err != nil {
+				return fmt.Errorf("reading desired state: %w", err)
+			}
+
+			var historicalMap map[string]interface{}
+			if err := json.Unmarshal(historicalJSON, &historicalMap); err != nil {
+				return fmt.Errorf("parsing historical version: %w", err)
+			}
+
+			currentDesiredMap := desiredPolicies[selectedSlug]
+
+			// Step 7: Compute diff (historical is "desired" = what we want, current is "actual" = what we have)
+			diffs := reconcile.ComputeDiff(historicalMap, currentDesiredMap)
+
+			if len(diffs) == 0 {
+				fmt.Fprintf(os.Stdout, "Selected version %s matches current desired state.\n", selectedVersion)
+				continue // back to version selection
+			}
+
+			// Step 8: Render diffs
+			fmt.Fprintf(os.Stdout, "\nDiff: %s version %s vs current desired state\n\n", selectedSlug, selectedVersion)
+			output.RenderFieldDiffs(os.Stdout, diffs, cfg.UseColor)
+			fmt.Fprintln(os.Stdout)
+
+			// Step 9: Action selection
+			action, err := SelectAction()
+			if err != nil {
+				return fmt.Errorf("selecting action: %w", err)
+			}
+
+			switch action {
+			case "back":
+				continue // back to version selection
+			case "quit":
+				return nil
+			case "restore":
+				return performRestore(ctx, cfg, selectedSlug, selectedVersion, historicalJSON)
+			}
+		}
+		if backToPolicies {
+			continue
 		}
 	}
 }

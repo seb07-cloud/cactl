@@ -1,1 +1,7 @@
 cactl
+
+# cactl workspace
+.cactl/config.yaml
+
+/policies
+.planning/

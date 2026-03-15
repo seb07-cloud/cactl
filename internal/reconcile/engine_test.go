@@ -154,6 +154,69 @@ func newManifestWith(slug, liveObjectID string) *state.Manifest {
 	return m
 }
 
+func TestDetectDuplicates(t *testing.T) {
+	live := map[string]LivePolicy{
+		"id-1": {NormalizedData: map[string]interface{}{"displayName": "MFA Policy"}, Slug: "mfa-policy"},
+		"id-2": {NormalizedData: map[string]interface{}{"displayName": "MFA Policy"}, Slug: "mfa-policy"},
+		"id-3": {NormalizedData: map[string]interface{}{"displayName": "MFA Policy"}, Slug: "mfa-policy"},
+		"id-4": {NormalizedData: map[string]interface{}{"displayName": "Unique Policy"}, Slug: "unique-policy"},
+	}
+
+	actions := DetectDuplicates(live)
+	if len(actions) != 1 {
+		t.Fatalf("expected 1 duplicate action, got %d", len(actions))
+	}
+	if actions[0].Action != ActionDuplicate {
+		t.Errorf("expected ActionDuplicate, got %v", actions[0].Action)
+	}
+	if actions[0].DisplayName != "MFA Policy" {
+		t.Errorf("expected displayName 'MFA Policy', got %q", actions[0].DisplayName)
+	}
+	if len(actions[0].DuplicateIDs) != 3 {
+		t.Errorf("expected 3 duplicate IDs, got %d", len(actions[0].DuplicateIDs))
+	}
+}
+
+func TestDetectDuplicatesNoDuplicates(t *testing.T) {
+	live := map[string]LivePolicy{
+		"id-1": {NormalizedData: map[string]interface{}{"displayName": "Policy A"}, Slug: "policy-a"},
+		"id-2": {NormalizedData: map[string]interface{}{"displayName": "Policy B"}, Slug: "policy-b"},
+	}
+
+	actions := DetectDuplicates(live)
+	if len(actions) != 0 {
+		t.Fatalf("expected 0 duplicate actions, got %d", len(actions))
+	}
+}
+
+func TestReconcileIncludesDuplicates(t *testing.T) {
+	backend := map[string]BackendPolicy{}
+	live := map[string]LivePolicy{
+		"id-1": {NormalizedData: map[string]interface{}{"displayName": "Dup Policy"}, Slug: "dup-policy"},
+		"id-2": {NormalizedData: map[string]interface{}{"displayName": "Dup Policy"}, Slug: "dup-policy"},
+	}
+	manifest := newManifest()
+
+	actions := Reconcile(backend, live, manifest)
+
+	// Should have 2 untracked + 1 duplicate = 3 actions
+	var duplicateCount, untrackedCount int
+	for _, a := range actions {
+		switch a.Action {
+		case ActionDuplicate:
+			duplicateCount++
+		case ActionUntracked:
+			untrackedCount++
+		}
+	}
+	if duplicateCount != 1 {
+		t.Errorf("expected 1 duplicate action, got %d", duplicateCount)
+	}
+	if untrackedCount != 2 {
+		t.Errorf("expected 2 untracked actions, got %d", untrackedCount)
+	}
+}
+
 // Helper for debug output.
 func summarizeActions(actions []PolicyAction) []string {
 	var s []string

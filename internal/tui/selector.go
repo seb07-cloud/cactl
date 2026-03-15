@@ -9,15 +9,18 @@ import (
 )
 
 // SelectPolicy presents an arrow-key selector for tracked policy slugs.
+// Returns "" when the user selects "Quit".
 func SelectPolicy(slugs []string) (string, error) {
 	var selected string
-	options := make([]huh.Option[string], len(slugs))
-	for i, s := range slugs {
-		options[i] = huh.NewOption(s, s)
+	options := make([]huh.Option[string], 0, len(slugs)+1)
+	options = append(options, huh.NewOption("Quit", ""))
+	for _, s := range slugs {
+		options = append(options, huh.NewOption(s, s))
 	}
 	err := huh.NewSelect[string]().
 		Title("Select a policy").
 		Options(options...).
+		Height(len(options)+2). // +2 for title and padding
 		Value(&selected).
 		Run()
 	return selected, err
@@ -25,9 +28,11 @@ func SelectPolicy(slugs []string) (string, error) {
 
 // SelectVersion presents an arrow-key selector for version tags with diff summaries.
 // Each option label shows "version  date  summary".
+// Returns "" when the user selects "Back to policies".
 func SelectVersion(tags []state.VersionTag, summaries []string) (string, error) {
 	var selected string
-	options := make([]huh.Option[string], len(tags))
+	options := make([]huh.Option[string], 0, len(tags)+1)
+	options = append(options, huh.NewOption("← Back to policies", ""))
 	for i, t := range tags {
 		date := t.Timestamp
 		if len(date) >= 10 {
@@ -38,11 +43,12 @@ func SelectVersion(tags []state.VersionTag, summaries []string) (string, error) 
 			summary = summaries[i]
 		}
 		label := fmt.Sprintf("%-8s  %s  %s", t.Version, date, summary)
-		options[i] = huh.NewOption(label, t.Version)
+		options = append(options, huh.NewOption(label, t.Version))
 	}
 	err := huh.NewSelect[string]().
 		Title("Select a version to inspect").
 		Options(options...).
+		Height(len(options)+2). // +2 for title and padding
 		Value(&selected).
 		Run()
 	return selected, err

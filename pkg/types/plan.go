@@ -17,8 +17,9 @@ type ActionOutput struct {
 	VersionFrom string       `json:"version_from,omitempty"`
 	VersionTo   string       `json:"version_to,omitempty"`
 	BumpLevel   string       `json:"bump_level,omitempty"`
-	Diffs       []DiffOutput `json:"diffs,omitempty"`
-	Warnings    []string     `json:"warnings,omitempty"`
+	Diffs        []DiffOutput `json:"diffs,omitempty"`
+	Warnings     []string     `json:"warnings,omitempty"`
+	DuplicateIDs []string     `json:"duplicate_ids,omitempty"`
 }
 
 // DiffOutput describes a single field-level diff in JSON output.
@@ -35,5 +36,6 @@ type SummaryOutput struct {
 	Update    int `json:"update"`
 	Recreate  int `json:"recreate"`
 	Untracked int `json:"untracked"`
+	Duplicate int `json:"duplicate"`
 	Noop      int `json:"noop"`
 }

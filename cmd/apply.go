@@ -9,10 +9,12 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/seb07-cloud/cactl/internal/output"
 	"github.com/seb07-cloud/cactl/internal/reconcile"
 	"github.com/seb07-cloud/cactl/internal/semver"
 	"github.com/seb07-cloud/cactl/pkg/types"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 var applyCmd = &cobra.Command{
@@ -118,17 +120,43 @@ func runApply(cmd *cobra.Command, args []string) error {
 	}
 
 	if !autoApprove {
-		if !confirm("Do you want to apply these changes? [Y/n]: ") {
-			fmt.Fprintln(os.Stdout, "Apply cancelled.")
-			return nil
-		}
 		if hasAction(actionable, reconcile.ActionRecreate) {
-			if !confirmExplicit("Recreate actions will DELETE and re-CREATE policies. Type 'yes' to confirm: ") {
+			// Recreate requires explicit "yes" — single prompt covers both approval and destructive acknowledgement
+			if !confirmExplicit("Plan includes recreate (DELETE + CREATE). Type 'yes' to apply: ") {
+				fmt.Fprintln(os.Stdout, "Apply cancelled.")
+				return nil
+			}
+
+			// Prompt for recreate bump level (interactive only)
+			if overrideBump == nil {
+				bl := promptBumpLevel("Recreate version bump level (major|minor|patch) [minor]: ", os.Stdin)
+				overrideBump = &bl
+				// Recompute bumps for recreates with chosen level
+				for i := range actionable {
+					if actionable[i].Action == reconcile.ActionRecreate {
+						currentVersion := "1.0.0"
+						if entry, ok := p.Manifest.Policies[actionable[i].Slug]; ok && entry.Version != "" {
+							currentVersion = entry.Version
+						}
+						newVersion, err := semver.BumpVersion(currentVersion, *overrideBump)
+						if err != nil {
+							newVersion = currentVersion
+						}
+						actionable[i].VersionFrom = currentVersion
+						actionable[i].VersionTo = newVersion
+						actionable[i].BumpLevel = overrideBump.String()
+					}
+				}
+			}
+		} else {
+			if !confirm("Do you want to apply these changes? [Y/n]: ") {
 				fmt.Fprintln(os.Stdout, "Apply cancelled.")
 				return nil
 			}
 		}
 	}
+
+	useColor := output.ShouldUseColor(viper.GetViper())
 
 	// Execute actions -- sort by slug for deterministic order
 	sort.Slice(actionable, func(i, j int) bool {
@@ -154,7 +182,7 @@ func runApply(cmd *cobra.Command, args []string) error {
 				return err
 			}
 
-			fmt.Fprintf(os.Stdout, "Applied: + %s (%s)\n", action.Slug, version)
+			fmt.Fprintln(os.Stdout, output.FormatApplied(reconcile.ActionCreate, fmt.Sprintf("%s (%s)", action.Slug, version), useColor))
 			created++
 
 		case reconcile.ActionUpdate:
@@ -177,7 +205,7 @@ func runApply(cmd *cobra.Command, args []string) error {
 				return err
 			}
 
-			fmt.Fprintf(os.Stdout, "Applied: ~ %s (%s -> %s)\n", action.Slug, action.VersionFrom, newVersion)
+			fmt.Fprintln(os.Stdout, output.FormatApplied(reconcile.ActionUpdate, fmt.Sprintf("%s (%s -> %s)", action.Slug, action.VersionFrom, newVersion), useColor))
 			updated++
 
 		case reconcile.ActionRecreate:
@@ -191,26 +219,31 @@ func runApply(cmd *cobra.Command, args []string) error {
 				}
 			}
 
-			currentVersion := "1.0.0"
-			if entry, ok := p.Manifest.Policies[action.Slug]; ok && entry.Version != "" {
-				currentVersion = entry.Version
+			currentVersion := action.VersionFrom
+			newVersion := action.VersionTo
+			if currentVersion == "" {
+				currentVersion = "1.0.0"
 			}
-			newVersion, err := semver.BumpVersion(currentVersion, semver.BumpMinor)
-			if err != nil {
-				newVersion = "1.1.0" // Fallback
+			if newVersion == "" {
+				// Fallback: bump minor if ComputeSemverBumps didn't populate
+				v, err := semver.BumpVersion(currentVersion, semver.BumpMinor)
+				if err != nil {
+					v = "1.1.0"
+				}
+				newVersion = v
 			}
 
 			if err := p.RecordAppliedAction(action.Slug, newID, newVersion, action.BackendJSON, fmt.Sprintf("Recreated %s at %s", action.Slug, newVersion)); err != nil {
 				return err
 			}
 
-			fmt.Fprintf(os.Stdout, "Applied: -/+ %s (%s -> %s)\n", action.Slug, currentVersion, newVersion)
+			fmt.Fprintln(os.Stdout, output.FormatApplied(reconcile.ActionRecreate, fmt.Sprintf("%s (%s -> %s)", action.Slug, currentVersion, newVersion), useColor))
 			recreated++
 		}
 	}
 
 	// Summary
-	fmt.Fprintf(os.Stdout, "Apply complete: %d created, %d updated, %d recreated.\n", created, updated, recreated)
+	fmt.Fprintln(os.Stdout, output.FormatApplySummary(created, updated, recreated, useColor))
 	return nil
 }
 
@@ -267,6 +300,28 @@ func hasAction(actions []reconcile.PolicyAction, t reconcile.ActionType) bool {
 		}
 	}
 	return false
+}
+
+// promptBumpLevel prompts the user to choose a bump level for recreate actions.
+// Empty input defaults to minor. Invalid input retries.
+func promptBumpLevel(prompt string, r io.Reader) semver.BumpLevel {
+	scanner := bufio.NewScanner(r)
+	for {
+		fmt.Fprint(os.Stdout, prompt)
+		if !scanner.Scan() {
+			return semver.BumpMinor
+		}
+		input := strings.TrimSpace(strings.ToLower(scanner.Text()))
+		if input == "" {
+			return semver.BumpMinor
+		}
+		bl, err := parseBumpLevel(input)
+		if err != nil {
+			fmt.Fprintf(os.Stdout, "Invalid bump level %q. Use major, minor, or patch.\n", input)
+			continue
+		}
+		return bl
+	}
 }
 
 // parseBumpLevel converts a user-provided string to a semver.BumpLevel.

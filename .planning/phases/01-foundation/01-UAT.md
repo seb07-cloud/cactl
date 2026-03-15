@@ -1,9 +1,9 @@
 ---
-status: complete
+status: diagnosed
 phase: 01-foundation
 source: [01-01-SUMMARY.md, 01-02-SUMMARY.md, 01-03-SUMMARY.md]
 started: 2026-03-04T20:30:00Z
-updated: 2026-03-04T20:35:00Z
+updated: 2026-03-04T20:45:00Z
 ---
 
 ## Current Test
@@ -55,9 +55,17 @@ skipped: 0
   reason: "User reported: no error — running init a second time just runs again with the same fallback message, no validation error"
   severity: major
   test: 4
-  root_cause: ""
-  artifacts: []
-  missing: []
+  root_cause: "SilenceErrors: true suppresses cobra error printing, and main.go never prints ExitError.Message before os.Exit — the guard fires correctly (exit code 3) but produces zero visible output"
+  artifacts:
+    - path: "cmd/root.go"
+      issue: "SilenceErrors: true suppresses cobra error output"
+    - path: "main.go"
+      issue: "Never prints ExitError.Message to stderr before os.Exit"
+    - path: "cmd/init.go"
+      issue: "Guard logic correct but renderer never used for error path"
+  missing:
+    - "In main.go: print ExitError.Message to stderr before os.Exit"
+    - "Optionally: call r.Error() in init.go before returning ExitError"
   debug_session: ""
 
 - truth: "Running cactl --output invalid returns exit code 3 with error about invalid output format"
@@ -65,7 +73,15 @@ skipped: 0
   reason: "User reported: doesn't reject invalid output value — just shows help text as if no subcommand given, no error message"
   severity: major
   test: 5
-  root_cause: ""
-  artifacts: []
-  missing: []
+  root_cause: "config.Validate() is defined but never called — initConfig only loads/binds viper flags without invoking config.Load() or config.Validate(), so invalid values are silently accepted"
+  artifacts:
+    - path: "cmd/root.go"
+      issue: "initConfig never calls config.Load() or config.Validate()"
+    - path: "internal/config/validate.go"
+      issue: "Validate function fully implemented but has zero call sites"
+    - path: "internal/config/config.go"
+      issue: "Load function never called from command lifecycle"
+  missing:
+    - "In cmd/root.go initConfig: call config.Load(v) then config.Validate(cfg) before returning"
+    - "Store resolved config for subcommand access"
   debug_session: ""

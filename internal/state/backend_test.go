@@ -104,8 +104,9 @@ func TestCreateVersionTag(t *testing.T) {
 	blobHash, err := b.WritePolicy("tenant-tag", "tag-test", data)
 	require.NoError(t, err)
 
-	err = b.CreateVersionTag("tenant-tag", "tag-test", "1.0.0", blobHash, "cactl import: tag-test 1.0.0")
+	actualVersion, err := b.CreateVersionTag("tenant-tag", "tag-test", "1.0.0", blobHash, "cactl import: tag-test 1.0.0")
 	require.NoError(t, err)
+	assert.Equal(t, "1.0.0", actualVersion)
 
 	// Verify tag exists
 	tagName := "cactl/tenant-tag/tag-test/1.0.0"
@@ -165,7 +166,7 @@ func TestListVersionTags(t *testing.T) {
 	// Create 3 annotated tags
 	versions := []string{"1.0.0", "1.1.0", "2.0.0"}
 	for _, v := range versions {
-		err := b.CreateVersionTag("test-tenant", "ca-mfa", v, blobHash, "cactl: ca-mfa "+v)
+		_, err := b.CreateVersionTag("test-tenant", "ca-mfa", v, blobHash, "cactl: ca-mfa "+v)
 		require.NoError(t, err)
 	}
 
@@ -207,11 +208,11 @@ func TestListVersionTags_OtherSlugs(t *testing.T) {
 	blobHash2, err := b.WritePolicy("test-tenant", "ca-block", data)
 	require.NoError(t, err)
 
-	err = b.CreateVersionTag("test-tenant", "ca-mfa", "1.0.0", blobHash, "mfa v1")
+	_, err = b.CreateVersionTag("test-tenant", "ca-mfa", "1.0.0", blobHash, "mfa v1")
 	require.NoError(t, err)
-	err = b.CreateVersionTag("test-tenant", "ca-mfa", "2.0.0", blobHash, "mfa v2")
+	_, err = b.CreateVersionTag("test-tenant", "ca-mfa", "2.0.0", blobHash, "mfa v2")
 	require.NoError(t, err)
-	err = b.CreateVersionTag("test-tenant", "ca-block", "1.0.0", blobHash2, "block v1")
+	_, err = b.CreateVersionTag("test-tenant", "ca-block", "1.0.0", blobHash2, "block v1")
 	require.NoError(t, err)
 
 	tags, err := b.ListVersionTags("test-tenant", "ca-mfa")
@@ -230,7 +231,7 @@ func TestReadTagBlob(t *testing.T) {
 	blobHash, err := b.WritePolicy("test-tenant", "ca-mfa", data)
 	require.NoError(t, err)
 
-	err = b.CreateVersionTag("test-tenant", "ca-mfa", "1.0.0", blobHash, "initial import")
+	_, err = b.CreateVersionTag("test-tenant", "ca-mfa", "1.0.0", blobHash, "initial import")
 	require.NoError(t, err)
 
 	got, err := b.ReadTagBlob("test-tenant", "ca-mfa", "1.0.0")

@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"time"
 )
 
 // Policy represents a Conditional Access policy fetched from Microsoft Graph.
@@ -100,7 +101,25 @@ func (c *Client) GetPolicy(ctx context.Context, policyID string) (*Policy, error
 
 // CreatePolicy creates a new Conditional Access policy and returns the
 // server-assigned ID.
+//
+// Implements read-before-write to prevent silent duplicates: Graph API has
+// no idempotency support, so POSTing the same policy twice creates two
+// separate objects. This method checks for an existing policy with the same
+// displayName before POSTing. If a match is found, the existing ID is
+// returned instead of creating a duplicate.
 func (c *Client) CreatePolicy(ctx context.Context, policyJSON map[string]interface{}) (string, error) {
+	// Read-before-write: check if a policy with this displayName already exists
+	displayName, _ := policyJSON["displayName"].(string)
+	if displayName != "" {
+		existingID, err := c.findPolicyByDisplayName(ctx, displayName)
+		if err != nil {
+			return "", fmt.Errorf("read-before-write check failed: %w", err)
+		}
+		if existingID != "" {
+			return existingID, nil
+		}
+	}
+
 	body, err := json.Marshal(policyJSON)
 	if err != nil {
 		return "", fmt.Errorf("marshaling policy: %w", err)
@@ -125,7 +144,37 @@ func (c *Client) CreatePolicy(ctx context.Context, policyJSON map[string]interfa
 		return "", fmt.Errorf("decoding create response: %w", err)
 	}
 
+	// Post-write verification: GET the policy to confirm it was created.
+	// Graph API is eventually consistent, so retry briefly on 404.
+	var verifyErr error
+	for _, wait := range []time.Duration{0, 1 * time.Second, 2 * time.Second, 4 * time.Second} {
+		if wait > 0 {
+			time.Sleep(wait)
+		}
+		if _, verifyErr = c.GetPolicy(ctx, result.ID); verifyErr == nil {
+			break
+		}
+	}
+	if verifyErr != nil {
+		return "", fmt.Errorf("post-create verification failed for %s: %w", result.ID, verifyErr)
+	}
+
 	return result.ID, nil
+}
+
+// findPolicyByDisplayName searches for an existing policy with the given
+// displayName. Returns the ID if found, empty string if not found.
+func (c *Client) findPolicyByDisplayName(ctx context.Context, displayName string) (string, error) {
+	policies, err := c.ListPolicies(ctx)
+	if err != nil {
+		return "", err
+	}
+	for _, p := range policies {
+		if p.DisplayName == displayName {
+			return p.ID, nil
+		}
+	}
+	return "", nil
 }
 
 // UpdatePolicy updates an existing Conditional Access policy by ID.

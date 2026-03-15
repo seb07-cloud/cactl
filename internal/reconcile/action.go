@@ -16,6 +16,8 @@ const (
 	ActionRecreate
 	// ActionUntracked means the policy exists in live but is not tracked.
 	ActionUntracked
+	// ActionDuplicate means multiple live policies share the same displayName.
+	ActionDuplicate
 )
 
 // String returns a human-readable label for the action type.
@@ -31,6 +33,8 @@ func (a ActionType) String() string {
 		return "recreate"
 	case ActionUntracked:
 		return "untracked"
+	case ActionDuplicate:
+		return "duplicate"
 	default:
 		return fmt.Sprintf("unknown(%d)", int(a))
 	}
@@ -46,6 +50,9 @@ type PolicyAction struct {
 	LiveObjectID string
 	Diff         []FieldDiff
 	Warnings     []string
+	// DuplicateIDs holds the live object IDs of duplicate policies (same displayName).
+	// Only populated for ActionDuplicate actions.
+	DuplicateIDs []string
 	// Version fields are populated by the plan command after semver computation.
 	VersionFrom string
 	VersionTo   string

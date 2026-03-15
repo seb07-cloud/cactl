@@ -2,6 +2,8 @@ package config
 
 import (
 	"fmt"
+	"os/exec"
+	"strings"
 
 	"github.com/seb07-cloud/cactl/pkg/types"
 	"github.com/spf13/viper"
@@ -27,6 +29,13 @@ func Load(v *viper.Viper) (*types.Config, error) {
 		}
 	}
 
+	// Fallback: resolve tenant from current az CLI context if still unset.
+	if len(cfg.Tenants) == 0 {
+		if tenantID := resolveAzCLITenant(); tenantID != "" {
+			cfg.Tenants = []string{tenantID}
+		}
+	}
+
 	// Keep deprecated Tenant field in sync for backward compatibility
 	if len(cfg.Tenants) > 0 {
 		cfg.Tenant = cfg.Tenants[0]
@@ -47,3 +56,21 @@ func Load(v *viper.Viper) (*types.Config, error) {
 func LoadFromGlobal() (*types.Config, error) {
 	return Load(viper.GetViper())
 }
+
+// resolveAzCLITenant shells out to `az account show` and extracts the tenantId
+// from the current subscription context. Returns empty string on any failure
+// (az CLI not installed, not logged in, etc.) — callers treat this as a
+// best-effort fallback.
+func resolveAzCLITenant() string {
+	out, err := exec.Command("az", "account", "show", "--query", "tenantId", "-o", "tsv").Output()
+	if err != nil {
+		return ""
+	}
+	tid := strings.TrimSpace(string(out))
+	// Sanity-check: tenant IDs are UUIDs, reject obviously wrong output.
+	if len(tid) != 36 {
+		return ""
+	}
+	return tid
+}
+

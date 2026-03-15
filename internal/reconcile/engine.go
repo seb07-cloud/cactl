@@ -88,6 +88,9 @@ func Reconcile(backend map[string]BackendPolicy, live map[string]LivePolicy, man
 		}
 	}
 
+	// Step 3: Detect duplicate live policies (same displayName, different IDs)
+	actions = append(actions, DetectDuplicates(live)...)
+
 	// Sort by slug for deterministic output
 	sort.Slice(actions, func(i, j int) bool {
 		return actions[i].Slug < actions[j].Slug
@@ -95,6 +98,46 @@ func Reconcile(backend map[string]BackendPolicy, live map[string]LivePolicy, man
 
 	if len(actions) == 0 {
 		return nil
+	}
+	return actions
+}
+
+// DetectDuplicates groups live policies by displayName and emits an
+// ActionDuplicate for each group with more than one member.
+func DetectDuplicates(live map[string]LivePolicy) []PolicyAction {
+	// Group by displayName
+	type dupEntry struct {
+		id          string
+		displayName string
+	}
+	groups := make(map[string][]dupEntry)
+	for id, lp := range live {
+		name, _ := lp.NormalizedData["displayName"].(string)
+		if name == "" {
+			continue
+		}
+		groups[name] = append(groups[name], dupEntry{id: id, displayName: name})
+	}
+
+	var actions []PolicyAction
+	for displayName, entries := range groups {
+		if len(entries) <= 1 {
+			continue
+		}
+		// Sort IDs for deterministic output
+		sort.Slice(entries, func(i, j int) bool {
+			return entries[i].id < entries[j].id
+		})
+		ids := make([]string, len(entries))
+		for i, e := range entries {
+			ids[i] = e.id
+		}
+		actions = append(actions, PolicyAction{
+			Slug:         displayName,
+			Action:       ActionDuplicate,
+			DisplayName:  displayName,
+			DuplicateIDs: ids,
+		})
 	}
 	return actions
 }

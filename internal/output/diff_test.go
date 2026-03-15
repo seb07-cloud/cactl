@@ -26,8 +26,8 @@ func TestRenderPlan_CreateAction(t *testing.T) {
 	if !strings.Contains(out, "+ require-mfa") {
 		t.Errorf("expected '+ require-mfa' sigil, got:\n%s", out)
 	}
-	if !strings.Contains(out, "new policy, initial version 1.0.0") {
-		t.Errorf("expected create message, got:\n%s", out)
+	if !strings.Contains(out, "(new)") {
+		t.Errorf("expected create indicator, got:\n%s", out)
 	}
 }
 
@@ -57,11 +57,14 @@ func TestRenderPlan_UpdateAction(t *testing.T) {
 	if !strings.Contains(out, "~ require-mfa") {
 		t.Errorf("expected '~ require-mfa' sigil, got:\n%s", out)
 	}
-	if !strings.Contains(out, "1.0.0 -> 1.1.0") {
-		t.Errorf("expected version bump info, got:\n%s", out)
+	if !strings.Contains(out, "1.1.0") {
+		t.Errorf("expected version info, got:\n%s", out)
 	}
-	if !strings.Contains(out, "~ state:") {
+	if !strings.Contains(out, "state") {
 		t.Errorf("expected field diff for state, got:\n%s", out)
+	}
+	if !strings.Contains(out, "disabled") || !strings.Contains(out, "enabled") {
+		t.Errorf("expected old/new values, got:\n%s", out)
 	}
 }
 
@@ -77,9 +80,17 @@ func TestRenderPlan_SummaryLine(t *testing.T) {
 	RenderPlan(&buf, actions, nil, nil, false)
 	out := buf.String()
 
-	expected := "Plan: 1 to create, 1 to update, 1 to recreate, 1 untracked."
-	if !strings.Contains(out, expected) {
-		t.Errorf("expected summary line %q, got:\n%s", expected, out)
+	if !strings.Contains(out, "1 to create") {
+		t.Errorf("expected create count in summary, got:\n%s", out)
+	}
+	if !strings.Contains(out, "1 to update") {
+		t.Errorf("expected update count in summary, got:\n%s", out)
+	}
+	if !strings.Contains(out, "1 to recreate") {
+		t.Errorf("expected recreate count in summary, got:\n%s", out)
+	}
+	if !strings.Contains(out, "1 untracked") {
+		t.Errorf("expected untracked count in summary, got:\n%s", out)
 	}
 }
 
@@ -139,7 +150,7 @@ func TestRenderPlan_MajorBumpWarning(t *testing.T) {
 	RenderPlan(&buf, actions, nil, nil, false)
 	out := buf.String()
 
-	if !strings.Contains(out, "WARNING: MAJOR version bump") {
+	if !strings.Contains(out, "MAJOR version bump") {
 		t.Errorf("expected MAJOR bump warning, got:\n%s", out)
 	}
 }
@@ -190,8 +201,11 @@ func TestRenderPlan_ValidationWarnings(t *testing.T) {
 	RenderPlan(&buf, actions, validations, nil, false)
 	out := buf.String()
 
-	if !strings.Contains(out, "WARNING [break-glass]") {
-		t.Errorf("expected validation warning, got:\n%s", out)
+	if !strings.Contains(out, "break-glass") {
+		t.Errorf("expected validation rule name, got:\n%s", out)
+	}
+	if !strings.Contains(out, "account not excluded") {
+		t.Errorf("expected validation message, got:\n%s", out)
 	}
 }
 
@@ -216,5 +230,44 @@ func TestRenderPlanJSON_WithValidations(t *testing.T) {
 
 	if len(out.Warnings) != 1 {
 		t.Errorf("expected 1 warning, got %d", len(out.Warnings))
+	}
+}
+
+func TestRenderPlan_EmptyActions(t *testing.T) {
+	var buf bytes.Buffer
+	RenderPlan(&buf, nil, nil, nil, false)
+	out := buf.String()
+
+	if !strings.Contains(out, "No changes") {
+		t.Errorf("expected no-changes message, got:\n%s", out)
+	}
+}
+
+func TestRenderPlan_DiffChanged_ShowsOldAndNew(t *testing.T) {
+	actions := []reconcile.PolicyAction{
+		{
+			Slug:   "test-policy",
+			Action: reconcile.ActionUpdate,
+			Diff: []reconcile.FieldDiff{
+				{
+					Path:     "conditions.applications.includeApplications",
+					Type:     reconcile.DiffChanged,
+					OldValue: []interface{}{"All"},
+					NewValue: []interface{}{},
+				},
+			},
+		},
+	}
+
+	var buf bytes.Buffer
+	RenderPlan(&buf, actions, nil, nil, false)
+	out := buf.String()
+
+	// Changed diffs should show old value with - and new value with +
+	if !strings.Contains(out, `- ["All"]`) {
+		t.Errorf("expected old value with - prefix, got:\n%s", out)
+	}
+	if !strings.Contains(out, "+ []") {
+		t.Errorf("expected new value with + prefix, got:\n%s", out)
 	}
 }
