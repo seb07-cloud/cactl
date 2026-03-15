@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-03-04)
 
 **Core value:** Reliable, idempotent, state-aware deployment of Entra CA policies with Git-native versioning and plan/apply safety
-**Current focus:** Phase 6: Point-in-Time Restore (Complete)
+**Current focus:** Phase 7: Codebase DRY Simplification (In Progress)
 
 ## Current Position
 
-Phase: 6 of 6 (Point-in-Time Restore)
-Plan: 2 of 2 in current phase
-Status: Complete
-Last activity: 2026-03-06 -- Completed 06-02 (History Command)
+Phase: 7 of 7 (Codebase DRY Simplification)
+Plan: 1 of 3 in current phase
+Status: In Progress
+Last activity: 2026-03-15 -- Completed 07-01 (Pipeline Helpers)
 
-Progress: [████████████████████████████████████] 100%
+Progress: [████████████████████████████████████░░] 96%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 24
+- Total plans completed: 25
 - Average duration: 1.8min
-- Total execution time: 0.68 hours
+- Total execution time: 0.71 hours
 
 **By Phase:**
 
@@ -33,9 +33,10 @@ Progress: [███████████████████████
 | 04-drift-rollback-and-status | 5/5 | 8min | 1.6min |
 | 05-production-readiness | 5/5 | 10min | 2.0min |
 | 06-point-in-time-restore | 2/2 | 2min | 1.0min |
+| 07-codebase-dry-simplification | 1/3 | 2min | 2.0min |
 
 **Recent Trend:**
-- Last 5 plans: 05-04 (2min), 05-05 (1min), 06-01 (1min), 06-02 (1min)
+- Last 5 plans: 05-05 (1min), 06-01 (1min), 06-02 (1min), 07-01 (2min)
 - Trend: Stable
 
 *Updated after each plan completion*
@@ -124,10 +125,14 @@ Recent decisions affecting current work:
 - 06-02: Diff summaries show top-level field names only (deduped from dot-path diffs)
 - 06-02: Graceful degradation: tag listing failure shows 0 versions instead of erroring
 - 06-02: No restore capability in history command (per user decision: read-only only)
+- 07-01: Manifest loaded in NewPipeline (not separate step) since all consumers need it
+- 07-01: NormalizeLivePolicies and HasValidationErrors as standalone functions (no pipeline state needed)
+- 07-01: ComputeSemverBumps accepts *semver.BumpLevel pointer for apply's --bump-level override reuse
 
 ### Roadmap Evolution
 
 - Phase 6 added: Point-in-Time Restore - git history timeline, point-in-time policy restore with full diffs
+- Phase 7 added: Codebase DRY Simplification - aggressive multi-pass deduplication across entire codebase
 
 ### Pending Todos
 
@@ -140,6 +145,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-06
-Stopped at: Completed 06-01-PLAN.md (Interactive History Browser) -- re-executed with actual implementation
+Last session: 2026-03-15
+Stopped at: Completed 07-01-PLAN.md (Pipeline Helpers)
 Resume file: None
