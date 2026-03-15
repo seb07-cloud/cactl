@@ -128,6 +128,9 @@ Recent decisions affecting current work:
 - 07-01: Manifest loaded in NewPipeline (not separate step) since all consumers need it
 - 07-01: NormalizeLivePolicies and HasValidationErrors as standalone functions (no pipeline state needed)
 - 07-01: ComputeSemverBumps accepts *semver.BumpLevel pointer for apply's --bump-level override reuse
+- 07-02: RecordAppliedAction as pipeline method since it needs Cfg, Backend, and Manifest state
+- 07-02: drift.go error wrapping changed from ExitError to fmt.Errorf via NewPipeline (compatible behavior)
+- 07-02: rollback interactive mode keeps separate backend/manifest init (TUI has own lifecycle)
 - 07-03: Type aliases (=) for FieldDiff and ActionType to eliminate mirror types without breaking callers
 - 07-03: validate.ActionType constants as var aliases (not const) -- Go const cannot alias typed constants
 - 07-03: Fixed output.DiffSummary to count unique top-level fields (not total diffs) for consistency
@@ -149,5 +152,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-15
-Stopped at: Completed 07-03-PLAN.md (Mirror Types and History Consolidation)
+Stopped at: Completed 07-02-PLAN.md (Apply/Drift/Rollback Pipeline Refactoring)
 Resume file: None
