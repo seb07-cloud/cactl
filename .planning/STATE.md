@@ -10,16 +10,16 @@ See: .planning/PROJECT.md (updated 2026-03-04)
 ## Current Position
 
 Phase: 8 of 8 (Policy Test Engine)
-Plan: 1 of 3 in current phase
+Plan: 2 of 3 in current phase
 Status: In Progress
-Last activity: 2026-03-15 -- Completed 08-01 (Types, Parser, and Condition Matchers)
+Last activity: 2026-03-15 -- Completed 08-02 (CA Policy Evaluation Engine)
 
-Progress: [█████████████████████████████████████░] 93%
+Progress: [██████████████████████████████████████░] 96%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 27
+- Total plans completed: 28
 - Average duration: 1.8min
 - Total execution time: 0.75 hours
 
@@ -34,10 +34,10 @@ Progress: [███████████████████████
 | 05-production-readiness | 5/5 | 10min | 2.0min |
 | 06-point-in-time-restore | 2/2 | 2min | 1.0min |
 | 07-codebase-dry-simplification | 3/3 | 7min | 2.3min |
-| 08-policy-test-engine | 1/3 | 3min | 3.0min |
+| 08-policy-test-engine | 2/3 | 5min | 2.5min |
 
 **Recent Trend:**
-- Last 5 plans: 06-02 (1min), 07-01 (2min), 07-02 (2min), 07-03 (3min), 08-01 (3min)
+- Last 5 plans: 07-01 (2min), 07-02 (2min), 07-03 (3min), 08-01 (3min), 08-02 (2min)
 - Trend: Stable
 
 *Updated after each plan completion*
@@ -139,6 +139,9 @@ Recent decisions affecting current work:
 - 08-01: matchStringList shared helper for include/exclude with All keyword across all matchers
 - 08-01: GuestsOrExternalUsers matched by ctx.User == "guest" (simple keyword mapping)
 - 08-01: Empty platform in context matches any platform condition (unspecified = any)
+- 08-02: No refactor phase needed -- evaluation implementation is clean and minimal (149 lines)
+- 08-02: Session controls merged by key in EvaluateAll (last-write-wins for same control)
+- 08-02: Policies with no grantControls block treated as ResultGrant with empty controls
 
 ### Roadmap Evolution
 
@@ -158,5 +161,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-15
-Stopped at: Completed 08-01-PLAN.md (Types, Parser, and Condition Matchers)
+Stopped at: Completed 08-02-PLAN.md (CA Policy Evaluation Engine)
 Resume file: None
