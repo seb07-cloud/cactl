@@ -248,6 +248,8 @@ See the [Multi-Tenant Guide](docs/multi-tenant.md) for credential isolation patt
 | Guide | Description |
 |---|---|
 | [Getting Started](docs/getting-started.md) | Install, authenticate, import, plan, apply |
+| [Policy Testing](docs/policy-testing.md) | Write YAML test scenarios to validate policy logic offline |
+| [Remote State](docs/remote-state.md) | How Git-native state storage and synchronization works |
 | [CI/CD Integration](docs/ci-cd.md) | GitHub Actions (OIDC), Azure DevOps, scheduled drift |
 | [Multi-Tenant](docs/multi-tenant.md) | Credential isolation, repo-per-tenant patterns |
 

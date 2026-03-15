@@ -27,10 +27,13 @@ func TestTestCmd_NoTestFiles(t *testing.T) {
 	require.NoError(t, os.Chdir(dir))
 	defer func() { _ = os.Chdir(origDir) }()
 
+	// Set tenant via env var so the test reaches the "no test files" check
+	// even when az CLI is not available (e.g. CI).
+	t.Setenv("CACTL_TENANT", "test-tenant-000")
+
 	// Call runTest directly to avoid viper state leaking between tests
 	err := runTest(testCmd, []string{})
 	assert.Error(t, err)
-	// With az login active, tenant resolves but no test files exist
 	assert.Contains(t, err.Error(), "no test files found")
 }
 
