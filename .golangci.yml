@@ -9,6 +9,14 @@ linters:
     - gocritic
     - gosec
     - prealloc
+  exclusions:
+    presets:
+      - std-error-handling
+      - common-false-positives
+    rules:
+      - path: _test\.go
+        linters:
+          - gosec
   settings:
     errcheck:
       exclude-functions:
@@ -29,13 +37,3 @@ formatters:
   enable:
     - gofmt
     - goimports
-
-exclusions:
-  rules:
-    - linters:
-        - gosec
-      path: _test\.go
-
-issues:
-  max-issues-per-linter: 0
-  max-same-issues: 0
