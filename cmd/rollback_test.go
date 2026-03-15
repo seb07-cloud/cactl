@@ -59,32 +59,6 @@ func TestRollbackCmd_RequiresTenant(t *testing.T) {
 	}
 }
 
-func TestBumpPatchVersion_Basic(t *testing.T) {
-	tests := []struct {
-		input    string
-		expected string
-	}{
-		{"1.0.0", "1.0.1"},
-		{"2.3.5", "2.3.6"},
-		{"0.0.0", "0.0.1"},
-		{"1.2.99", "1.2.100"},
-	}
-
-	for _, tc := range tests {
-		got := bumpPatchVersion(tc.input)
-		if got != tc.expected {
-			t.Errorf("bumpPatchVersion(%q) = %q, want %q", tc.input, got, tc.expected)
-		}
-	}
-}
-
-func TestBumpPatchVersion_InvalidFallback(t *testing.T) {
-	got := bumpPatchVersion("invalid")
-	if got != "1.0.1" {
-		t.Errorf("bumpPatchVersion(\"invalid\") = %q, want \"1.0.1\"", got)
-	}
-}
-
 func TestRollbackCmd_RequiresPolicyFlag(t *testing.T) {
 	// Verify the flag exists and is required by convention (empty default)
 	f := rollbackCmd.Flags().Lookup("policy")

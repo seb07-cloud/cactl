@@ -14,6 +14,7 @@ import (
 	"github.com/seb07-cloud/cactl/internal/graph"
 	"github.com/seb07-cloud/cactl/internal/normalize"
 	"github.com/seb07-cloud/cactl/internal/output"
+	"github.com/seb07-cloud/cactl/internal/semver"
 	"github.com/seb07-cloud/cactl/internal/state"
 	"github.com/seb07-cloud/cactl/pkg/types"
 	"github.com/spf13/cobra"
@@ -78,7 +79,7 @@ func runImport(cmd *cobra.Command, args []string) error {
 	if len(cfg.Tenants) == 0 {
 		return &types.ExitError{
 			Code:    types.ExitValidationError,
-			Message: "tenant is required (set via --tenant flag, CACTL_TENANT env, or config file)",
+			Message: "tenant is required: use --tenant, set CACTL_TENANT, or log in with az login",
 		}
 	}
 
@@ -128,7 +129,8 @@ func importForTenant(
 	// Determine which policies to import
 	var toImport []graph.Policy
 
-	if importAll {
+	if importAll || (force && policyFilter == "") {
+		// --all or --force without --policy: import everything
 		toImport = policies
 	} else if policyFilter != "" {
 		toImport, err = filterPolicy(policies, policyFilter)
@@ -155,14 +157,12 @@ func importForTenant(
 
 		// Check if already tracked
 		if entry, exists := manifest.Policies[slug]; exists {
-			// Check for slug collision (different LiveObjectID)
+			// Slug collision: same display name but different live object ID.
+			// Disambiguate by appending a short ID suffix.
 			if entry.LiveObjectID != p.ID {
-				return &types.ExitError{
-					Code:    types.ExitValidationError,
-					Message: fmt.Sprintf("slug collision: %q maps to existing policy %s, but live policy has ID %s", slug, entry.LiveObjectID, p.ID),
-				}
-			}
-			if !force {
+				slug = disambiguateSlug(slug, p.ID, manifest)
+				r.Warn(fmt.Sprintf("Slug collision for %q -- using disambiguated slug: %s", p.DisplayName, slug))
+			} else if !force {
 				r.Info(fmt.Sprintf("  - %s (already tracked, use --force to overwrite)", slug))
 				continue
 			}
@@ -174,7 +174,12 @@ func importForTenant(
 			return fmt.Errorf("normalizing policy %s: %w", slug, err)
 		}
 
-		// Write to state
+		// Write policy JSON file to working tree for review/editing
+		if err := WritePolicyFile(tenantID, slug, normalized); err != nil {
+			return fmt.Errorf("writing policy file for %s: %w", slug, err)
+		}
+
+		// Write to state (Git blob -- records last-deployed state)
 		blobSHA, err := backend.WritePolicy(tenantID, slug, normalized)
 		if err != nil {
 			return fmt.Errorf("writing policy %s to state: %w", slug, err)
@@ -183,14 +188,20 @@ func importForTenant(
 		// Determine version
 		version := "1.0.0"
 		if entry, exists := manifest.Policies[slug]; exists && force {
-			version = bumpPatchVersion(entry.Version)
+			newVer, verErr := semver.BumpVersion(entry.Version, semver.BumpPatch)
+			if verErr != nil {
+				newVer = "1.0.1"
+			}
+			version = newVer
 		}
 
 		// Create annotated tag
 		tagMsg := fmt.Sprintf("cactl import: %s %s", slug, version)
-		if err := backend.CreateVersionTag(tenantID, slug, version, blobSHA, tagMsg); err != nil {
-			return fmt.Errorf("creating version tag for %s: %w", slug, err)
+		actualVersion, tagErr := backend.CreateVersionTag(tenantID, slug, version, blobSHA, tagMsg)
+		if tagErr != nil {
+			return fmt.Errorf("creating version tag for %s: %w", slug, tagErr)
 		}
+		version = actualVersion
 
 		// Update manifest entry
 		manifest.Policies[slug] = state.Entry{
@@ -293,16 +304,23 @@ func interactiveSelect(_ context.Context, r output.Renderer, policies []graph.Po
 	}
 }
 
-// bumpPatchVersion increments the patch component of a semver string.
-// For example, "1.0.0" becomes "1.0.1".
-func bumpPatchVersion(version string) string {
-	parts := strings.Split(version, ".")
-	if len(parts) != 3 {
-		return "1.0.1" // Fallback
+// disambiguateSlug appends a short suffix from the policy's object ID to
+// resolve slug collisions when two live policies share the same display name.
+// Uses the first 8 characters of the object ID (before the first hyphen).
+func disambiguateSlug(baseSlug, objectID string, manifest *state.Manifest) string {
+	suffix := objectID
+	if idx := strings.Index(objectID, "-"); idx >= 0 {
+		suffix = objectID[:idx]
 	}
-	patch, err := strconv.Atoi(parts[2])
-	if err != nil {
-		return "1.0.1"
+	if len(suffix) > 8 {
+		suffix = suffix[:8]
 	}
-	return fmt.Sprintf("%s.%s.%d", parts[0], parts[1], patch+1)
+	candidate := baseSlug + "-" + suffix
+	// Ensure the disambiguated slug itself doesn't collide
+	if entry, exists := manifest.Policies[candidate]; exists && entry.LiveObjectID != objectID {
+		// Extremely unlikely: use full ID
+		candidate = baseSlug + "-" + objectID
+	}
+	return candidate
 }
+

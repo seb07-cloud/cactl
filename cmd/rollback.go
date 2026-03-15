@@ -5,14 +5,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
-	"time"
 
-	"github.com/seb07-cloud/cactl/internal/auth"
-	"github.com/seb07-cloud/cactl/internal/config"
-	"github.com/seb07-cloud/cactl/internal/graph"
 	"github.com/seb07-cloud/cactl/internal/normalize"
 	"github.com/seb07-cloud/cactl/internal/output"
 	"github.com/seb07-cloud/cactl/internal/reconcile"
+	"github.com/seb07-cloud/cactl/internal/semver"
 	"github.com/seb07-cloud/cactl/internal/state"
 	"github.com/seb07-cloud/cactl/internal/tui"
 	"github.com/seb07-cloud/cactl/pkg/types"
@@ -54,32 +51,25 @@ func runRollback(cmd *cobra.Command, args []string) error {
 		ctx = context.Background()
 	}
 
-	// 1. Load config, validate tenant
-	cfg, err := config.LoadFromGlobal()
+	// Bootstrap (config + auth + graph + backend + manifest)
+	p, err := NewPipeline(ctx)
 	if err != nil {
-		return fmt.Errorf("loading config: %w", err)
+		return err
 	}
 
-	if cfg.Tenant == "" {
-		return &types.ExitError{
-			Code:    types.ExitFatalError,
-			Message: "tenant is required: use --tenant, set CACTL_TENANT, or log in with az login",
-		}
-	}
-
-	// 2. Check for interactive mode BEFORE existing flag validation
+	// Check for interactive mode BEFORE existing flag validation
 	interactive, _ := cmd.Flags().GetBool("interactive")
 	if interactive {
-		if cfg.CI {
+		if p.Cfg.CI {
 			return &types.ExitError{
 				Code:    types.ExitValidationError,
 				Message: "--interactive cannot be used with --ci mode; use --policy and --version flags instead",
 			}
 		}
-		return runInteractiveRollback(ctx, cfg)
+		return runInteractiveRollback(ctx, p.Cfg)
 	}
 
-	// 3. Get flags (direct rollback mode)
+	// Get flags (direct rollback mode)
 	slug, _ := cmd.Flags().GetString("policy")
 	version, _ := cmd.Flags().GetString("version")
 	autoApprove, _ := cmd.Flags().GetBool("auto-approve")
@@ -97,43 +87,8 @@ func runRollback(cmd *cobra.Command, args []string) error {
 		}
 	}
 
-	// 3. Create auth factory and credential
-	factory, err := auth.NewClientFactory(cfg.Auth)
-	if err != nil {
-		return &types.ExitError{
-			Code:    types.ExitFatalError,
-			Message: fmt.Sprintf("auth setup failed: %v", err),
-		}
-	}
-
-	cred, err := factory.Credential(ctx, cfg.Tenant)
-	if err != nil {
-		return &types.ExitError{
-			Code:    types.ExitFatalError,
-			Message: fmt.Sprintf("authentication failed: %v", err),
-		}
-	}
-
-	// 4. Create graph client
-	graphClient := graph.NewClient(cred, cfg.Tenant)
-
-	// 5. Create git backend
-	backend, err := state.NewGitBackend(".")
-	if err != nil {
-		return &types.ExitError{
-			Code:    types.ExitFatalError,
-			Message: fmt.Sprintf("git backend: %v", err),
-		}
-	}
-
-	// 6. Load manifest
-	manifest, err := state.ReadManifest(backend, cfg.Tenant)
-	if err != nil {
-		return fmt.Errorf("reading manifest: %w", err)
-	}
-
-	// 7. Validate policy is tracked (ROLL-01)
-	entry, tracked := manifest.Policies[slug]
+	// Validate policy is tracked (ROLL-01)
+	entry, tracked := p.Manifest.Policies[slug]
 	if !tracked {
 		return &types.ExitError{
 			Code:    types.ExitFatalError,
@@ -141,11 +96,11 @@ func runRollback(cmd *cobra.Command, args []string) error {
 		}
 	}
 
-	// 8. Read historical version from tag (ROLL-01)
-	tagJSON, err := backend.ReadTagBlob(cfg.Tenant, slug, version)
+	// Read historical version from tag (ROLL-01)
+	tagJSON, err := p.Backend.ReadTagBlob(p.Cfg.Tenant, slug, version)
 	if err != nil {
 		// List available versions for helpful error
-		tags, listErr := backend.ListVersionTags(cfg.Tenant, slug)
+		tags, listErr := p.Backend.ListVersionTags(p.Cfg.Tenant, slug)
 		fmt.Fprintf(os.Stderr, "Version %s not found for policy %s.\n", version, slug)
 		if listErr == nil && len(tags) > 0 {
 			fmt.Fprintln(os.Stderr, "Available versions:")
@@ -159,8 +114,8 @@ func runRollback(cmd *cobra.Command, args []string) error {
 		}
 	}
 
-	// 9. Get current live state
-	livePolicy, err := graphClient.GetPolicy(ctx, entry.LiveObjectID)
+	// Get current live state
+	livePolicy, err := p.GraphClient.GetPolicy(ctx, entry.LiveObjectID)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Live policy not found (may have been deleted). Rollback would require recreating the policy.\n")
 		return &types.ExitError{
@@ -169,7 +124,7 @@ func runRollback(cmd *cobra.Command, args []string) error {
 		}
 	}
 
-	// 10. Compute diff (ROLL-02)
+	// Compute diff (ROLL-02)
 	var tagMap map[string]interface{}
 	if err := json.Unmarshal(tagJSON, &tagMap); err != nil {
 		return fmt.Errorf("parsing historical version: %w", err)
@@ -186,17 +141,16 @@ func runRollback(cmd *cobra.Command, args []string) error {
 
 	diffs := reconcile.ComputeDiff(tagMap, liveMap)
 
-	// 11. No-diff case
+	// No-diff case
 	if len(diffs) == 0 {
 		fmt.Fprintf(os.Stdout, "No changes needed. Live policy already matches version %s.\n", version)
 		return nil
 	}
 
-	// 12-13. Display diff (ROLL-02)
+	// Display diff (ROLL-02)
 	fmt.Fprintf(os.Stdout, "Rolling back %s to version %s\n\n", slug, version)
 
-	if cfg.Output == "json" {
-		// JSON output: render diff as JSON
+	if p.Cfg.Output == "json" {
 		jsonOut := map[string]interface{}{
 			"policy":         slug,
 			"rollbackTo":     version,
@@ -223,8 +177,8 @@ func runRollback(cmd *cobra.Command, args []string) error {
 	}
 	fmt.Fprintln(os.Stdout)
 
-	// 14-16. Confirmation
-	if cfg.CI && !autoApprove {
+	// Confirmation
+	if p.Cfg.CI && !autoApprove {
 		return &types.ExitError{
 			Code:    types.ExitFatalError,
 			Message: "ci mode requires --auto-approve",
@@ -238,52 +192,26 @@ func runRollback(cmd *cobra.Command, args []string) error {
 		}
 	}
 
-	// 17. Execute rollback (ROLL-03) - PATCH live policy
-	if err := graphClient.UpdatePolicy(ctx, entry.LiveObjectID, tagMap); err != nil {
+	// Execute rollback (ROLL-03) - PATCH live policy
+	if err := p.GraphClient.UpdatePolicy(ctx, entry.LiveObjectID, tagMap); err != nil {
 		return &types.ExitError{
 			Code:    types.ExitFatalError,
 			Message: fmt.Sprintf("rollback failed: %v", err),
 		}
 	}
 
-	// 18-21. Create new version (ROLL-04 -- never modify existing tags)
-	newVersion := bumpPatchVersion(entry.Version)
-
-	blobHash, err := backend.WritePolicy(cfg.Tenant, slug, tagJSON)
-	if err != nil {
-		return &types.ExitError{
-			Code:    types.ExitFatalError,
-			Message: fmt.Sprintf("writing backend state for %s: %v", slug, err),
-		}
+	// Create new version (ROLL-04 -- never modify existing tags)
+	newVersion, verErr := semver.BumpVersion(entry.Version, semver.BumpPatch)
+	if verErr != nil {
+		newVersion = "1.0.1"
 	}
 
 	tagMessage := fmt.Sprintf("cactl rollback: %s %s (rolled back to %s)", slug, newVersion, version)
-	actualVersion, tagErr := backend.CreateVersionTag(cfg.Tenant, slug, newVersion, blobHash, tagMessage)
-	if tagErr != nil {
-		return &types.ExitError{
-			Code:    types.ExitFatalError,
-			Message: fmt.Sprintf("creating version tag for %s: %v", slug, tagErr),
-		}
+	if err := p.RecordAppliedAction(slug, entry.LiveObjectID, newVersion, tagMap, tagMessage); err != nil {
+		return err
 	}
 
-	manifest.Policies[slug] = state.Entry{
-		Slug:         slug,
-		Tenant:       cfg.Tenant,
-		LiveObjectID: entry.LiveObjectID,
-		Version:      actualVersion,
-		LastDeployed: time.Now().UTC().Format(time.RFC3339),
-		DeployedBy:   deployerIdentity(cfg),
-		AuthMode:     cfg.Auth.Mode,
-		BackendSHA:   blobHash,
-	}
-	if err := state.WriteManifest(backend, cfg.Tenant, manifest); err != nil {
-		return &types.ExitError{
-			Code:    types.ExitFatalError,
-			Message: fmt.Sprintf("writing manifest after rollback: %v", err),
-		}
-	}
-
-	// 22. Success output
+	// Success output
 	fmt.Fprintf(os.Stdout, "Rollback complete: %s rolled back to %s (new version: %s)\n", slug, version, newVersion)
 	return nil
 }

@@ -54,20 +54,3 @@ func TestImportCommandRegistered(t *testing.T) {
 	assert.True(t, found, "import command should be registered on root")
 }
 
-func TestBumpPatchVersion(t *testing.T) {
-	tests := []struct {
-		input    string
-		expected string
-	}{
-		{"1.0.0", "1.0.1"},
-		{"1.0.5", "1.0.6"},
-		{"2.1.0", "2.1.1"},
-		{"invalid", "1.0.1"},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.input, func(t *testing.T) {
-			assert.Equal(t, tt.expected, bumpPatchVersion(tt.input))
-		})
-	}
-}
