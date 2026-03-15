@@ -10,16 +10,16 @@ See: .planning/PROJECT.md (updated 2026-03-04)
 ## Current Position
 
 Phase: 8 of 8 (Policy Test Engine)
-Plan: 2 of 3 in current phase
-Status: In Progress
-Last activity: 2026-03-15 -- Completed 08-02 (CA Policy Evaluation Engine)
+Plan: 3 of 3 in current phase
+Status: Complete
+Last activity: 2026-03-15 -- Completed 08-03 (Test Runner and CLI Command)
 
-Progress: [██████████████████████████████████████░] 96%
+Progress: [████████████████████████████████████████] 100%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 28
+- Total plans completed: 29
 - Average duration: 1.8min
 - Total execution time: 0.75 hours
 
@@ -34,10 +34,10 @@ Progress: [███████████████████████
 | 05-production-readiness | 5/5 | 10min | 2.0min |
 | 06-point-in-time-restore | 2/2 | 2min | 1.0min |
 | 07-codebase-dry-simplification | 3/3 | 7min | 2.3min |
-| 08-policy-test-engine | 2/3 | 5min | 2.5min |
+| 08-policy-test-engine | 3/3 | 8min | 2.7min |
 
 **Recent Trend:**
-- Last 5 plans: 07-01 (2min), 07-02 (2min), 07-03 (3min), 08-01 (3min), 08-02 (2min)
+- Last 5 plans: 07-02 (2min), 07-03 (3min), 08-01 (3min), 08-02 (2min), 08-03 (3min)
 - Trend: Stable
 
 *Updated after each plan completion*
@@ -142,6 +142,10 @@ Recent decisions affecting current work:
 - 08-02: No refactor phase needed -- evaluation implementation is clean and minimal (149 lines)
 - 08-02: Session controls merged by key in EvaluateAll (last-write-wins for same control)
 - 08-02: Policies with no grantControls block treated as ResultGrant with empty controls
+- 08-03: LoadPolicies in testengine (not cmd.ReadDesiredPolicies) to avoid circular dep with cmd package
+- 08-03: Policy filter uses slug prefix matching for flexible test scoping
+- 08-03: Test command has no auth/Graph dependency -- pure local evaluation for speed
+- 08-03: Exit code 1 for test failures (consistent with ExitChanges), 2 for fatal errors
 
 ### Roadmap Evolution
 
@@ -161,5 +165,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-15
-Stopped at: Completed 08-02-PLAN.md (CA Policy Evaluation Engine)
+Stopped at: Completed 08-03-PLAN.md (Test Runner and CLI Command)
 Resume file: None
