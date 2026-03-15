@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-03-04)
 
 **Core value:** Reliable, idempotent, state-aware deployment of Entra CA policies with Git-native versioning and plan/apply safety
-**Current focus:** Phase 7: Codebase DRY Simplification (In Progress)
+**Current focus:** Phase 8: Policy Test Engine (In Progress)
 
 ## Current Position
 
-Phase: 7 of 7 (Codebase DRY Simplification)
-Plan: 3 of 3 in current phase
-Status: Complete
-Last activity: 2026-03-15 -- Completed 07-03 (Mirror Types and History Consolidation)
+Phase: 8 of 8 (Policy Test Engine)
+Plan: 1 of 3 in current phase
+Status: In Progress
+Last activity: 2026-03-15 -- Completed 08-01 (Types, Parser, and Condition Matchers)
 
-Progress: [██████████████████████████████████████] 100%
+Progress: [█████████████████████████████████████░] 93%
 
 ## Performance Metrics
 
@@ -34,9 +34,10 @@ Progress: [███████████████████████
 | 05-production-readiness | 5/5 | 10min | 2.0min |
 | 06-point-in-time-restore | 2/2 | 2min | 1.0min |
 | 07-codebase-dry-simplification | 3/3 | 7min | 2.3min |
+| 08-policy-test-engine | 1/3 | 3min | 3.0min |
 
 **Recent Trend:**
-- Last 5 plans: 06-01 (1min), 06-02 (1min), 07-01 (2min), 07-02 (2min), 07-03 (3min)
+- Last 5 plans: 06-02 (1min), 07-01 (2min), 07-02 (2min), 07-03 (3min), 08-01 (3min)
 - Trend: Stable
 
 *Updated after each plan completion*
@@ -134,6 +135,10 @@ Recent decisions affecting current work:
 - 07-03: Type aliases (=) for FieldDiff and ActionType to eliminate mirror types without breaking callers
 - 07-03: validate.ActionType constants as var aliases (not const) -- Go const cannot alias typed constants
 - 07-03: Fixed output.DiffSummary to count unique top-level fields (not total diffs) for consistency
+- 08-01: Copied getNestedValue/getStringSlice/splitPath helpers into testengine (no import coupling with validate)
+- 08-01: matchStringList shared helper for include/exclude with All keyword across all matchers
+- 08-01: GuestsOrExternalUsers matched by ctx.User == "guest" (simple keyword mapping)
+- 08-01: Empty platform in context matches any platform condition (unspecified = any)
 
 ### Roadmap Evolution
 
@@ -153,5 +158,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-15
-Stopped at: Completed 07-02-PLAN.md (Apply/Drift/Rollback Pipeline Refactoring)
+Stopped at: Completed 08-01-PLAN.md (Types, Parser, and Condition Matchers)
 Resume file: None
