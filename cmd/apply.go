@@ -3,27 +3,16 @@ package cmd
 import (
 	"bufio"
 	"context"
-	"encoding/json"
 	"fmt"
 	"io"
 	"os"
 	"sort"
 	"strings"
-	"time"
 
-	"github.com/seb07-cloud/cactl/internal/auth"
-	"github.com/seb07-cloud/cactl/internal/config"
-	"github.com/seb07-cloud/cactl/internal/graph"
-	"github.com/seb07-cloud/cactl/internal/normalize"
-	"github.com/seb07-cloud/cactl/internal/output"
 	"github.com/seb07-cloud/cactl/internal/reconcile"
-	"github.com/seb07-cloud/cactl/internal/resolve"
 	"github.com/seb07-cloud/cactl/internal/semver"
-	"github.com/seb07-cloud/cactl/internal/state"
-	"github.com/seb07-cloud/cactl/internal/validate"
 	"github.com/seb07-cloud/cactl/pkg/types"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
 var applyCmd = &cobra.Command{
@@ -46,22 +35,7 @@ func runApply(cmd *cobra.Command, args []string) error {
 		ctx = context.Background()
 	}
 
-	// Phase A: Generate plan (reuse plan logic)
-
-	// 1. Load config, validate tenant
-	cfg, err := config.LoadFromGlobal()
-	if err != nil {
-		return fmt.Errorf("loading config: %w", err)
-	}
-
-	if cfg.Tenant == "" {
-		return &types.ExitError{
-			Code:    types.ExitFatalError,
-			Message: "tenant is required: use --tenant or set CACTL_TENANT",
-		}
-	}
-
-	// Read --bump-level override
+	// Read --bump-level override before pipeline (fast fail on bad input)
 	bumpLevelOverride, _ := cmd.Flags().GetString("bump-level")
 	var overrideBump *semver.BumpLevel
 	if bumpLevelOverride != "" {
@@ -75,207 +49,68 @@ func runApply(cmd *cobra.Command, args []string) error {
 		overrideBump = &bl
 	}
 
-	// 2. Create auth factory and credential
-	factory, err := auth.NewClientFactory(cfg.Auth)
+	// Bootstrap
+	p, err := NewPipeline(ctx)
 	if err != nil {
-		return &types.ExitError{
-			Code:    types.ExitFatalError,
-			Message: fmt.Sprintf("auth setup failed: %v", err),
-		}
+		return err
 	}
 
-	cred, err := factory.Credential(ctx, cfg.Tenant)
+	// Load desired + live state
+	backendPolicies, err := ReadDesiredPolicies(p.Cfg.Tenant)
 	if err != nil {
-		return &types.ExitError{
-			Code:    types.ExitFatalError,
-			Message: fmt.Sprintf("authentication failed: %v", err),
-		}
+		return &types.ExitError{Code: types.ExitFatalError, Message: fmt.Sprintf("loading desired state: %v", err)}
 	}
 
-	// 3. Create graph client and git backend
-	graphClient := graph.NewClient(cred, cfg.Tenant)
-
-	backend, err := state.NewGitBackend(".")
+	livePoliciesGraph, err := p.GraphClient.ListPolicies(ctx)
 	if err != nil {
-		return &types.ExitError{
-			Code:    types.ExitFatalError,
-			Message: fmt.Sprintf("git backend: %v", err),
-		}
+		return &types.ExitError{Code: types.ExitFatalError, Message: fmt.Sprintf("fetching live policies: %v", err)}
 	}
 
-	// 4. Load backend policies
-	slugs, err := backend.ListPolicies(cfg.Tenant)
+	livePolicies, err := NormalizeLivePolicies(livePoliciesGraph)
 	if err != nil {
-		return fmt.Errorf("listing backend policies: %w", err)
+		return err
 	}
 
-	backendPolicies := make(map[string]reconcile.BackendPolicy)
-	for _, slug := range slugs {
-		data, err := backend.ReadPolicy(cfg.Tenant, slug)
-		if err != nil {
-			return fmt.Errorf("reading backend policy %s: %w", slug, err)
-		}
-		var m map[string]interface{}
-		if err := json.Unmarshal(data, &m); err != nil {
-			return fmt.Errorf("parsing backend policy %s: %w", slug, err)
-		}
-		backendPolicies[slug] = reconcile.BackendPolicy{Data: m}
+	// Reconcile
+	actions := reconcile.Reconcile(backendPolicies, livePolicies, p.Manifest)
+
+	// Semver, validate, resolve, render
+	if err := p.ComputeSemverBumps(actions, overrideBump); err != nil {
+		return err
 	}
+	validations := p.RunValidations(actions)
+	resolver := p.ResolveDisplayNames(ctx, actions)
 
-	// 5. Load live policies
-	livePoliciesGraph, err := graphClient.ListPolicies(ctx)
-	if err != nil {
-		return &types.ExitError{
-			Code:    types.ExitFatalError,
-			Message: fmt.Sprintf("fetching live policies: %v", err),
-		}
-	}
-
-	livePolicies := make(map[string]reconcile.LivePolicy)
-	for _, p := range livePoliciesGraph {
-		normalized, err := normalize.Normalize(p.RawJSON)
-		if err != nil {
-			return fmt.Errorf("normalizing live policy %s: %w", p.ID, err)
-		}
-		var m map[string]interface{}
-		if err := json.Unmarshal(normalized, &m); err != nil {
-			return fmt.Errorf("parsing normalized policy %s: %w", p.ID, err)
-		}
-		livePolicies[p.ID] = reconcile.LivePolicy{
-			NormalizedData: m,
-			Slug:           p.DisplayName,
-		}
-	}
-
-	// 6. Load manifest
-	manifest, err := state.ReadManifest(backend, cfg.Tenant)
-	if err != nil {
-		return fmt.Errorf("reading manifest: %w", err)
-	}
-
-	// 7. Reconcile
-	actions := reconcile.Reconcile(backendPolicies, livePolicies, manifest)
-
-	// 8. Compute semver bumps
-	v := viper.GetViper()
-	majorFields := v.GetStringSlice("semver.major_fields")
-	minorFields := v.GetStringSlice("semver.minor_fields")
-	if len(majorFields) == 0 && len(minorFields) == 0 {
-		defaults := semver.DefaultSemverConfig()
-		majorFields = defaults.MajorFields
-		minorFields = defaults.MinorFields
-	}
-
-	for i := range actions {
-		if actions[i].Action != reconcile.ActionUpdate {
-			continue
-		}
-		semverDiffs := make([]semver.FieldDiff, len(actions[i].Diff))
-		for j, d := range actions[i].Diff {
-			semverDiffs[j] = semver.FieldDiff{
-				Path:     d.Path,
-				OldValue: d.OldValue,
-				NewValue: d.NewValue,
-			}
-		}
-
-		bumpLevel := semver.DetermineBump(semverDiffs, majorFields, minorFields)
-		if overrideBump != nil {
-			bumpLevel = *overrideBump
-		}
-		actions[i].BumpLevel = bumpLevel.String()
-
-		currentVersion := "1.0.0"
-		if entry, ok := manifest.Policies[actions[i].Slug]; ok && entry.Version != "" {
-			currentVersion = entry.Version
-		}
-
-		newVersion, err := semver.BumpVersion(currentVersion, bumpLevel)
-		if err != nil {
-			return fmt.Errorf("computing version for %s: %w", actions[i].Slug, err)
-		}
-		actions[i].VersionFrom = currentVersion
-		actions[i].VersionTo = newVersion
-	}
-
-	// 9. Run validations -- if any SeverityError, block apply
-	breakGlassAccounts := v.GetStringSlice("validation.break_glass_accounts")
-	valCfg := validate.ValidationConfig{
-		BreakGlassAccounts: breakGlassAccounts,
-	}
-	valActions := make([]validate.PolicyAction, len(actions))
-	for i, a := range actions {
-		valActions[i] = validate.PolicyAction{
-			Slug:        a.Slug,
-			Action:      validate.ActionType(a.Action),
-			BackendJSON: a.BackendJSON,
-		}
-	}
-	validations := validate.ValidatePlan(valActions, valCfg)
-
-	// Phase B: Display plan
-
-	// 10. Resolve display names
-	policyMaps := make([]map[string]interface{}, 0, len(actions))
-	for _, a := range actions {
-		if a.BackendJSON != nil {
-			policyMaps = append(policyMaps, a.BackendJSON)
-		}
-	}
-	refs := resolve.CollectRefs(policyMaps)
-
-	resolver := resolve.NewResolver(graphClient)
-	if len(refs) > 0 {
-		if err := resolver.ResolveAll(ctx, refs); err != nil {
-			// Non-fatal: continue with raw IDs
-			_ = err
-		}
-	}
-
-	// 11. Render plan
-	useColor := output.ShouldUseColor(v)
-	if cfg.Output == "json" {
-		if err := output.RenderPlanJSON(os.Stdout, actions, validations, resolver); err != nil {
-			return fmt.Errorf("rendering JSON: %w", err)
-		}
-	} else {
-		output.RenderPlan(os.Stdout, actions, validations, resolver, useColor)
+	if err := p.RenderPlan(os.Stdout, actions, validations, resolver); err != nil {
+		return err
 	}
 
 	// Check for validation errors -- block apply
-	hasValidationErrors := false
-	for _, val := range validations {
-		if val.Severity == validate.SeverityError {
-			hasValidationErrors = true
-			break
-		}
-	}
-	if hasValidationErrors {
+	if HasValidationErrors(validations) {
 		return &types.ExitError{
 			Code:    types.ExitValidationError,
 			Message: "validation errors detected, apply blocked",
 		}
 	}
 
-	// 12. Filter to actionable items
+	// Filter to actionable items
 	actionable := filterActionable(actions)
 	if len(actionable) == 0 {
-		fmt.Fprintln(os.Stdout, "No changes. Infrastructure is up-to-date.")
 		return nil
 	}
 
-	// Phase C: Dry-run check (PLAN-07)
+	// Dry-run check (PLAN-07)
 	dryRun, _ := cmd.Flags().GetBool("dry-run")
 	if dryRun {
 		fmt.Fprintln(os.Stdout, "Dry run complete. No changes applied.")
 		return nil
 	}
 
-	// Phase D: Confirmation (PLAN-05, PLAN-08)
+	// Confirmation (PLAN-05, PLAN-08)
 	autoApprove, _ := cmd.Flags().GetBool("auto-approve")
 
 	// CI mode check: must use --auto-approve
-	if cfg.CI && !autoApprove {
+	if p.Cfg.CI && !autoApprove {
 		return &types.ExitError{
 			Code:    types.ExitFatalError,
 			Message: "ci mode requires --auto-approve for write operations",
@@ -283,13 +118,10 @@ func runApply(cmd *cobra.Command, args []string) error {
 	}
 
 	if !autoApprove {
-		// Standard confirmation
 		if !confirm("Do you want to apply these changes? [Y/n]: ") {
 			fmt.Fprintln(os.Stdout, "Apply cancelled.")
 			return nil
 		}
-
-		// Escalated confirmation for recreate actions (PLAN-08)
 		if hasAction(actionable, reconcile.ActionRecreate) {
 			if !confirmExplicit("Recreate actions will DELETE and re-CREATE policies. Type 'yes' to confirm: ") {
 				fmt.Fprintln(os.Stdout, "Apply cancelled.")
@@ -298,8 +130,7 @@ func runApply(cmd *cobra.Command, args []string) error {
 		}
 	}
 
-	// Phase E: Execute actions
-	// Sort actionable by slug for deterministic order
+	// Execute actions -- sort by slug for deterministic order
 	sort.Slice(actionable, func(i, j int) bool {
 		return actionable[i].Slug < actionable[j].Slug
 	})
@@ -308,7 +139,7 @@ func runApply(cmd *cobra.Command, args []string) error {
 	for idx, action := range actionable {
 		switch action.Action {
 		case reconcile.ActionCreate:
-			newID, err := graphClient.CreatePolicy(ctx, action.BackendJSON)
+			newID, err := p.GraphClient.CreatePolicy(ctx, action.BackendJSON)
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "Failed applying policy %q: %v\n", action.Slug, err)
 				fmt.Fprintf(os.Stderr, "%d of %d actions succeeded before failure.\n", idx, len(actionable))
@@ -319,44 +150,16 @@ func runApply(cmd *cobra.Command, args []string) error {
 			}
 
 			version := "1.0.0"
-			backendJSON, _ := json.Marshal(action.BackendJSON)
-			sha, err := backend.WritePolicy(cfg.Tenant, action.Slug, backendJSON)
-			if err != nil {
-				return &types.ExitError{
-					Code:    types.ExitFatalError,
-					Message: fmt.Sprintf("writing backend state for %s: %v", action.Slug, err),
-				}
-			}
-
-			if err := backend.CreateVersionTag(cfg.Tenant, action.Slug, version, sha, fmt.Sprintf("Created %s at %s", action.Slug, version)); err != nil {
-				return &types.ExitError{
-					Code:    types.ExitFatalError,
-					Message: fmt.Sprintf("creating version tag for %s: %v", action.Slug, err),
-				}
-			}
-
-			manifest.Policies[action.Slug] = state.Entry{
-				Slug:         action.Slug,
-				Tenant:       cfg.Tenant,
-				LiveObjectID: newID,
-				Version:      version,
-				LastDeployed: time.Now().UTC().Format(time.RFC3339),
-				DeployedBy:   deployerIdentity(cfg),
-				AuthMode:     cfg.Auth.Mode,
-				BackendSHA:   sha,
-			}
-			if err := state.WriteManifest(backend, cfg.Tenant, manifest); err != nil {
-				return &types.ExitError{
-					Code:    types.ExitFatalError,
-					Message: fmt.Sprintf("writing manifest after %s: %v", action.Slug, err),
-				}
+			if err := p.RecordAppliedAction(action.Slug, newID, version, action.BackendJSON, fmt.Sprintf("Created %s at %s", action.Slug, version)); err != nil {
+				return err
 			}
 
 			fmt.Fprintf(os.Stdout, "Applied: + %s (%s)\n", action.Slug, version)
 			created++
 
 		case reconcile.ActionUpdate:
-			if err := graphClient.UpdatePolicy(ctx, action.LiveObjectID, action.BackendJSON); err != nil {
+			patchBody := buildPatchBody(action.BackendJSON, action.Diff)
+			if err := p.GraphClient.UpdatePolicy(ctx, action.LiveObjectID, patchBody); err != nil {
 				fmt.Fprintf(os.Stderr, "Failed applying policy %q: %v\n", action.Slug, err)
 				fmt.Fprintf(os.Stderr, "%d of %d actions succeeded before failure.\n", idx, len(actionable))
 				return &types.ExitError{
@@ -370,44 +173,15 @@ func runApply(cmd *cobra.Command, args []string) error {
 				newVersion = "1.0.1"
 			}
 
-			backendJSON, _ := json.Marshal(action.BackendJSON)
-			sha, err := backend.WritePolicy(cfg.Tenant, action.Slug, backendJSON)
-			if err != nil {
-				return &types.ExitError{
-					Code:    types.ExitFatalError,
-					Message: fmt.Sprintf("writing backend state for %s: %v", action.Slug, err),
-				}
-			}
-
-			if err := backend.CreateVersionTag(cfg.Tenant, action.Slug, newVersion, sha, fmt.Sprintf("Updated %s to %s", action.Slug, newVersion)); err != nil {
-				return &types.ExitError{
-					Code:    types.ExitFatalError,
-					Message: fmt.Sprintf("creating version tag for %s: %v", action.Slug, err),
-				}
-			}
-
-			manifest.Policies[action.Slug] = state.Entry{
-				Slug:         action.Slug,
-				Tenant:       cfg.Tenant,
-				LiveObjectID: action.LiveObjectID,
-				Version:      newVersion,
-				LastDeployed: time.Now().UTC().Format(time.RFC3339),
-				DeployedBy:   deployerIdentity(cfg),
-				AuthMode:     cfg.Auth.Mode,
-				BackendSHA:   sha,
-			}
-			if err := state.WriteManifest(backend, cfg.Tenant, manifest); err != nil {
-				return &types.ExitError{
-					Code:    types.ExitFatalError,
-					Message: fmt.Sprintf("writing manifest after %s: %v", action.Slug, err),
-				}
+			if err := p.RecordAppliedAction(action.Slug, action.LiveObjectID, newVersion, action.BackendJSON, fmt.Sprintf("Updated %s to %s", action.Slug, newVersion)); err != nil {
+				return err
 			}
 
 			fmt.Fprintf(os.Stdout, "Applied: ~ %s (%s -> %s)\n", action.Slug, action.VersionFrom, newVersion)
 			updated++
 
 		case reconcile.ActionRecreate:
-			newID, err := graphClient.CreatePolicy(ctx, action.BackendJSON)
+			newID, err := p.GraphClient.CreatePolicy(ctx, action.BackendJSON)
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "Failed applying policy %q: %v\n", action.Slug, err)
 				fmt.Fprintf(os.Stderr, "%d of %d actions succeeded before failure.\n", idx, len(actionable))
@@ -417,9 +191,8 @@ func runApply(cmd *cobra.Command, args []string) error {
 				}
 			}
 
-			// Compute version from current + bump
 			currentVersion := "1.0.0"
-			if entry, ok := manifest.Policies[action.Slug]; ok && entry.Version != "" {
+			if entry, ok := p.Manifest.Policies[action.Slug]; ok && entry.Version != "" {
 				currentVersion = entry.Version
 			}
 			newVersion, err := semver.BumpVersion(currentVersion, semver.BumpMinor)
@@ -427,37 +200,8 @@ func runApply(cmd *cobra.Command, args []string) error {
 				newVersion = "1.1.0" // Fallback
 			}
 
-			backendJSON, _ := json.Marshal(action.BackendJSON)
-			sha, writeErr := backend.WritePolicy(cfg.Tenant, action.Slug, backendJSON)
-			if writeErr != nil {
-				return &types.ExitError{
-					Code:    types.ExitFatalError,
-					Message: fmt.Sprintf("writing backend state for %s: %v", action.Slug, writeErr),
-				}
-			}
-
-			if err := backend.CreateVersionTag(cfg.Tenant, action.Slug, newVersion, sha, fmt.Sprintf("Recreated %s at %s", action.Slug, newVersion)); err != nil {
-				return &types.ExitError{
-					Code:    types.ExitFatalError,
-					Message: fmt.Sprintf("creating version tag for %s: %v", action.Slug, err),
-				}
-			}
-
-			manifest.Policies[action.Slug] = state.Entry{
-				Slug:         action.Slug,
-				Tenant:       cfg.Tenant,
-				LiveObjectID: newID,
-				Version:      newVersion,
-				LastDeployed: time.Now().UTC().Format(time.RFC3339),
-				DeployedBy:   deployerIdentity(cfg),
-				AuthMode:     cfg.Auth.Mode,
-				BackendSHA:   sha,
-			}
-			if err := state.WriteManifest(backend, cfg.Tenant, manifest); err != nil {
-				return &types.ExitError{
-					Code:    types.ExitFatalError,
-					Message: fmt.Sprintf("writing manifest after %s: %v", action.Slug, err),
-				}
+			if err := p.RecordAppliedAction(action.Slug, newID, newVersion, action.BackendJSON, fmt.Sprintf("Recreated %s at %s", action.Slug, newVersion)); err != nil {
+				return err
 			}
 
 			fmt.Fprintf(os.Stdout, "Applied: -/+ %s (%s -> %s)\n", action.Slug, currentVersion, newVersion)
@@ -465,7 +209,7 @@ func runApply(cmd *cobra.Command, args []string) error {
 		}
 	}
 
-	// Phase F: Summary
+	// Summary
 	fmt.Fprintf(os.Stdout, "Apply complete: %d created, %d updated, %d recreated.\n", created, updated, recreated)
 	return nil
 }
@@ -537,6 +281,30 @@ func parseBumpLevel(s string) (semver.BumpLevel, error) {
 	default:
 		return 0, fmt.Errorf("unknown bump level: %s", s)
 	}
+}
+
+// buildPatchBody creates a minimal PATCH body containing only the top-level
+// keys from the desired state that have changed fields. Graph API recommends
+// sending only changed values in PATCH requests.
+func buildPatchBody(desired map[string]interface{}, diffs []reconcile.FieldDiff) map[string]interface{} {
+	// Collect top-level keys that contain changes
+	changedKeys := make(map[string]bool)
+	for _, d := range diffs {
+		// Extract top-level key from dot-separated path
+		key := d.Path
+		if idx := strings.Index(key, "."); idx >= 0 {
+			key = key[:idx]
+		}
+		changedKeys[key] = true
+	}
+
+	patch := make(map[string]interface{})
+	for key := range changedKeys {
+		if val, ok := desired[key]; ok {
+			patch[key] = val
+		}
+	}
+	return patch
 }
 
 // deployerIdentity returns the deployer identity string for manifest entries.
