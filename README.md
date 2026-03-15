@@ -9,6 +9,10 @@
 
 ---
 
+<p align="center">
+  <img src="media/cactl-info.png" alt="cactl overview -- Git-powered governance for Entra ID" width="800" />
+</p>
+
 A misconfigured Conditional Access policy can lock out thousands of users in seconds -- with no version history to roll back to. cactl prevents this by bringing plan/apply discipline, Git-native versioning, and per-policy semantic versioning to Entra ID.
 
 ```

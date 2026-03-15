@@ -6,3 +6,5 @@ cactl
 /policies
 .planning/
 .claude
+
+.DS_Store
