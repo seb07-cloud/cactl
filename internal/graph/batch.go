@@ -48,7 +48,7 @@ func (c *Client) ExecuteBatch(ctx context.Context, requests []BatchRequestItem) 
 	if err != nil {
 		return nil, fmt.Errorf("executing batch request: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode != http.StatusOK {
 		respBody, _ := io.ReadAll(resp.Body)

@@ -38,7 +38,7 @@ func (c *Client) ListPolicies(ctx context.Context) ([]Policy, error) {
 		if err != nil {
 			return nil, fmt.Errorf("listing policies: %w", err)
 		}
-		defer resp.Body.Close()
+		defer func() { _ = resp.Body.Close() }()
 
 		if resp.StatusCode != http.StatusOK {
 			body, _ := io.ReadAll(resp.Body)
@@ -78,7 +78,7 @@ func (c *Client) GetPolicy(ctx context.Context, policyID string) (*Policy, error
 	if err != nil {
 		return nil, fmt.Errorf("getting policy %s: %w", policyID, err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode != http.StatusOK {
 		body, _ := io.ReadAll(resp.Body)
@@ -130,7 +130,7 @@ func (c *Client) CreatePolicy(ctx context.Context, policyJSON map[string]interfa
 	if err != nil {
 		return "", fmt.Errorf("creating policy: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode != http.StatusCreated {
 		respBody, _ := io.ReadAll(resp.Body)
@@ -189,7 +189,7 @@ func (c *Client) UpdatePolicy(ctx context.Context, id string, policyJSON map[str
 	if err != nil {
 		return fmt.Errorf("updating policy %s: %w", id, err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode != http.StatusNoContent {
 		respBody, _ := io.ReadAll(resp.Body)
@@ -206,7 +206,7 @@ func (c *Client) DeletePolicy(ctx context.Context, id string) error {
 	if err != nil {
 		return fmt.Errorf("deleting policy %s: %w", id, err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode != http.StatusNoContent {
 		respBody, _ := io.ReadAll(resp.Body)

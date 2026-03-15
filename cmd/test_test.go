@@ -4,8 +4,10 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 
+	"github.com/spf13/viper"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -30,6 +32,12 @@ func TestTestCmd_NoTestFiles(t *testing.T) {
 	// Set tenant via env var so the test reaches the "no test files" check
 	// even when az CLI is not available (e.g. CI).
 	t.Setenv("CACTL_TENANT", "test-tenant-000")
+
+	// Initialize viper to read CACTL_* env vars (normally done by PersistentPreRunE)
+	v := viper.GetViper()
+	v.SetEnvPrefix("CACTL")
+	v.AutomaticEnv()
+	v.SetEnvKeyReplacer(strings.NewReplacer("-", "_", ".", "_"))
 
 	// Call runTest directly to avoid viper state leaking between tests
 	err := runTest(testCmd, []string{})

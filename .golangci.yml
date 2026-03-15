@@ -10,6 +10,13 @@ linters:
     - gosec
     - prealloc
   settings:
+    errcheck:
+      exclude-functions:
+        - fmt.Fprintf
+        - fmt.Fprintln
+        - fmt.Fprint
+        - (net/http.ResponseWriter).Write
+        - (*encoding/json.Encoder).Encode
     exhaustive:
       check:
         - switch
