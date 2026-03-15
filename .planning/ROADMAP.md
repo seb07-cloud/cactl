@@ -19,7 +19,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 5: Production Readiness** - Multi-tenant, CI/CD, code quality, docs, binary distribution (completed 2026-03-05)
 - [ ] **Phase 6: Point-in-Time Restore** - Git history timeline, point-in-time policy restore with full diffs (not started)
 - [x] **Phase 7: Codebase DRY Simplification** - Behavior-preserving refactoring, shared pipeline helpers, mirror type elimination (completed 2026-03-15)
-- [ ] **Phase 8: Policy Test Engine** - Declarative test scenarios with local CA policy evaluation engine, YAML test runner, and CI integration (not started)
+- [x] **Phase 8: Policy Test Engine** - Declarative test scenarios with local CA policy evaluation engine, YAML test runner, and CI integration (not started) (completed 2026-03-15)
 
 ## Phase Details
 
@@ -126,7 +126,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8
 | 5. Production Readiness | 0/4 | Complete    | 2026-03-05 |
 | 6. Point-in-Time Restore | 0/2 | Not Started | - |
 | 7. Codebase DRY Simplification | 0/3 | Complete    | 2026-03-15 |
-| 8. Policy Test Engine | 0/3 | Not Started | - |
+| 8. Policy Test Engine | 0/3 | Complete    | 2026-03-15 |
 
 ### Phase 6: Point-in-Time Restore
 **Goal**: User can restore any policy to its state at any previous point in time, with full diff preview and confirmation
@@ -150,7 +150,7 @@ Plans:
 ### Phase 8: Policy Test Engine
 **Goal:** User can write declarative YAML test scenarios that assert CA policy behavior and run `cactl test` to verify policies produce expected outcomes locally without Azure API calls
 **Depends on:** Phase 7
-**Plans:** 3 plans
+**Plans:** 3/3 plans complete
 
 Plans:
 - [ ] 08-01-PLAN.md — Types, YAML parser, and condition matchers for CA policy evaluation
