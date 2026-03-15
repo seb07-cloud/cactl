@@ -318,7 +318,7 @@ func promptBumpLevel(prompt string, r io.Reader) semver.BumpLevel {
 		}
 		bl, err := parseBumpLevel(input)
 		if err != nil {
-			fmt.Fprintf(os.Stdout, "Invalid bump level %q. Use major, minor, or patch.\n", input)
+			fmt.Fprintf(os.Stdout, "Invalid bump level %q. Use major, minor, or patch.\n", input) //nolint:gosec // G705 - CLI output, not web
 			continue
 		}
 		return bl

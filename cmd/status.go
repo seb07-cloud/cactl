@@ -220,15 +220,17 @@ func buildPolicyStatuses(manifest *state.Manifest, syncAvailable bool, liveIndex
 			LiveObjectID: e.LiveObjectID,
 		}
 
-		if !syncAvailable {
+		switch {
+		case !syncAvailable:
 			ps.SyncStatus = "unknown"
-		} else {
+		default:
 			liveSHA, found := liveIndex[e.LiveObjectID]
-			if !found {
+			switch {
+			case !found:
 				ps.SyncStatus = "missing"
-			} else if liveSHA == e.BackendSHA {
+			case liveSHA == e.BackendSHA:
 				ps.SyncStatus = "in-sync"
-			} else {
+			default:
 				ps.SyncStatus = "drifted"
 			}
 		}

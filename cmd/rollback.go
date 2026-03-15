@@ -237,9 +237,7 @@ func runInteractiveRollback(ctx context.Context, cfg *types.Config) error {
 		Manifest: manifest,
 		UseColor: output.ShouldUseColor(viper.GetViper()),
 		RepoDir:  ".",
-		WritePolicyFile: func(tenant, slug string, data []byte) error {
-			return WritePolicyFile(tenant, slug, data)
-		},
+		WritePolicyFile: WritePolicyFile,
 		ReadDesiredPolicies: func(tenant string) (map[string]map[string]interface{}, error) {
 			policies, err := ReadDesiredPolicies(tenant)
 			if err != nil {

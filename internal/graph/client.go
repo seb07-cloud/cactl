@@ -59,7 +59,7 @@ func (c *Client) do(ctx context.Context, method, url string, body io.Reader) (*h
 	req.Header.Set("Authorization", "Bearer "+token.Token)
 	req.Header.Set("Content-Type", "application/json")
 
-	resp, err := c.httpClient.Do(req)
+	resp, err := c.httpClient.Do(req) //nolint:gosec // G704 - URL constructed from trusted baseURL
 	if err != nil {
 		return nil, fmt.Errorf("executing request: %w", err)
 	}

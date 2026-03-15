@@ -62,13 +62,8 @@ func TestListPoliciesPagination(t *testing.T) {
 		w.Header().Set("Content-Type", "application/json")
 
 		if count == 1 {
-			// Page 1: includes nextLink
+			// Page 1: includes nextLink (full URL with scheme)
 			resp := fmt.Sprintf(`{
-				"value": [{"id": "policy-1", "displayName": "Policy 1", "state": "enabled"}],
-				"@odata.nextLink": "%s/page2"
-			}`, r.Host) // Use placeholder; we'll fix the URL below
-			// Actually need full URL with scheme
-			resp = fmt.Sprintf(`{
 				"value": [{"id": "policy-1", "displayName": "Policy 1", "state": "enabled"}],
 				"@odata.nextLink": "http://%s/page2"
 			}`, r.Host)

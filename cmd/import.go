@@ -129,15 +129,16 @@ func importForTenant(
 	// Determine which policies to import
 	var toImport []graph.Policy
 
-	if importAll || (force && policyFilter == "") {
+	switch {
+	case importAll || (force && policyFilter == ""):
 		// --all or --force without --policy: import everything
 		toImport = policies
-	} else if policyFilter != "" {
+	case policyFilter != "":
 		toImport, err = filterPolicy(policies, policyFilter)
 		if err != nil {
 			return err
 		}
-	} else {
+	default:
 		// Interactive selection
 		toImport, err = interactiveSelect(ctx, r, policies, manifest, ciMode)
 		if err != nil {

@@ -221,7 +221,7 @@ func TestReconcileIncludesDuplicates(t *testing.T) {
 
 // Helper for debug output.
 func summarizeActions(actions []PolicyAction) []string {
-	var s []string
+	s := make([]string, 0, len(actions))
 	for _, a := range actions {
 		s = append(s, a.Slug+"="+a.Action.String())
 	}

@@ -87,11 +87,12 @@ func RunTestFile(path string, allPolicies []PolicyWithSlug) (*FileResult, error)
 	for _, scenario := range spec.Scenarios {
 		sr := evaluateScenario(scenario, policies)
 		result.Scenarios = append(result.Scenarios, sr)
-		if sr.Error != "" {
+		switch {
+		case sr.Error != "":
 			result.Errors++
-		} else if sr.Passed {
+		case sr.Passed:
 			result.Passed++
-		} else {
+		default:
 			result.Failed++
 		}
 	}
