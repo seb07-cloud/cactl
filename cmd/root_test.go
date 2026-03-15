@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"errors"
 	"testing"
 
 	"github.com/seb07-cloud/cactl/pkg/types"
@@ -26,7 +25,7 @@ func TestInvalidOutputFormatReturnsExitError(t *testing.T) {
 	require.Error(t, err)
 
 	var exitErr *types.ExitError
-	require.True(t, errors.As(err, &exitErr), "expected ExitError, got: %v", err)
+	require.ErrorAs(t, err, &exitErr)
 	assert.Equal(t, types.ExitValidationError, exitErr.Code)
 	assert.Contains(t, exitErr.Message, "invalid output format")
 }

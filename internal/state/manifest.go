@@ -3,7 +3,6 @@ package state
 import (
 	"encoding/json"
 	"fmt"
-	"strings"
 )
 
 // Manifest holds the state of all tracked policies for a tenant.
@@ -37,14 +36,11 @@ func ReadManifest(backend *GitBackend, tenantID string) (*Manifest, error) {
 	data, err := backend.catFile(ref)
 	if err != nil {
 		// Ref doesn't exist -- return empty manifest
-		if strings.Contains(err.Error(), "reading") {
-			return &Manifest{
-				SchemaVersion: 1,
-				Tenant:        tenantID,
-				Policies:      make(map[string]Entry),
-			}, nil
-		}
-		return nil, fmt.Errorf("reading manifest for %s: %w", tenantID, err)
+		return &Manifest{
+			SchemaVersion: 1,
+			Tenant:        tenantID,
+			Policies:      make(map[string]Entry),
+		}, nil
 	}
 
 	var m Manifest

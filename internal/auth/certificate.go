@@ -31,7 +31,7 @@ func NewClientCertificateProvider(clientID, certPath string) *ClientCertificateP
 // It reads and parses the certificate file using azidentity.ParseCertificates,
 // which handles both PEM and PKCS#12 formats.
 func (p *ClientCertificateProvider) Credential(_ context.Context, tenantID string) (azcore.TokenCredential, error) {
-	certData, err := os.ReadFile(p.certPath)
+	certData, err := os.ReadFile(p.certPath) //nolint:gosec // G304 - path from config/traversal
 	if err != nil {
 		return nil, fmt.Errorf("reading certificate file %s: %w", p.certPath, err)
 	}

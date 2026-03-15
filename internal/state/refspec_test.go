@@ -13,7 +13,7 @@ func TestConfigureRefspec(t *testing.T) {
 	dir := initTempRepo(t)
 
 	// Add a remote origin
-	cmd := exec.Command("git", "remote", "add", "origin", "https://example.com/repo.git")
+	cmd := exec.Command("git", "remote", "add", "origin", "https://example.com/repo.git") //nolint:gosec // G204 - hardcoded binary
 	cmd.Dir = dir
 	require.NoError(t, cmd.Run())
 
@@ -21,14 +21,14 @@ func TestConfigureRefspec(t *testing.T) {
 	require.NoError(t, err)
 
 	// Verify fetch refspec
-	fetchCmd := exec.Command("git", "config", "--get-all", "remote.origin.fetch")
+	fetchCmd := exec.Command("git", "config", "--get-all", "remote.origin.fetch") //nolint:gosec // G204 - hardcoded binary
 	fetchCmd.Dir = dir
 	out, err := fetchCmd.Output()
 	require.NoError(t, err)
 	assert.Contains(t, string(out), "+refs/cactl/*:refs/cactl/*")
 
 	// Verify push refspec
-	pushCmd := exec.Command("git", "config", "--get-all", "remote.origin.push")
+	pushCmd := exec.Command("git", "config", "--get-all", "remote.origin.push") //nolint:gosec // G204 - hardcoded binary
 	pushCmd.Dir = dir
 	out, err = pushCmd.Output()
 	require.NoError(t, err)
@@ -38,7 +38,7 @@ func TestConfigureRefspec(t *testing.T) {
 func TestConfigureRefspecIdempotent(t *testing.T) {
 	dir := initTempRepo(t)
 
-	cmd := exec.Command("git", "remote", "add", "origin", "https://example.com/repo.git")
+	cmd := exec.Command("git", "remote", "add", "origin", "https://example.com/repo.git") //nolint:gosec // G204 - hardcoded binary
 	cmd.Dir = dir
 	require.NoError(t, cmd.Run())
 
@@ -47,7 +47,7 @@ func TestConfigureRefspecIdempotent(t *testing.T) {
 	require.NoError(t, ConfigureRefspec(dir))
 
 	// Count fetch refspec entries -- should be exactly 1
-	fetchCmd := exec.Command("git", "config", "--get-all", "remote.origin.fetch")
+	fetchCmd := exec.Command("git", "config", "--get-all", "remote.origin.fetch") //nolint:gosec // G204 - hardcoded binary
 	fetchCmd.Dir = dir
 	out, err := fetchCmd.Output()
 	require.NoError(t, err)
@@ -61,7 +61,7 @@ func TestConfigureRefspecIdempotent(t *testing.T) {
 	assert.Equal(t, 1, cactlCount, "should have exactly one cactl fetch refspec")
 
 	// Count push refspec entries
-	pushCmd := exec.Command("git", "config", "--get-all", "remote.origin.push")
+	pushCmd := exec.Command("git", "config", "--get-all", "remote.origin.push") //nolint:gosec // G204 - hardcoded binary
 	pushCmd.Dir = dir
 	out, err = pushCmd.Output()
 	require.NoError(t, err)

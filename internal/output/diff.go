@@ -23,6 +23,8 @@ const (
 // sigil returns the sigil character and color for an action type.
 func sigil(action reconcile.ActionType) (string, string) {
 	switch action {
+	case reconcile.ActionNoop:
+		return " ", colorReset
 	case reconcile.ActionCreate:
 		return "+", colorGreen
 	case reconcile.ActionUpdate:
@@ -35,24 +37,6 @@ func sigil(action reconcile.ActionType) (string, string) {
 		return "!!", colorMagenta
 	default:
 		return " ", colorReset
-	}
-}
-
-// actionVerb returns a human-readable description for each action type.
-func actionVerb(action reconcile.ActionType) string {
-	switch action {
-	case reconcile.ActionCreate:
-		return "create"
-	case reconcile.ActionUpdate:
-		return "update"
-	case reconcile.ActionRecreate:
-		return "recreate"
-	case reconcile.ActionUntracked:
-		return "untracked"
-	case reconcile.ActionDuplicate:
-		return "duplicate"
-	default:
-		return ""
 	}
 }
 
@@ -106,6 +90,8 @@ func RenderPlan(w io.Writer, actions []reconcile.PolicyAction, validations []val
 	var create, update, recreate, untracked, duplicate int
 	for _, a := range actions {
 		switch a.Action {
+		case reconcile.ActionNoop:
+			// no-op: not counted in summary
 		case reconcile.ActionCreate:
 			create++
 		case reconcile.ActionUpdate:
@@ -120,7 +106,7 @@ func RenderPlan(w io.Writer, actions []reconcile.PolicyAction, validations []val
 	}
 
 	fmt.Fprintln(w, "")
-	parts := []string{}
+	var parts []string
 	if create > 0 {
 		parts = append(parts, c(colorGreen, fmt.Sprintf("%d to create", create)))
 	}
@@ -148,6 +134,8 @@ func renderAction(w io.Writer, a reconcile.PolicyAction, resolver *resolve.Resol
 	header := fmt.Sprintf("%s %s", c(clr+colorBold, s), c(colorBold, a.Slug))
 
 	switch a.Action {
+	case reconcile.ActionNoop:
+		// no-op: should not reach renderAction
 	case reconcile.ActionCreate:
 		header += c(colorDim, " (new)")
 	case reconcile.ActionUpdate:

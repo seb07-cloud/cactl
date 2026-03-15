@@ -20,7 +20,7 @@ func SelectPolicy(slugs []string) (string, error) {
 	err := huh.NewSelect[string]().
 		Title("Select a policy").
 		Options(options...).
-		Height(len(options)+2). // +2 for title and padding
+		Height(len(options) + 2). // +2 for title and padding
 		Value(&selected).
 		Run()
 	return selected, err
@@ -48,7 +48,7 @@ func SelectVersion(tags []state.VersionTag, summaries []string) (string, error) 
 	err := huh.NewSelect[string]().
 		Title("Select a version to inspect").
 		Options(options...).
-		Height(len(options)+2). // +2 for title and padding
+		Height(len(options) + 2). // +2 for title and padding
 		Value(&selected).
 		Run()
 	return selected, err

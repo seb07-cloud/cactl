@@ -140,7 +140,7 @@ func runHistoryListAll(backend *state.GitBackend, cfg *types.Config, manifest *s
 		for _, s := range summaries {
 			fmt.Fprintf(tw, "%s\t%d\t%s\t%s\n", s.Slug, s.VersionCount, s.CurrentVersion, s.LastDeployed)
 		}
-		tw.Flush()
+		_ = tw.Flush()
 	}
 
 	return nil
@@ -206,7 +206,7 @@ func runHistorySinglePolicy(backend *state.GitBackend, cfg *types.Config, manife
 		for i, t := range tags {
 			fmt.Fprintf(tw, "%s\t%s\t%s\n", t.Version, t.Timestamp, diffSummaries[i])
 		}
-		tw.Flush()
+		_ = tw.Flush()
 	}
 
 	return nil

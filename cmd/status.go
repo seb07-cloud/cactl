@@ -237,4 +237,3 @@ func buildPolicyStatuses(manifest *state.Manifest, syncAvailable bool, liveIndex
 	}
 	return entries
 }
-

@@ -60,8 +60,8 @@ func TestDetermineBump(t *testing.T) {
 			expected: BumpMinor,
 		},
 		{
-			name: "empty diffs returns BumpPatch",
-			diffs: []FieldDiff{},
+			name:     "empty diffs returns BumpPatch",
+			diffs:    []FieldDiff{},
 			expected: BumpPatch,
 		},
 		{
@@ -77,6 +77,23 @@ func TestDetermineBump(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			result := DetermineBump(tc.diffs, cfg.MajorFields, cfg.MinorFields)
 			assert.Equal(t, tc.expected, result)
+		})
+	}
+}
+
+func TestBumpLevel_String(t *testing.T) {
+	tests := []struct {
+		level BumpLevel
+		want  string
+	}{
+		{BumpPatch, "PATCH"},
+		{BumpMinor, "MINOR"},
+		{BumpMajor, "MAJOR"},
+		{BumpLevel(99), "UNKNOWN"},
+	}
+	for _, tt := range tests {
+		t.Run(tt.want, func(t *testing.T) {
+			assert.Equal(t, tt.want, tt.level.String())
 		})
 	}
 }
@@ -122,6 +139,30 @@ func TestBumpVersion(t *testing.T) {
 		{
 			name:    "invalid version returns error",
 			current: "abc",
+			level:   BumpPatch,
+			wantErr: true,
+		},
+		{
+			name:    "invalid major version",
+			current: "x.1.2",
+			level:   BumpPatch,
+			wantErr: true,
+		},
+		{
+			name:    "invalid minor version",
+			current: "1.y.2",
+			level:   BumpPatch,
+			wantErr: true,
+		},
+		{
+			name:    "invalid patch version",
+			current: "1.2.z",
+			level:   BumpPatch,
+			wantErr: true,
+		},
+		{
+			name:    "too few parts",
+			current: "1.2",
 			level:   BumpPatch,
 			wantErr: true,
 		},

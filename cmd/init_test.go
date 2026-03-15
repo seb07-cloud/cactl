@@ -30,11 +30,11 @@ func TestInitHappyPath(t *testing.T) {
 
 	// .cactl/config.yaml exists
 	_, err = os.Stat(filepath.Join(cactlDir, configFileName))
-	assert.NoError(t, err, ".cactl/config.yaml should exist")
+	require.NoError(t, err, ".cactl/config.yaml should exist")
 
 	// .cactl/schema.json exists
 	_, err = os.Stat(filepath.Join(cactlDir, schemaFileName))
-	assert.NoError(t, err, ".cactl/schema.json should exist")
+	require.NoError(t, err, ".cactl/schema.json should exist")
 
 	// .gitignore contains the entry
 	content, err := os.ReadFile(gitignoreFile)

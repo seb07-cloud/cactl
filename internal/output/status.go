@@ -20,7 +20,7 @@ func RenderStatus(w io.Writer, entries []types.PolicyStatus, useColor bool) {
 		syncLabel := formatSyncStatus(e.SyncStatus, useColor)
 		fmt.Fprintf(tw, "%s\t%s\t%s\t%s\t%s\n", e.Slug, e.Version, e.LastDeployed, e.DeployedBy, syncLabel)
 	}
-	tw.Flush()
+	_ = tw.Flush()
 
 	// Summary line
 	summary := BuildSummary(entries)
@@ -51,7 +51,7 @@ func RenderHistory(w io.Writer, slug string, tags []state.VersionTag, useColor b
 	for _, t := range tags {
 		fmt.Fprintf(tw, "%s\t%s\t%s\n", t.Version, t.Timestamp, t.Message)
 	}
-	tw.Flush()
+	_ = tw.Flush()
 }
 
 // BuildSummary computes a StatusSummary from a slice of PolicyStatus entries.

@@ -323,4 +323,3 @@ func disambiguateSlug(baseSlug, objectID string, manifest *state.Manifest) strin
 	}
 	return candidate
 }
-

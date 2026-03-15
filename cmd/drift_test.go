@@ -28,7 +28,7 @@ func TestDriftCmd_Name(t *testing.T) {
 func TestDriftCmd_HasPolicyFlag(t *testing.T) {
 	f := driftCmd.Flags().Lookup("policy")
 	if f == nil {
-		t.Error("drift command should have --policy flag")
+		t.Fatal("drift command should have --policy flag")
 	}
 	if f.DefValue != "" {
 		t.Errorf("expected --policy default to be empty, got %q", f.DefValue)

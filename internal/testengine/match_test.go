@@ -487,11 +487,11 @@ func TestMatchUserRiskLevels(t *testing.T) {
 
 func TestMatchStringList(t *testing.T) {
 	tests := []struct {
-		name     string
-		include  []string
-		exclude  []string
-		values   []string
-		want     bool
+		name    string
+		include []string
+		exclude []string
+		values  []string
+		want    bool
 	}{
 		{
 			name:    "All includes matches anything",

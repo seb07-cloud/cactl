@@ -41,7 +41,7 @@ func TestTestCmd_NoTestFiles(t *testing.T) {
 
 	// Call runTest directly to avoid viper state leaking between tests
 	err := runTest(testCmd, []string{})
-	assert.Error(t, err)
+	require.Error(t, err)
 	assert.Contains(t, err.Error(), "no test files found")
 }
 

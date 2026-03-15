@@ -16,7 +16,7 @@ var validResults = map[string]bool{
 
 // ParseTestFile reads a YAML test spec file from disk and returns a validated TestSpec.
 func ParseTestFile(path string) (*TestSpec, error) {
-	data, err := os.ReadFile(path)
+	data, err := os.ReadFile(path) //nolint:gosec // G304 - path from config/traversal
 	if err != nil {
 		return nil, fmt.Errorf("reading test file %s: %w", path, err)
 	}

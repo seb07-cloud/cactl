@@ -22,7 +22,7 @@ func initTempRepo(t *testing.T) string {
 		{"git", "config", "user.email", "test@test.com"},
 	}
 	for _, args := range cmds {
-		cmd := exec.Command(args[0], args[1:]...)
+		cmd := exec.Command(args[0], args[1:]...) //nolint:gosec // G204 - hardcoded binary
 		cmd.Dir = dir
 		out, err := cmd.CombinedOutput()
 		require.NoError(t, err, "setup %v: %s", args, string(out))
@@ -53,7 +53,7 @@ func TestWritePolicyCreatesRef(t *testing.T) {
 	_, err = b.WritePolicy("tenant-123", "ref-check", data)
 	require.NoError(t, err)
 
-	cmd := exec.Command("git", "for-each-ref", "refs/cactl/tenants/tenant-123/policies/ref-check")
+	cmd := exec.Command("git", "for-each-ref", "refs/cactl/tenants/tenant-123/policies/ref-check") //nolint:gosec // G204 - hardcoded binary
 	cmd.Dir = dir
 	out, err := cmd.Output()
 	require.NoError(t, err)
@@ -110,14 +110,14 @@ func TestCreateVersionTag(t *testing.T) {
 
 	// Verify tag exists
 	tagName := "cactl/tenant-tag/tag-test/1.0.0"
-	cmd := exec.Command("git", "tag", "-l", tagName)
+	cmd := exec.Command("git", "tag", "-l", tagName) //nolint:gosec // G204 - hardcoded binary
 	cmd.Dir = dir
 	out, err := cmd.Output()
 	require.NoError(t, err)
 	assert.Equal(t, tagName, strings.TrimSpace(string(out)))
 
 	// Verify it is annotated (cat-file -t on the tag ref returns "tag")
-	cmd2 := exec.Command("git", "cat-file", "-t", tagName)
+	cmd2 := exec.Command("git", "cat-file", "-t", tagName) //nolint:gosec // G204 - hardcoded binary
 	cmd2.Dir = dir
 	out2, err := cmd2.Output()
 	require.NoError(t, err)

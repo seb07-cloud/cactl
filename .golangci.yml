@@ -21,7 +21,7 @@ linters:
       check:
         - switch
         - map
-      default-signifies-exhaustive: false
+      default-signifies-exhaustive: true
     testifylint:
       enable-all: true
 
@@ -29,6 +29,12 @@ formatters:
   enable:
     - gofmt
     - goimports
+
+exclusions:
+  rules:
+    - linters:
+        - gosec
+      path: _test\.go
 
 issues:
   max-issues-per-linter: 0

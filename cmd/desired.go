@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -20,7 +21,7 @@ func ReadDesiredPolicies(tenantID string) (map[string]reconcile.BackendPolicy, e
 
 	entries, err := os.ReadDir(dir)
 	if err != nil {
-		if os.IsNotExist(err) {
+		if errors.Is(err, os.ErrNotExist) {
 			return nil, fmt.Errorf("no policies directory found at %s -- run 'cactl import' first", dir)
 		}
 		return nil, fmt.Errorf("reading policies directory %s: %w", dir, err)
@@ -33,7 +34,7 @@ func ReadDesiredPolicies(tenantID string) (map[string]reconcile.BackendPolicy, e
 		}
 
 		slug := strings.TrimSuffix(entry.Name(), ".json")
-		data, err := os.ReadFile(filepath.Join(dir, entry.Name()))
+		data, err := os.ReadFile(filepath.Join(dir, entry.Name())) //nolint:gosec // G304 - path from config/traversal
 		if err != nil {
 			return nil, fmt.Errorf("reading policy file %s: %w", entry.Name(), err)
 		}
@@ -52,11 +53,11 @@ func ReadDesiredPolicies(tenantID string) (map[string]reconcile.BackendPolicy, e
 // WritePolicyFile writes normalized policy JSON to policies/<tenantID>/<slug>.json.
 func WritePolicyFile(tenantID, slug string, data []byte) error {
 	dir := filepath.Join(policiesDir, tenantID)
-	if err := os.MkdirAll(dir, 0755); err != nil {
+	if err := os.MkdirAll(dir, 0750); err != nil { //nolint:gosec // G301 - policy directory
 		return fmt.Errorf("creating policies directory: %w", err)
 	}
 	path := filepath.Join(dir, slug+".json")
-	if err := os.WriteFile(path, data, 0644); err != nil {
+	if err := os.WriteFile(path, data, 0644); err != nil { //nolint:gosec // G306 - policy files not sensitive
 		return fmt.Errorf("writing policy file %s: %w", path, err)
 	}
 	return nil

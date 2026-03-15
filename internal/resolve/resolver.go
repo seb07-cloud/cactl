@@ -117,8 +117,8 @@ func (r *Resolver) ResolveAll(ctx context.Context, refs []ObjectRef) error {
 		r.mu.Lock()
 		for _, resp := range responses {
 			objectID := idMap[resp.ID]
-			switch {
-			case resp.Status == 200:
+			switch resp.Status {
+			case 200:
 				var obj struct {
 					DisplayName string `json:"displayName"`
 				}
@@ -127,7 +127,7 @@ func (r *Resolver) ResolveAll(ctx context.Context, refs []ObjectRef) error {
 				} else {
 					r.cache[objectID] = objectID
 				}
-			case resp.Status == 404:
+			case 404:
 				r.cache[objectID] = fmt.Sprintf("%s (deleted)", objectID)
 			default:
 				r.cache[objectID] = objectID

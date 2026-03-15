@@ -13,7 +13,7 @@ type TestSpec struct {
 // Scenario defines a single test case: a sign-in context and the expected outcome.
 type Scenario struct {
 	Name    string          `yaml:"name"`
-	Context SignInContext    `yaml:"context"`
+	Context SignInContext   `yaml:"context"`
 	Expect  ExpectedOutcome `yaml:"expect"`
 }
 
@@ -32,9 +32,9 @@ type SignInContext struct {
 
 // ExpectedOutcome describes the expected result of evaluating policies against a sign-in context.
 type ExpectedOutcome struct {
-	Result          string                 `yaml:"result"`                      // block, grant, notApplicable
-	Controls        []string               `yaml:"controls,omitempty"`          // Expected grant controls (e.g., mfa, compliantDevice)
-	SessionControls map[string]interface{} `yaml:"sessionControls,omitempty"`   // Expected session controls
+	Result          string                 `yaml:"result"`                    // block, grant, notApplicable
+	Controls        []string               `yaml:"controls,omitempty"`        // Expected grant controls (e.g., mfa, compliantDevice)
+	SessionControls map[string]interface{} `yaml:"sessionControls,omitempty"` // Expected session controls
 }
 
 // PolicyWithSlug pairs a policy slug with its raw JSON data.
@@ -74,7 +74,7 @@ type PolicyDecision struct {
 	PolicySlug      string
 	Result          EvalResult
 	GrantControls   []string
-	Operator        string                 // "AND" or "OR"
+	Operator        string // "AND" or "OR"
 	SessionControls map[string]interface{}
 }
 

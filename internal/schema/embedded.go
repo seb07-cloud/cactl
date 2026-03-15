@@ -15,7 +15,7 @@ var EmbeddedSchema []byte
 
 // WriteEmbedded writes the embedded fallback schema to the given path.
 func WriteEmbedded(path string) error {
-	if err := os.WriteFile(path, EmbeddedSchema, 0644); err != nil {
+	if err := os.WriteFile(path, EmbeddedSchema, 0644); err != nil { //nolint:gosec // G306 - schema files not sensitive
 		return fmt.Errorf("writing embedded schema: %w", err)
 	}
 	return nil

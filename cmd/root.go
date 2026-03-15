@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 
@@ -55,7 +56,8 @@ func initConfig(cmd *cobra.Command) error {
 
 	// 3. Read config file (ignore if not found -- init hasn't been run yet)
 	if err := v.ReadInConfig(); err != nil {
-		if _, ok := err.(viper.ConfigFileNotFoundError); !ok {
+		var configNotFound viper.ConfigFileNotFoundError
+		if !errors.As(err, &configNotFound) {
 			return fmt.Errorf("reading config: %w", err)
 		}
 	}

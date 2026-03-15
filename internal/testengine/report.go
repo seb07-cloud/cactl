@@ -9,9 +9,9 @@ import (
 
 // ANSI color codes consistent with internal/output/human.go.
 const (
-	resetCode  = "\033[0m"
-	redCode    = "\033[31m"
-	greenCode  = "\033[32m"
+	resetCode = "\033[0m"
+	redCode   = "\033[31m"
+	greenCode = "\033[32m"
 )
 
 // Summary computes totals across all files in the report.
@@ -82,8 +82,8 @@ func renderStatus(w io.Writer, useColor, passed bool, msg string) {
 
 // jsonReport is the JSON output structure.
 type jsonReport struct {
-	Summary jsonSummary  `json:"summary"`
-	Files   []jsonFile   `json:"files"`
+	Summary jsonSummary `json:"summary"`
+	Files   []jsonFile  `json:"files"`
 }
 
 type jsonSummary struct {

@@ -2,6 +2,7 @@ package testengine
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -12,7 +13,7 @@ import (
 func LoadPolicies(policyDir string) ([]PolicyWithSlug, error) {
 	entries, err := os.ReadDir(policyDir)
 	if err != nil {
-		if os.IsNotExist(err) {
+		if errors.Is(err, os.ErrNotExist) {
 			return nil, fmt.Errorf("policy directory not found: %s", policyDir)
 		}
 		return nil, fmt.Errorf("reading policy directory %s: %w", policyDir, err)
@@ -24,7 +25,7 @@ func LoadPolicies(policyDir string) ([]PolicyWithSlug, error) {
 			continue
 		}
 
-		data, err := os.ReadFile(filepath.Join(policyDir, entry.Name()))
+		data, err := os.ReadFile(filepath.Join(policyDir, entry.Name())) //nolint:gosec // G304 - path from config/traversal
 		if err != nil {
 			return nil, fmt.Errorf("reading policy file %s: %w", entry.Name(), err)
 		}

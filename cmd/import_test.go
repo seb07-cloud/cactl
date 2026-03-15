@@ -53,4 +53,3 @@ func TestImportCommandRegistered(t *testing.T) {
 	}
 	assert.True(t, found, "import command should be registered on root")
 }
-

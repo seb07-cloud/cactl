@@ -237,7 +237,7 @@ func computeDiffSummaries(backend *state.GitBackend, tenant, slug string, tags [
 
 // hasUncommittedChanges checks if a file has uncommitted local changes.
 func hasUncommittedChanges(repoDir, filePath string) (bool, error) {
-	cmd := exec.Command("git", "status", "--porcelain", filePath)
+	cmd := exec.Command("git", "status", "--porcelain", filePath) //nolint:gosec // G204 - hardcoded binary
 	cmd.Dir = repoDir
 	out, err := cmd.Output()
 	if err != nil {
@@ -248,16 +248,15 @@ func hasUncommittedChanges(repoDir, filePath string) (bool, error) {
 
 // autoCommit stages and commits a file with the given message.
 func autoCommit(repoDir, filePath, message string) error {
-	add := exec.Command("git", "add", filePath)
+	add := exec.Command("git", "add", filePath) //nolint:gosec // G204 - hardcoded binary
 	add.Dir = repoDir
 	if out, err := add.CombinedOutput(); err != nil {
 		return fmt.Errorf("git add: %s: %w", strings.TrimSpace(string(out)), err)
 	}
-	commit := exec.Command("git", "commit", "-m", message)
+	commit := exec.Command("git", "commit", "-m", message) //nolint:gosec // G204 - hardcoded binary
 	commit.Dir = repoDir
 	if out, err := commit.CombinedOutput(); err != nil {
 		return fmt.Errorf("git commit: %s: %w", strings.TrimSpace(string(out)), err)
 	}
 	return nil
 }
-

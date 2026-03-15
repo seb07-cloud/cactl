@@ -96,7 +96,7 @@ func runDrift(cmd *cobra.Command, args []string) error {
 // Unlike apply's filterActionable, drift keeps Untracked actions since
 // untracked policies represent drift (DRIFT-02).
 func filterDriftActionable(actions []reconcile.PolicyAction) []reconcile.PolicyAction {
-	var result []reconcile.PolicyAction
+	result := make([]reconcile.PolicyAction, 0, len(actions))
 	for _, a := range actions {
 		if a.Action != reconcile.ActionNoop {
 			result = append(result, a)
@@ -111,7 +111,7 @@ func filterBySlug(actions []reconcile.PolicyAction, slug string) []reconcile.Pol
 	if slug == "" {
 		return actions
 	}
-	var result []reconcile.PolicyAction
+	result := make([]reconcile.PolicyAction, 0, len(actions))
 	for _, a := range actions {
 		if a.Slug == slug {
 			result = append(result, a)

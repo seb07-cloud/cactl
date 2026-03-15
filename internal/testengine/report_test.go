@@ -3,7 +3,6 @@ package testengine
 import (
 	"bytes"
 	"encoding/json"
-	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -145,7 +144,7 @@ func TestRenderHuman_ErrorScenario(t *testing.T) {
 	RenderHuman(&buf, report, false)
 	output := buf.String()
 
-	assert.True(t, strings.Contains(output, "FAIL"))
+	assert.Contains(t, output, "FAIL")
 	assert.Contains(t, output, "error: parsing error: invalid YAML")
 	assert.Contains(t, output, "Results: 0 passed, 0 failed, 1 errors")
 }

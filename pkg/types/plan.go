@@ -11,12 +11,12 @@ type PlanOutput struct {
 
 // ActionOutput describes a single policy action in JSON output.
 type ActionOutput struct {
-	Slug        string       `json:"slug"`
-	DisplayName string       `json:"display_name"`
-	Action      string       `json:"action"`
-	VersionFrom string       `json:"version_from,omitempty"`
-	VersionTo   string       `json:"version_to,omitempty"`
-	BumpLevel   string       `json:"bump_level,omitempty"`
+	Slug         string       `json:"slug"`
+	DisplayName  string       `json:"display_name"`
+	Action       string       `json:"action"`
+	VersionFrom  string       `json:"version_from,omitempty"`
+	VersionTo    string       `json:"version_to,omitempty"`
+	BumpLevel    string       `json:"bump_level,omitempty"`
 	Diffs        []DiffOutput `json:"diffs,omitempty"`
 	Warnings     []string     `json:"warnings,omitempty"`
 	DuplicateIDs []string     `json:"duplicate_ids,omitempty"`

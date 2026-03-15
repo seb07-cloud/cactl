@@ -13,7 +13,7 @@ const cactlRefspec = "+refs/cactl/*:refs/cactl/*"
 // when no remote origin is configured.
 func ConfigureRefspec(repoDir string) error {
 	// Check if remote "origin" exists
-	check := exec.Command("git", "config", "--get", "remote.origin.url")
+	check := exec.Command("git", "config", "--get", "remote.origin.url") //nolint:gosec // G204 - hardcoded binary
 	check.Dir = repoDir
 	if err := check.Run(); err != nil {
 		// No remote origin -- skip silently
@@ -36,7 +36,7 @@ func ConfigureRefspec(repoDir string) error {
 // addRefspecIfMissing checks if the cactl refspec already exists for the given
 // config key and adds it if not present.
 func addRefspecIfMissing(repoDir, configKey string) error {
-	cmd := exec.Command("git", "config", "--get-all", configKey)
+	cmd := exec.Command("git", "config", "--get-all", configKey) //nolint:gosec // G204 - hardcoded binary
 	cmd.Dir = repoDir
 	out, _ := cmd.Output() // ignore error -- key may not exist yet
 
@@ -44,7 +44,7 @@ func addRefspecIfMissing(repoDir, configKey string) error {
 		return nil // Already configured
 	}
 
-	add := exec.Command("git", "config", "--add", configKey, cactlRefspec)
+	add := exec.Command("git", "config", "--add", configKey, cactlRefspec) //nolint:gosec // G204 - hardcoded binary
 	add.Dir = repoDir
 	if out, err := add.CombinedOutput(); err != nil {
 		return fmt.Errorf("git config --add %s: %s: %w", configKey, strings.TrimSpace(string(out)), err)

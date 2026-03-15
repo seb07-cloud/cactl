@@ -51,7 +51,7 @@ func Fetch(destPath string) error {
 	if err != nil {
 		return fmt.Errorf("fetching schema from %s: %w", schemaURL, err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode != http.StatusOK {
 		return fmt.Errorf("fetching schema: HTTP %d from %s", resp.StatusCode, schemaURL)
@@ -83,7 +83,7 @@ func Fetch(destPath string) error {
 	}
 	out = append(out, '\n')
 
-	if err := os.WriteFile(destPath, out, 0644); err != nil {
+	if err := os.WriteFile(destPath, out, 0644); err != nil { //nolint:gosec // G306 - schema files not sensitive
 		return fmt.Errorf("writing schema to %s: %w", destPath, err)
 	}
 
@@ -111,9 +111,9 @@ func convertToJSONSchema(policyDef interface{}, allSchemas map[string]interface{
 		shortName := strings.TrimPrefix(typeName, "microsoft.graph.")
 		definitions[shortName] = map[string]interface{}{
 			"type":                 "object",
-			"description":         descriptionFrom(def),
+			"description":          descriptionFrom(def),
 			"additionalProperties": true,
-			"properties":          defProps,
+			"properties":           defProps,
 		}
 	}
 

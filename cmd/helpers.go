@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log"
 
@@ -40,8 +41,8 @@ func runForTenants(
 		}
 
 		if err := fn(ctx, tenantID, cred); err != nil {
-			exitErr, ok := err.(*types.ExitError)
-			if !ok {
+			var exitErr *types.ExitError
+			if !errors.As(err, &exitErr) {
 				// Non-ExitError is fatal
 				return err
 			}
@@ -63,18 +64,5 @@ func runForTenants(
 		}
 	}
 
-	return nil
-}
-
-// requireApproveInCI returns a validation error if CI mode is active but
-// --auto-approve was not provided. This guards write operations (apply, rollback)
-// from running unattended without explicit approval.
-func requireApproveInCI(ciMode, autoApprove bool) error {
-	if ciMode && !autoApprove {
-		return &types.ExitError{
-			Code:    types.ExitValidationError,
-			Message: "--ci mode requires --auto-approve for write operations",
-		}
-	}
 	return nil
 }

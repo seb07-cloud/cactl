@@ -239,6 +239,9 @@ func runApply(cmd *cobra.Command, args []string) error {
 
 			fmt.Fprintln(os.Stdout, output.FormatApplied(reconcile.ActionRecreate, fmt.Sprintf("%s (%s -> %s)", action.Slug, currentVersion, newVersion), useColor))
 			recreated++
+
+		case reconcile.ActionNoop, reconcile.ActionUntracked, reconcile.ActionDuplicate:
+			continue
 		}
 	}
 
@@ -283,7 +286,7 @@ func confirmExplicitFromReader(prompt string, r io.Reader) bool {
 
 // filterActionable returns only actions that require Graph API writes.
 func filterActionable(actions []reconcile.PolicyAction) []reconcile.PolicyAction {
-	var result []reconcile.PolicyAction
+	result := make([]reconcile.PolicyAction, 0, len(actions))
 	for _, a := range actions {
 		if a.Action == reconcile.ActionCreate || a.Action == reconcile.ActionUpdate || a.Action == reconcile.ActionRecreate {
 			result = append(result, a)

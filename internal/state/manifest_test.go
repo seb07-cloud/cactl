@@ -47,7 +47,7 @@ func TestManifestRoundTrip(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, m.SchemaVersion, got.SchemaVersion)
 	assert.Equal(t, m.Tenant, got.Tenant)
-	assert.Equal(t, len(m.Policies), len(got.Policies))
+	assert.Len(t, got.Policies, len(m.Policies))
 	assert.Equal(t, m.Policies["policy-a"], got.Policies["policy-a"])
 	assert.Equal(t, m.Policies["policy-b"], got.Policies["policy-b"])
 }

@@ -215,8 +215,8 @@ func TestCheckOverlyBroad(t *testing.T) {
 				"state": "enabled",
 				"conditions": map[string]interface{}{
 					"users": map[string]interface{}{
-						"includeUsers": []interface{}{"All"},
-						"excludeUsers": []interface{}{},
+						"includeUsers":  []interface{}{"All"},
+						"excludeUsers":  []interface{}{},
 						"excludeGroups": []interface{}{},
 					},
 				},

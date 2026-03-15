@@ -146,7 +146,7 @@ func TestCreatePolicy(t *testing.T) {
 			// Actual create
 			var body map[string]interface{}
 			err := json.NewDecoder(r.Body).Decode(&body)
-			require.NoError(t, err)
+			assert.NoError(t, err)
 			assert.Equal(t, "New Policy", body["displayName"])
 
 			w.WriteHeader(http.StatusCreated)
@@ -270,7 +270,7 @@ func TestExecuteBatch(t *testing.T) {
 
 		var batchReq BatchRequest
 		err := json.NewDecoder(r.Body).Decode(&batchReq)
-		require.NoError(t, err)
+		assert.NoError(t, err)
 		assert.Len(t, batchReq.Requests, 2)
 
 		resp := BatchResponse{
@@ -339,9 +339,9 @@ func (m *MockGraphClient) GetPolicy(ctx context.Context, policyID string) (*Poli
 
 func TestMockGraphClient(t *testing.T) {
 	tests := []struct {
-		name      string
-		mock      *MockGraphClient
-		run       func(t *testing.T, c GraphClient)
+		name string
+		mock *MockGraphClient
+		run  func(t *testing.T, c GraphClient)
 	}{
 		{
 			name: "ListPolicies returns expected policies",

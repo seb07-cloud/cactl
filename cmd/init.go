@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"os"
 	"os/exec"
@@ -69,21 +70,21 @@ func runInit(cmd *cobra.Command, args []string) error {
 	}
 
 	// Step 3: Create .cactl directory.
-	if err := os.MkdirAll(cactlDir, 0755); err != nil {
+	if err := os.MkdirAll(cactlDir, 0750); err != nil { //nolint:gosec // G301 - workspace directory
 		return fmt.Errorf("creating %s directory: %w", cactlDir, err)
 	}
 
 	// Step 4: Update .gitignore BEFORE creating config.yaml (CONF-03 order).
 	if err := ensureGitignore(); err != nil {
 		// Clean up .cactl dir on failure
-		os.RemoveAll(cactlDir)
+		_ = os.RemoveAll(cactlDir)
 		return fmt.Errorf("updating .gitignore: %w", err)
 	}
 
 	// Step 5: Write .cactl/config.yaml with default content.
 	cfgPath := cactlDir + "/" + configFileName
-	if err := os.WriteFile(cfgPath, []byte(defaultConfig), 0644); err != nil {
-		os.RemoveAll(cactlDir)
+	if err := os.WriteFile(cfgPath, []byte(defaultConfig), 0600); err != nil {
+		_ = os.RemoveAll(cactlDir)
 		return fmt.Errorf("writing config file: %w", err)
 	}
 
@@ -92,7 +93,7 @@ func runInit(cmd *cobra.Command, args []string) error {
 	usedFallback, err := schema.FetchOrFallback(schemaPath)
 	if err != nil {
 		// Even embedded write failed -- this is fatal
-		os.RemoveAll(cactlDir)
+		_ = os.RemoveAll(cactlDir)
 		return fmt.Errorf("writing schema: %w", err)
 	}
 	if usedFallback {
@@ -111,7 +112,7 @@ func runInit(cmd *cobra.Command, args []string) error {
 // isGitTracked returns true if the given path is tracked by Git.
 // Returns false if git is not available or the file is not tracked.
 func isGitTracked(path string) bool {
-	cmd := exec.Command("git", "ls-files", "--error-unmatch", path)
+	cmd := exec.Command("git", "ls-files", "--error-unmatch", path) //nolint:gosec // G204 - hardcoded binary
 	cmd.Stdout = nil
 	cmd.Stderr = nil
 	err := cmd.Run()
@@ -125,8 +126,8 @@ func ensureGitignore() error {
 	const header = "# cactl workspace"
 
 	// Read existing .gitignore if it exists
-	existing, err := os.ReadFile(gitignoreFile)
-	if err != nil && !os.IsNotExist(err) {
+	existing, err := os.ReadFile(gitignoreFile) //nolint:gosec // G304 - path from workspace config
+	if err != nil && !errors.Is(err, os.ErrNotExist) {
 		return fmt.Errorf("reading .gitignore: %w", err)
 	}
 
@@ -146,10 +147,10 @@ func ensureGitignore() error {
 			content += "\n"
 		}
 		content += "\n" + header + "\n" + entry + "\n"
-		return os.WriteFile(gitignoreFile, []byte(content), 0644)
+		return os.WriteFile(gitignoreFile, []byte(content), 0644) //nolint:gosec // G306 - not sensitive
 	}
 
 	// Create new .gitignore
 	content := header + "\n" + entry + "\n"
-	return os.WriteFile(gitignoreFile, []byte(content), 0644)
+	return os.WriteFile(gitignoreFile, []byte(content), 0644) //nolint:gosec // G306 - not sensitive
 }

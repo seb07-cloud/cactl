@@ -1,7 +1,5 @@
 package testengine
 
-import "strings"
-
 // matchUsers checks if the sign-in context user matches the policy's user conditions.
 // Include logic: user matches if they appear in ANY include list (users OR groups OR roles).
 // Exclude logic: user is excluded if they match ANY exclude list.
@@ -317,25 +315,6 @@ func locationValues(location string) []string {
 
 // --- Helpers (copied from internal/validate to avoid import coupling) ---
 
-// getNestedValue walks a dot-separated path in a nested map and returns the value.
-func getNestedValue(data map[string]interface{}, dotPath string) interface{} {
-	parts := splitPath(dotPath)
-	var current interface{} = data
-
-	for _, part := range parts {
-		m, ok := current.(map[string]interface{})
-		if !ok {
-			return nil
-		}
-		current, ok = m[part]
-		if !ok {
-			return nil
-		}
-	}
-
-	return current
-}
-
 // getNestedMap walks a dot-separated path and returns the value as a map, or nil.
 func getNestedMap(data map[string]interface{}, key string) map[string]interface{} {
 	val, ok := data[key]
@@ -369,12 +348,4 @@ func getStringSlice(data map[string]interface{}, key string) []string {
 	}
 
 	return result
-}
-
-// splitPath splits a dot-separated path into parts.
-func splitPath(path string) []string {
-	if path == "" {
-		return nil
-	}
-	return strings.Split(path, ".")
 }

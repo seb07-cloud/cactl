@@ -62,7 +62,7 @@ func LoadFromGlobal() (*types.Config, error) {
 // (az CLI not installed, not logged in, etc.) — callers treat this as a
 // best-effort fallback.
 func resolveAzCLITenant() string {
-	out, err := exec.Command("az", "account", "show", "--query", "tenantId", "-o", "tsv").Output()
+	out, err := exec.Command("az", "account", "show", "--query", "tenantId", "-o", "tsv").Output() //nolint:gosec // G204 - hardcoded binary
 	if err != nil {
 		return ""
 	}
@@ -73,4 +73,3 @@ func resolveAzCLITenant() string {
 	}
 	return tid
 }
-

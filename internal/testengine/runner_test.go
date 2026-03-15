@@ -183,7 +183,7 @@ func TestFilterPolicies(t *testing.T) {
 
 	// No match
 	filtered = filterPolicies(all, []string{"cap999"})
-	assert.Len(t, filtered, 0)
+	assert.Empty(t, filtered)
 }
 
 func TestContainsAllControls(t *testing.T) {

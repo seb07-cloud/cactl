@@ -18,7 +18,7 @@ type GitBackend struct {
 // NewGitBackend creates a new GitBackend rooted at the given repo directory.
 // It validates that the directory is a valid Git repository.
 func NewGitBackend(repoDir string) (*GitBackend, error) {
-	cmd := exec.Command("git", "rev-parse", "--git-dir")
+	cmd := exec.Command("git", "rev-parse", "--git-dir") //nolint:gosec // G204 - hardcoded binary
 	cmd.Dir = repoDir
 	if out, err := cmd.CombinedOutput(); err != nil {
 		return nil, fmt.Errorf("not a git repository (%s): %s: %w", repoDir, strings.TrimSpace(string(out)), err)
@@ -70,7 +70,7 @@ func (b *GitBackend) CreateVersionTag(tenantID, slug, version, blobHash, message
 		existing, err := b.tagTarget(tagName)
 		if err != nil {
 			// Tag doesn't exist — create it
-			cmd := exec.Command("git", "tag", "-a", tagName, blobHash, "-m", message)
+			cmd := exec.Command("git", "tag", "-a", tagName, blobHash, "-m", message) //nolint:gosec // G204 - hardcoded binary
 			cmd.Dir = b.repoDir
 			if out, err := cmd.CombinedOutput(); err != nil {
 				return "", fmt.Errorf("creating tag %s: %s: %w", tagName, strings.TrimSpace(string(out)), err)
@@ -97,14 +97,14 @@ func bumpPatch(version string) string {
 		return version + ".1"
 	}
 	patch := 0
-	fmt.Sscanf(parts[2], "%d", &patch)
+	_, _ = fmt.Sscanf(parts[2], "%d", &patch)
 	return fmt.Sprintf("%s.%s.%d", parts[0], parts[1], patch+1)
 }
 
 // tagTarget returns the blob hash that an annotated tag points to.
 // Returns an error if the tag does not exist.
 func (b *GitBackend) tagTarget(tagName string) (string, error) {
-	cmd := exec.Command("git", "rev-parse", tagName+"^{}")
+	cmd := exec.Command("git", "rev-parse", tagName+"^{}") //nolint:gosec // G204 - hardcoded binary
 	cmd.Dir = b.repoDir
 	out, err := cmd.Output()
 	if err != nil {
@@ -115,7 +115,7 @@ func (b *GitBackend) tagTarget(tagName string) (string, error) {
 
 // hashObject writes data as a blob to the Git object store and returns the SHA.
 func (b *GitBackend) hashObject(data []byte) (string, error) {
-	cmd := exec.Command("git", "hash-object", "-w", "--stdin")
+	cmd := exec.Command("git", "hash-object", "-w", "--stdin") //nolint:gosec // G204 - hardcoded binary
 	cmd.Dir = b.repoDir
 	cmd.Stdin = bytes.NewReader(data)
 	out, err := cmd.Output()
@@ -127,7 +127,7 @@ func (b *GitBackend) hashObject(data []byte) (string, error) {
 
 // updateRef points a ref to the given hash.
 func (b *GitBackend) updateRef(ref, hash string) error {
-	cmd := exec.Command("git", "update-ref", ref, hash)
+	cmd := exec.Command("git", "update-ref", ref, hash) //nolint:gosec // G204 - hardcoded binary
 	cmd.Dir = b.repoDir
 	if out, err := cmd.CombinedOutput(); err != nil {
 		return fmt.Errorf("git update-ref: %s: %w", strings.TrimSpace(string(out)), err)
@@ -137,7 +137,7 @@ func (b *GitBackend) updateRef(ref, hash string) error {
 
 // catFile reads the blob content at the given ref.
 func (b *GitBackend) catFile(ref string) ([]byte, error) {
-	cmd := exec.Command("git", "cat-file", "blob", ref)
+	cmd := exec.Command("git", "cat-file", "blob", ref) //nolint:gosec // G204 - hardcoded binary
 	cmd.Dir = b.repoDir
 	out, err := cmd.Output()
 	if err != nil {
@@ -148,7 +148,7 @@ func (b *GitBackend) catFile(ref string) ([]byte, error) {
 
 // forEachRef lists refs under the given prefix and extracts the slug (last path component).
 func (b *GitBackend) forEachRef(prefix string) ([]string, error) {
-	cmd := exec.Command("git", "for-each-ref", "--format=%(refname)", prefix)
+	cmd := exec.Command("git", "for-each-ref", "--format=%(refname)", prefix) //nolint:gosec // G204 - hardcoded binary
 	cmd.Dir = b.repoDir
 	out, err := cmd.Output()
 	if err != nil {
@@ -187,7 +187,7 @@ type VersionTag struct {
 // Returns an empty slice (not nil) when no tags exist.
 func (b *GitBackend) ListVersionTags(tenantID, slug string) ([]VersionTag, error) {
 	prefix := fmt.Sprintf("refs/tags/cactl/%s/%s/", tenantID, slug)
-	cmd := exec.Command("git", "for-each-ref",
+	cmd := exec.Command("git", "for-each-ref", //nolint:gosec // G204 - hardcoded binary
 		"--format=%(refname:strip=5)\t%(creatordate:iso)\t%(contents:lines=1)",
 		"--sort=-version:refname",
 		prefix,
@@ -236,7 +236,7 @@ func (b *GitBackend) ListVersionTags(tenantID, slug string) ([]VersionTag, error
 // Uses ^{} to dereference the annotated tag to the underlying blob.
 func (b *GitBackend) ReadTagBlob(tenantID, slug, version string) ([]byte, error) {
 	tagName := fmt.Sprintf("cactl/%s/%s/%s", tenantID, slug, version)
-	cmd := exec.Command("git", "cat-file", "blob", tagName+"^{}")
+	cmd := exec.Command("git", "cat-file", "blob", tagName+"^{}") //nolint:gosec // G204 - hardcoded binary
 	cmd.Dir = b.repoDir
 	out, err := cmd.Output()
 	if err != nil {

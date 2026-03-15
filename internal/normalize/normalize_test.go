@@ -119,7 +119,7 @@ func TestNormalize(t *testing.T) {
 `,
 		},
 		{
-			name: "pretty-print with 2-space indent and trailing newline",
+			name:  "pretty-print with 2-space indent and trailing newline",
 			input: `{"displayName":"Test","state":"enabled"}`,
 			expected: `{
   "displayName": "Test",

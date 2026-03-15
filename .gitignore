@@ -4,7 +4,7 @@ cactl
 .cactl/config.yaml
 
 /policies
-.planning/
+.planning
 .claude
 
 .DS_Store

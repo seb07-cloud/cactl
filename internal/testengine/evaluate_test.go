@@ -280,12 +280,12 @@ func TestEvaluatePolicy_SessionControls(t *testing.T) {
 
 func TestEvaluateAll(t *testing.T) {
 	tests := []struct {
-		name             string
-		policies         []PolicyWithSlug
-		ctx              *SignInContext
-		wantResult       EvalResult
-		wantCtrls        []string
-		wantMatchCount   int
+		name           string
+		policies       []PolicyWithSlug
+		ctx            *SignInContext
+		wantResult     EvalResult
+		wantCtrls      []string
+		wantMatchCount int
 	}{
 		{
 			name: "block wins over grant",
@@ -327,8 +327,8 @@ func TestEvaluateAll(t *testing.T) {
 					},
 				},
 			},
-			ctx:           &SignInContext{User: "user-1", Application: "app-1"},
-			wantResult:    ResultBlock,
+			ctx:            &SignInContext{User: "user-1", Application: "app-1"},
+			wantResult:     ResultBlock,
 			wantMatchCount: 2,
 		},
 		{
@@ -371,9 +371,9 @@ func TestEvaluateAll(t *testing.T) {
 					},
 				},
 			},
-			ctx:           &SignInContext{User: "user-1", Application: "app-1"},
-			wantResult:    ResultGrant,
-			wantCtrls:     []string{"mfa", "compliantDevice"},
+			ctx:            &SignInContext{User: "user-1", Application: "app-1"},
+			wantResult:     ResultGrant,
+			wantCtrls:      []string{"mfa", "compliantDevice"},
 			wantMatchCount: 2,
 		},
 		{
@@ -398,8 +398,8 @@ func TestEvaluateAll(t *testing.T) {
 					},
 				},
 			},
-			ctx:           &SignInContext{User: "user-1", Application: "app-1"},
-			wantResult:    ResultNotApplicable,
+			ctx:            &SignInContext{User: "user-1", Application: "app-1"},
+			wantResult:     ResultNotApplicable,
 			wantMatchCount: 0,
 		},
 		{
@@ -431,9 +431,9 @@ func TestEvaluateAll(t *testing.T) {
 					},
 				},
 			},
-			ctx:           &SignInContext{User: "user-1", Application: "app-1"},
-			wantResult:    ResultGrant,
-			wantCtrls:     []string{"mfa"},
+			ctx:            &SignInContext{User: "user-1", Application: "app-1"},
+			wantResult:     ResultGrant,
+			wantCtrls:      []string{"mfa"},
 			wantMatchCount: 1,
 		},
 	}
