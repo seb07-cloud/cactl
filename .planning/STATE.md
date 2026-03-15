@@ -139,6 +139,7 @@ Recent decisions affecting current work:
 
 - Phase 6 added: Point-in-Time Restore - git history timeline, point-in-time policy restore with full diffs
 - Phase 7 added: Codebase DRY Simplification - aggressive multi-pass deduplication across entire codebase
+- Phase 8 added: Policy Test Engine - declarative test scenarios with local CA policy evaluation engine, YAML test runner, and CI integration
 
 ### Pending Todos
 

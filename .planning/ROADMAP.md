@@ -18,6 +18,8 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 4: Drift, Rollback, and Status** - Drift detection, version rollback, status dashboard (completed 2026-03-05)
 - [x] **Phase 5: Production Readiness** - Multi-tenant, CI/CD, code quality, docs, binary distribution (completed 2026-03-05)
 - [ ] **Phase 6: Point-in-Time Restore** - Git history timeline, point-in-time policy restore with full diffs (not started)
+- [x] **Phase 7: Codebase DRY Simplification** - Behavior-preserving refactoring, shared pipeline helpers, mirror type elimination (completed 2026-03-15)
+- [ ] **Phase 8: Policy Test Engine** - Declarative test scenarios with local CA policy evaluation engine, YAML test runner, and CI integration (not started)
 
 ## Phase Details
 
@@ -113,7 +115,7 @@ Plans:
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7
+Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -124,6 +126,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7
 | 5. Production Readiness | 0/4 | Complete    | 2026-03-05 |
 | 6. Point-in-Time Restore | 0/2 | Not Started | - |
 | 7. Codebase DRY Simplification | 0/3 | Complete    | 2026-03-15 |
+| 8. Policy Test Engine | 0/0 | Not Started | - |
 
 ### Phase 6: Point-in-Time Restore
 **Goal**: User can restore any policy to its state at any previous point in time, with full diff preview and confirmation
@@ -143,3 +146,11 @@ Plans:
 - [ ] 07-01-PLAN.md — Extract CommandPipeline struct with shared bootstrap, normalization, semver, validation, resolution, and rendering helpers; refactor plan.go
 - [ ] 07-02-PLAN.md — Refactor apply/drift/rollback to use pipeline, consolidate apply action handlers, eliminate bumpPatchVersion duplicate
 - [ ] 07-03-PLAN.md — Eliminate mirror type definitions (semver.FieldDiff, validate.ActionType), consolidate history JSON structure and diff summary logic
+
+### Phase 8: Policy Test Engine
+**Goal:** User can write declarative YAML test scenarios that assert CA policy behavior and run `cactl test` to verify policies produce expected outcomes locally without Azure API calls
+**Depends on:** Phase 7
+**Plans:** 0 plans
+
+Plans:
+- [ ] TBD (run /gsd:plan-phase 8 to break down)
