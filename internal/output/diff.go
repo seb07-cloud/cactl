@@ -335,6 +335,8 @@ func RenderPlanJSON(w io.Writer, actions []reconcile.PolicyAction, validations [
 				diffType = "added"
 			case reconcile.DiffRemoved:
 				diffType = "removed"
+			case reconcile.DiffChanged:
+				// already set above
 			}
 			ao.Diffs = append(ao.Diffs, types.DiffOutput{
 				Path:     d.Path,

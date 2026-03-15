@@ -148,11 +148,9 @@ func runApply(cmd *cobra.Command, args []string) error {
 					}
 				}
 			}
-		} else {
-			if !confirm("Do you want to apply these changes? [Y/n]: ") {
-				fmt.Fprintln(os.Stdout, "Apply cancelled.")
-				return nil
-			}
+		} else if !confirm("Do you want to apply these changes? [Y/n]: ") {
+			fmt.Fprintln(os.Stdout, "Apply cancelled.")
+			return nil
 		}
 	}
 

@@ -207,6 +207,8 @@ func TestReconcileIncludesDuplicates(t *testing.T) {
 			duplicateCount++
 		case ActionUntracked:
 			untrackedCount++
+		case ActionNoop, ActionCreate, ActionUpdate, ActionRecreate:
+			// not relevant for this test
 		}
 	}
 	if duplicateCount != 1 {

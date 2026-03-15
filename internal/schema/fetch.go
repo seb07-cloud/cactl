@@ -288,7 +288,7 @@ func FetchOrFallback(destPath string) (usedFallback bool, err error) {
 	if fetchErr := Fetch(destPath); fetchErr != nil {
 		// Network fetch failed; use embedded fallback
 		if writeErr := WriteEmbedded(destPath); writeErr != nil {
-			return true, fmt.Errorf("embedded schema fallback failed: %w (fetch error: %v)", writeErr, fetchErr)
+			return true, fmt.Errorf("embedded schema fallback failed: %w (fetch error: %w)", writeErr, fetchErr)
 		}
 		return true, nil
 	}

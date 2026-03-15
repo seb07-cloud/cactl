@@ -167,6 +167,9 @@ func (p *CommandPipeline) ComputeSemverBumps(actions []reconcile.PolicyAction, o
 			}
 			actions[i].VersionFrom = currentVersion
 			actions[i].VersionTo = newVersion
+
+		case reconcile.ActionNoop, reconcile.ActionCreate, reconcile.ActionUntracked, reconcile.ActionDuplicate:
+			continue
 		}
 	}
 	return nil
