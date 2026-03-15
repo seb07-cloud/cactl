@@ -298,7 +298,7 @@ func DiffSummary(diffs []reconcile.FieldDiff) string {
 		suffix = ", ..."
 	}
 
-	return fmt.Sprintf("%d fields changed: %s%s", len(diffs), strings.Join(display, ", "), suffix)
+	return fmt.Sprintf("%d fields changed: %s%s", len(paths), strings.Join(display, ", "), suffix)
 }
 
 // RenderPlanJSON renders the plan output as JSON to the given writer.

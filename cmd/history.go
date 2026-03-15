@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 	"sort"
-	"strings"
 	"text/tabwriter"
 
 	"github.com/seb07-cloud/cactl/internal/config"
@@ -16,6 +15,15 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
+
+// historyEntry is the JSON structure for version history entries.
+// Used by both history and status --history commands.
+type historyEntry struct {
+	Version   string `json:"version"`
+	Timestamp string `json:"timestamp"`
+	Message   string `json:"message"`
+	Changes   string `json:"changes,omitempty"`
+}
 
 var historyCmd = &cobra.Command{
 	Use:   "history",
@@ -165,12 +173,6 @@ func runHistorySinglePolicy(backend *state.GitBackend, cfg *types.Config, manife
 	diffSummaries := computeDiffSummaries(backend, cfg.Tenant, slug, tags)
 
 	if jsonOutput {
-		type historyEntry struct {
-			Version   string `json:"version"`
-			Timestamp string `json:"timestamp"`
-			Message   string `json:"message"`
-			Changes   string `json:"changes"`
-		}
 		entries := make([]historyEntry, len(tags))
 		for i, t := range tags {
 			entries[i] = historyEntry{
@@ -250,30 +252,7 @@ func computeDiffSummaries(backend *state.GitBackend, tenant, slug string, tags [
 
 		// ComputeDiff: current is desired (newer), previous is actual (older)
 		diffs := reconcile.ComputeDiff(currentMap, previousMap)
-		if len(diffs) == 0 {
-			summaries[i] = "no changes"
-			continue
-		}
-
-		// Collect top-level field names (first segment of dot path), deduplicate
-		fieldSet := make(map[string]struct{})
-		for _, d := range diffs {
-			parts := strings.SplitN(d.Path, ".", 2)
-			fieldSet[parts[0]] = struct{}{}
-		}
-		fields := make([]string, 0, len(fieldSet))
-		for f := range fieldSet {
-			fields = append(fields, f)
-		}
-		sort.Strings(fields)
-
-		// Build summary: "{N} fields changed: field1, field2, ..."
-		fieldCount := len(fields)
-		if fieldCount <= 3 {
-			summaries[i] = fmt.Sprintf("%d fields changed: %s", fieldCount, strings.Join(fields, ", "))
-		} else {
-			summaries[i] = fmt.Sprintf("%d fields changed: %s, ...", fieldCount, strings.Join(fields[:3], ", "))
-		}
+		summaries[i] = output.DiffSummary(diffs)
 	}
 
 	return summaries

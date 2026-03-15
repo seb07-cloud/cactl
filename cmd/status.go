@@ -49,7 +49,7 @@ func runStatus(cmd *cobra.Command, args []string) error {
 	if cfg.Tenant == "" {
 		return &types.ExitError{
 			Code:    types.ExitFatalError,
-			Message: "tenant is required: use --tenant or set CACTL_TENANT",
+			Message: "tenant is required: use --tenant, set CACTL_TENANT, or log in with az login",
 		}
 	}
 
@@ -174,12 +174,8 @@ func runStatusHistory(backend *state.GitBackend, cfg *types.Config, slug string,
 	}
 
 	if cfg.Output == "json" {
-		// For JSON history, output a simple JSON array of version info
-		type historyEntry struct {
-			Version   string `json:"version"`
-			Timestamp string `json:"timestamp"`
-			Message   string `json:"message"`
-		}
+		// Use shared historyEntry from history.go (Changes is omitempty, so
+		// status --history JSON output remains unchanged with no "changes" field).
 		histEntries := make([]historyEntry, len(tags))
 		for i, t := range tags {
 			histEntries[i] = historyEntry{
